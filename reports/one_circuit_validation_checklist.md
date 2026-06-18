@@ -28,6 +28,12 @@ mkdir -p reports/before_after reports/logs
 
 ## Static Preflight
 
+- [ ] Discover available inputs and suggested commands.
+
+```sh
+python3 scripts/discover_validation_inputs.py --root . --include-common
+```
+
 - [ ] Run the full prepared wrapper if all inputs are available:
 
 ```sh

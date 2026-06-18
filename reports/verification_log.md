@@ -112,3 +112,6 @@ Date: 2026-06-18
 | `python3 scripts/inspect_spice.py examples/umich_test_case/umich_test_case.sp` | Passed. Reported hierarchical subckts, MOS/cap/X instance counts, and model references. |
 | `python3 scripts/inspect_gds_layers.py --help && python3 scripts/inspect_spice.py --help` | Passed. Inspectors expose help text. |
 | `python3 -m py_compile scripts/inspect_spice.py scripts/inspect_gds_layers.py` | Passed. |
+| `python3 scripts/discover_validation_inputs.py --root . --limit 12` | Passed. Found example SPICE candidates and no GDS/open_pdks candidates; reported missing Magic/Netgen/ALIGN CLI. |
+| `python3 scripts/discover_validation_inputs.py --help` | Passed. Discovery helper exposes help text. |
+| `python3 -m py_compile scripts/discover_validation_inputs.py` | Passed. |

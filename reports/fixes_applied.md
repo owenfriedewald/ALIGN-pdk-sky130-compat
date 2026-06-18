@@ -260,3 +260,32 @@ python3 scripts/inspect_gds_layers.py --help
 
 Remaining limitations:
 `inspect_gds_layers.py` requires a KLayout Python module and a real GDS file.
+
+## 9. Validation Input Discovery Helper
+
+Issue:
+When generated artifacts are later added somewhere in the workspace or common PDK directories, manually finding the right GDS/SPICE/open_pdks tuple is error-prone.
+
+Source diagnostic:
+Long-run environment discovery requirements.
+
+Files changed:
+`scripts/discover_validation_inputs.py`
+
+Before behavior:
+Discovery used ad hoc `find` commands.
+
+Patch made:
+Added a helper that reports tool availability, scans roots for GDS/SPICE/open_pdks `sky130A` candidates, infers SPICE top cells, ranks real examples ahead of fixtures/PDK models, and prints a `run_one_circuit_validation.sh` command when it finds a complete tuple.
+
+Why the patch is safe:
+Read-only discovery only.
+
+How to verify:
+
+```sh
+python3 scripts/discover_validation_inputs.py --root . --limit 12
+```
+
+Remaining limitations:
+No complete validation tuple is currently present because GDS and open_pdks are missing.
