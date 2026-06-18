@@ -57,6 +57,7 @@ Verification and LVS-prep improvements:
 - Added `SKY130_PDK/openpdks_compat.json` as experimental compatibility metadata for layer maps, special layer notes, model aliases, and LVS parameter policy
 - Added official LVT/HVT and MIM capacitor model stubs to `SKY130_PDK/models.sp`
 - Updated model alias normalization to preserve LVT/HVT intent where official SkyWater names exist
+- Added SPICE and GDS inspection helpers: `scripts/inspect_spice.py`, `scripts/inspect_gds_layers.py`
 - Added fixture logs for summarizer smoke tests
 
 No `SKY130_PDK/layers.json` geometry/rule changes were applied. Current static comparison still indicates the main ALIGN abstract stack matches SkyWater GDS pairs when interpreted as `M1=li1`, `M2=met1`, etc.

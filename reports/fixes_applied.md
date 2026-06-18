@@ -229,3 +229,34 @@ Remaining limitations:
 Whether Magic extraction emits these exact variant model names depends on generated geometry/marker layers and the open_pdks Magic extraction setup.
 
 Whether ALIGN-generated MIM capacitor geometry matches official/open_pdks extraction still requires a generated capacitor layout and Magic/Netgen evidence.
+
+## 8. SPICE And GDS Inspection Helpers
+
+Issue:
+Once generated artifacts are provided, we need quick pre-Magic/pre-Netgen visibility into schematic top cells, pins, model usage, parameters, and streamed GDS layer/datatype usage.
+
+Source diagnostic:
+Pin/port, layer-map, and model/parameter mismatch classes.
+
+Files changed:
+`scripts/inspect_spice.py`
+`scripts/inspect_gds_layers.py`
+
+Before behavior:
+Top-cell/pin/model inspection required ad hoc `rg` commands, and there was no prepared GDS layer dump helper.
+
+Patch made:
+Added `inspect_spice.py` for subcircuits, pins, instance counts, model references, and parameter names. Added `inspect_gds_layers.py` to read a GDS with KLayout Python and compare used layer/datatype pairs against `SKY130_PDK/openpdks_compat.json`.
+
+Why the patch is safe:
+Read-only diagnostics only.
+
+How to verify:
+
+```sh
+python3 scripts/inspect_spice.py examples/inverter/inverter.sp
+python3 scripts/inspect_gds_layers.py --help
+```
+
+Remaining limitations:
+`inspect_gds_layers.py` requires a KLayout Python module and a real GDS file.

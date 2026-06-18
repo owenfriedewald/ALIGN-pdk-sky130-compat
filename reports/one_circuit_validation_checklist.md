@@ -56,6 +56,20 @@ python3 scripts/compare_layer_map.py \
   | tee reports/logs/${TOP}.layer_map_check.log
 ```
 
+- [ ] Inspect schematic top cell, pins, model usage, and parameters.
+
+```sh
+python3 scripts/inspect_spice.py "$SCHEMATIC_SPICE" \
+  | tee reports/logs/${TOP}.schematic_inspection.log
+```
+
+- [ ] If KLayout Python is available, inspect generated GDS layer/datatype usage before Magic.
+
+```sh
+python3 scripts/inspect_gds_layers.py "$LAYOUT_GDS" \
+  | tee reports/logs/${TOP}.gds_layer_inspection.log
+```
+
 - [ ] Check local model aliases and example parameter conventions.
 
 ```sh

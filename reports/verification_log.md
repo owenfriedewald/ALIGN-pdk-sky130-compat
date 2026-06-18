@@ -108,3 +108,7 @@ Date: 2026-06-18
 | `rg -n "cap_mim_m3_1\|cap_mim_m3_2\|model__cap_mim\|cap_mim" upstream/skywater-pdk/docs SKY130_PDK examples ...` | Passed. Confirmed official MIM cap names in SkyWater docs and existing ALIGN cap stub. |
 | `python3 -m json.tool SKY130_PDK/openpdks_compat.json` | Passed. Compatibility metadata JSON is valid. |
 | `python3 -m py_compile ...` | Passed after compatibility metadata/model-normalizer updates. |
+| `python3 scripts/inspect_spice.py examples/inverter/inverter.sp` | Passed. Reported inverter pins, two MOS instances, LVT aliases, and MOS params `l/nf/stack/w`. |
+| `python3 scripts/inspect_spice.py examples/umich_test_case/umich_test_case.sp` | Passed. Reported hierarchical subckts, MOS/cap/X instance counts, and model references. |
+| `python3 scripts/inspect_gds_layers.py --help && python3 scripts/inspect_spice.py --help` | Passed. Inspectors expose help text. |
+| `python3 -m py_compile scripts/inspect_spice.py scripts/inspect_gds_layers.py` | Passed. |
