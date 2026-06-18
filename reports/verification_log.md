@@ -1,0 +1,103 @@
+# Verification Log
+
+Date: 2026-06-18
+
+| Command | Outcome |
+|---|---|
+| `pwd && rg --files -g '!*~' \| sed -n '1,200p'` | Passed. Confirmed repo root and top-level tracked/untracked files. |
+| `find . -maxdepth 3 -type d \| sort \| sed -n '1,200p'` | Passed. Found `SKY130_PDK`, `context`, `examples`, and `upstream/skywater-pdk`. |
+| `git status --short` | Passed. Pre-existing untracked `.gitignore`, `ALIGN SKY130 Diagnostic Report.md:Zone.Identifier`, and `upstream/` observed. |
+| `find context -maxdepth 2 -type f -print` | Passed. Found `context/ALIGN SKY130 Diagnostic Report.md`. |
+| `sed -n '1,260p' 'context/ALIGN Sky130 Diagnostic Report.md'` | Failed. Requested capitalization did not match existing filename. |
+| `find SKY130_PDK -maxdepth 2 -type f -print \| sort` | Passed. Listed ALIGN-side PDK files. |
+| `find upstream -maxdepth 2 -type d -print \| sort` | Passed. Found `upstream/skywater-pdk`; no `upstream/open_pdks`. |
+| `sed -n '1,260p' 'context/ALIGN SKY130 Diagnostic Report.md'` | Passed. Read first part of diagnostic report. |
+| `sed -n '261,560p' 'context/ALIGN SKY130 Diagnostic Report.md'` | Passed. Read remainder of diagnostic report. |
+| `sed -n '1,220p' README.md` | Passed. Confirmed ALIGN-pdk-sky130 usage instructions. |
+| `sed -n '1,220p' SKY130_PDK/layers.json` | Passed. Inspected primary layer/rule encoding. |
+| `sed -n '221,520p' SKY130_PDK/layers.json` | Passed. Inspected remaining layers and helper entries. |
+| `sed -n '1,240p' SKY130_PDK/models.sp` | Passed. Inspected model aliases. |
+| `sed -n '1,240p' SKY130_PDK/mos.py` | Passed. Inspected MOS generator layer usage. |
+| `sed -n '1,220p' SKY130_PDK/Align_primitives.py` | Passed. Inspected primitive generation entrypoint. |
+| `find upstream -path '*sky130A.tech' -print` | Passed with no output. No Magic tech file found under `upstream/`. |
+| `find upstream -path '*setup.tcl' -o -path '*sky130A_setup.tcl' -o -path '*sky130A.magicrc' ...` | Passed with no output. No Netgen/Magic setup files found. |
+| `find upstream/skywater-pdk/libraries ...` | Passed with no output for shallow search. This SkyWater clone has docs but no obvious open_pdks-ready tech setup. |
+| `rg -n 'gds\|GDS\|li1\|mcon\|via1...' upstream/skywater-pdk/docs/rules ...` | Passed. Produced large output; relevant rule CSVs identified. |
+| `rg -n ... examples SKY130_PDK -g '*.sp' -g '*.py'` | Passed. Found mixed schematic model aliases and official Sky130 model names. |
+| `sed -n '1,80p' upstream/skywater-pdk/docs/rules/layers/table-c4b-layer-description.csv` | Passed. Inspected layer descriptions and GDS references. |
+| `sed -n '1,80p' ... p035-ct_dotdash.csv ... p038-m1_dotdash.csv ... p040-m2_dotdash.csv` | Passed. Confirmed mcon/met1/met2 rule values from SkyWater docs. |
+| `sed -n '1,80p' ... p039-via_dotdash.csv ... p041-via2_dotdash.csv ... p043-via4_dotdash.csv` | Partially failed. `p043-via4_dotdash.csv` does not exist; via/via2 sections read. |
+| `sed -n '1,80p' ... p042-via3_dotdash.csv` | Passed. Confirmed via3 cut/enclosure/spacing values. |
+| `sed -n '1,80p' ... p044-via4_dotdash.csv` | Passed. Confirmed via4 cut/enclosure/spacing values. |
+| `sed -n '1,80p' ... p035-li_dotdash_dotdash.csv` | Passed. Confirmed li1 width/spacing/area values. |
+| `rg -n 'met5\|via4\|via3...' ... gds_layers.csv ...` | Passed. Located official GDS mapping lines. |
+| `sed -n '1,45p' upstream/skywater-pdk/docs/rules/gds_layers.csv` | Passed. Confirmed official drawing-layer GDS pairs. |
+| `find . -maxdepth 3 -type f \( -name '*.sh' -o -name '*.py' ... \)` | Passed. Confirmed no existing DRC/LVS/PEX scripts. |
+| `find upstream -maxdepth 2 -type d -name 'open_pdks' -print` | Passed with no output. No open_pdks tree present. |
+| `git ls-files` | Passed. Listed tracked project files. |
+| `mkdir -p reports scripts tests/fixtures` | Passed. Created report/script/test directories. |
+| `python3 scripts/compare_layer_map.py` | Passed. Main route/contact stack matched SkyWater GDS docs under ALIGN abstraction; helper layers skipped with notes. |
+| `python3 scripts/normalize_netlist.py tests/fixtures/normalize_input.sp` | Passed. Printed expected normalized fixture to stdout. |
+| `python3 -m py_compile scripts/compare_layer_map.py scripts/normalize_netlist.py` | Passed. Python syntax check clean. |
+| `chmod +x scripts/compare_layer_map.py scripts/normalize_netlist.py` | Passed. Made helper scripts executable. |
+| `python3 scripts/normalize_netlist.py tests/fixtures/normalize_input.sp -o /tmp/align_sky130_normalized_fixture.sp` | Passed. Wrote normalized fixture. |
+| `diff -u tests/fixtures/normalize_expected.sp /tmp/align_sky130_normalized_fixture.sp` | Failed once because it was run in parallel before the output file existed. |
+| `ls -l /tmp/align_sky130_normalized_fixture.sp` | Passed after rerun. Confirmed output file exists. |
+| `diff -u tests/fixtures/normalize_expected.sp /tmp/align_sky130_normalized_fixture.sp` | Passed after sequential rerun. Fixture output matches expected. |
+| `git diff --stat` | Passed with no output because all new files are currently untracked. |
+| `git status --short` | Passed. New `scripts/`, `tests/`, and pre-existing untracked files reported. |
+| `python3 scripts/compare_layer_map.py` | Passed in final verification. Main route/contact stack matched SkyWater GDS docs under ALIGN abstraction. |
+| `python3 -m py_compile scripts/compare_layer_map.py scripts/normalize_netlist.py` | Passed in final verification. Generated `scripts/__pycache__`, later removed. |
+| `python3 scripts/normalize_netlist.py tests/fixtures/normalize_input.sp -o /tmp/align_sky130_normalized_fixture.sp` | Passed in final verification. |
+| `git diff --check` | Passed. Note: new files are untracked, so this only checks tracked diffs. |
+| `diff -u tests/fixtures/normalize_expected.sp /tmp/align_sky130_normalized_fixture.sp` | Passed in final verification. |
+| `find reports scripts tests -type f -print \| sort` | Passed. Revealed generated `scripts/__pycache__` files from `py_compile`. |
+| `rm -rf scripts/__pycache__` | Passed with approval. Removed generated bytecode cache from verification. |
+| `find upstream SKY130_PDK context examples -type f (...)` | Passed. Only `SKY130_PDK/models.sp` and `upstream/skywater-pdk/docs/rules/gds_layers.csv` matched exact runtime/reference filename patterns; no Magic tech/rc or Netgen setup found. |
+| `find upstream/skywater-pdk -type f (...) \| rg ...` | Passed. Located relevant SkyWater verification docs, layer tables, rule CSVs, and device-detail docs. |
+| `rg -n "sky130_fd_pr__\|\\.model\|\\.subckt..." SKY130_PDK examples upstream/skywater-pdk/docs ...` | Passed. Found ALIGN model definitions, example model usage, and official-looking SkyWater model names in docs. |
+| `find upstream -maxdepth 3 -type d -iname '*open*' -o -iname '*pdks*'` | Passed with no output. No local `upstream/open_pdks` tree found. |
+| `python3 scripts/check_verification_refs.py` | Expected failure. Reported missing Magic tech, Magic rc, Netgen setup Tcl, and Magic extraction runtime files; found SkyWater `gds_layers.csv`, docs, and local SPICE files. |
+| `python3 scripts/compare_model_names.py` | Passed. Found 13 ALIGN `.model` definitions, 6 MOS model names used by examples, 10 ALIGN aliases not seen as official SkyWater names, and no example MOS models missing from `SKY130_PDK/models.sp`. |
+| `python3 scripts/check_verification_refs.py --help && python3 scripts/compare_model_names.py --help && python3 scripts/normalize_netlist.py --help` | Passed. Help output available for new and existing helpers. |
+| `chmod +x scripts/check_verification_refs.py scripts/compare_model_names.py` | Passed. Made new helper scripts executable. |
+| `python3 scripts/check_verification_refs.py --help && python3 scripts/compare_model_names.py --help && python3 scripts/compare_layer_map.py --help && python3 scripts/normalize_netlist.py --help` | Passed. All helper scripts expose `--help`. |
+| `python3 scripts/check_verification_refs.py` | Expected failure in final validation for missing required runtime files. |
+| `python3 scripts/compare_model_names.py` | Passed in final validation. |
+| `python3 -m py_compile scripts/check_verification_refs.py scripts/compare_model_names.py scripts/compare_layer_map.py scripts/normalize_netlist.py` | Passed. Generated `scripts/__pycache__`, later removed. |
+| `python3 scripts/compare_layer_map.py` | Passed in final validation. Main route/contact stack matched SkyWater docs under ALIGN abstraction. |
+| `python3 scripts/normalize_netlist.py tests/fixtures/normalize_input.sp -o /tmp/align_sky130_normalized_fixture.sp` | Passed in final validation. |
+| `git diff --check` | Passed. Note: most current work is untracked, so this does not inspect untracked file content. |
+| `find scripts -type d -name __pycache__ -print` | Found generated `scripts/__pycache__` after `py_compile`. |
+| `rm -rf scripts/__pycache__` | Passed with approval. Removed generated bytecode cache. |
+| `diff -u tests/fixtures/normalize_expected.sp /tmp/align_sky130_normalized_fixture.sp` | Passed. Normalizer fixture output matches expected output. |
+| `find scripts -type d -name __pycache__ -print` | Passed with no output after cleanup. |
+| `git status --short` | Passed at long-run start. Worktree had untracked prior reports/scripts/tests/upstream and `.gitignore`. |
+| `git rev-parse HEAD` | Passed at long-run start. Starting commit: `0f04c647bf6767c79fb8f7eab1ac64306888b4db`. |
+| `git branch --show-current` | Passed at long-run start. Initial branch before switch: `sky130-openpdks-verification-compat`. |
+| `git switch -c sky130-compat-longrun` | Failed inside sandbox because `.git` ref writes were read-only. |
+| `git switch -c sky130-compat-longrun` with escalation | Passed. Working branch for long run: `sky130-compat-longrun`. |
+| `find . upstream reports examples outputs results SKY130_PDK -type f (...)` | Passed. No generated GDS/MAG files found; local SPICE examples and `SKY130_PDK/models.sp` found. |
+| `find ~/data ~/share/pdk ~/data/pdk ~/data/open_pdks ~/pdks /usr/local/share/pdk /usr/share/pdk -maxdepth 5 -type f (...)` | Passed with no output. No common-path `sky130A.tech`, Magic rc, Netgen setup, GDS, or SPICE runtime files found. |
+| `find ~/data ~/share/pdk ~/data/pdk ~/data/open_pdks ~/pdks /usr/local/share/pdk /usr/share/pdk -maxdepth 4 -type d (...)` | Passed with no output. No common-path open_pdks/sky130A install directory found. |
+| `command -v magic; command -v netgen; command -v schematic2layout.py; command -v klayout; command -v python3` | Passed. Found `/usr/bin/klayout` and `/usr/bin/python3`; Magic, Netgen, and ALIGN CLI missing. |
+| `python3 scripts/check_verification_refs.py --search-common` | Expected failure. Reported missing Magic, Netgen, ALIGN CLI, open_pdks runtime files, and generated GDS; found SkyWater docs/layer map and local SPICE files. |
+| `chmod +x scripts/run_magic_drc.sh scripts/run_magic_extract.sh scripts/run_netgen_lvs.sh scripts/summarize_drc_log.py scripts/summarize_lvs_log.py ...` | Passed. Made helper scripts executable. |
+| `bash -n scripts/run_magic_drc.sh scripts/run_magic_extract.sh scripts/run_netgen_lvs.sh` | Passed. Shell syntax clean. |
+| `python3 -m py_compile scripts/check_verification_refs.py scripts/compare_layer_map.py scripts/compare_model_names.py scripts/normalize_netlist.py scripts/summarize_drc_log.py scripts/summarize_lvs_log.py` | Passed. Generated `scripts/__pycache__`, later removed. |
+| `scripts/run_magic_drc.sh --help && scripts/run_magic_extract.sh --help && scripts/run_netgen_lvs.sh --help && scripts/summarize_drc_log.py --help && scripts/summarize_lvs_log.py --help` | Passed. New helpers expose usage/help. |
+| `python3 scripts/normalize_netlist.py tests/fixtures/normalize_input.sp -o /tmp/align_sky130_normalized_fixture.sp && diff -u tests/fixtures/normalize_expected.sp /tmp/align_sky130_normalized_fixture.sp` | Passed. Default normalizer behavior preserved. |
+| `python3 scripts/normalize_netlist.py examples/inverter/inverter.sp --drop-param stack -o /tmp/inverter.normalized.sp && sed -n '1,20p' /tmp/inverter.normalized.sp` | Passed. Inverter aliases normalized and `stack` dropped only when explicitly requested. |
+| `python3 scripts/summarize_drc_log.py tests/fixtures/magic_drc_sample.log` | Passed. DRC summarizer reports count candidate and key rule lines from fixture. |
+| `python3 scripts/summarize_lvs_log.py tests/fixtures/netgen_lvs_sample.log` | Passed. LVS summarizer reports key mismatch/property lines from fixture. |
+| `chmod +x scripts/run_one_circuit_validation.sh && bash -n scripts/run_one_circuit_validation.sh` | Passed. One-command validation wrapper shell syntax clean. |
+| `scripts/run_one_circuit_validation.sh --help` | Passed. Wrapper usage/help is available. |
+| `bash -n scripts/run_magic_drc.sh scripts/run_magic_extract.sh scripts/run_netgen_lvs.sh scripts/run_one_circuit_validation.sh` | Passed in final validation. |
+| `python3 -m py_compile scripts/check_verification_refs.py scripts/compare_layer_map.py scripts/compare_model_names.py scripts/normalize_netlist.py scripts/summarize_drc_log.py scripts/summarize_lvs_log.py` | Passed in final validation. Generated `scripts/__pycache__`, later removed. |
+| `scripts/run_one_circuit_validation.sh --help && scripts/run_magic_drc.sh --help && scripts/run_magic_extract.sh --help && scripts/run_netgen_lvs.sh --help && python3 scripts/check_verification_refs.py --help && python3 scripts/normalize_netlist.py --help` | Passed in final validation. |
+| `python3 scripts/check_verification_refs.py --search-common` | Expected failure in final validation because runtime tools/files are missing; found only docs/layer map/local SPICE files. |
+| `python3 scripts/normalize_netlist.py tests/fixtures/normalize_input.sp -o /tmp/align_sky130_normalized_fixture.sp && diff -u tests/fixtures/normalize_expected.sp /tmp/align_sky130_normalized_fixture.sp` | Passed in final validation. |
+| `python3 scripts/summarize_drc_log.py tests/fixtures/magic_drc_sample.log ... && python3 scripts/summarize_lvs_log.py tests/fixtures/netgen_lvs_sample.log ...` | Passed in final validation. |
+| `git diff --check` | Passed in final validation. Note: new files are untracked, so this does not check untracked file content. |
+| `find scripts -type d -name __pycache__ -print` | Found generated `scripts/__pycache__` after final `py_compile`. |
+| `rm -rf scripts/__pycache__` | Passed with approval. Removed generated bytecode cache. |

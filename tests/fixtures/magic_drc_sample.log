@@ -1,0 +1,7 @@
+Magic 8.3 diagnostic sample
+drc style drc(full)
+drc count total
+Total DRC errors found: 2
+why
+met1.2 spacing violation
+li.6 minimum area violation
