@@ -60,11 +60,11 @@ Command run:
 python3 scripts/normalize_netlist.py examples/inverter/inverter.sp --drop-param stack -o /tmp/inverter.normalized.sp
 ```
 
-Observed normalized MOS lines:
+Observed normalized MOS lines after the experimental LVT-aware mapping:
 
 ```spice
-mn0 out in vss vss sky130_fd_pr__nfet_01v8 w=10.5e-7 L=150e-9 nf=20
-mp0 out in vdd vdd sky130_fd_pr__pfet_01v8 w=10.5e-7 L=150e-9 nf=20
+mn0 out in vss vss sky130_fd_pr__nfet_01v8_lvt w=10.5e-7 L=150e-9 nf=20
+mp0 out in vdd vdd sky130_fd_pr__pfet_01v8_lvt w=10.5e-7 L=150e-9 nf=20
 ```
 
 This is an opt-in LVS dialect normalization, not a claim that LVS will pass.

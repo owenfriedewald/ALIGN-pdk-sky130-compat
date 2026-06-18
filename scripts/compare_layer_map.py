@@ -50,6 +50,21 @@ SPECIAL_LAYERS = {
 }
 
 
+def load_compat(path: Path | None) -> tuple[dict[str, str], dict[str, str]]:
+    if path is None or not path.exists():
+        return EXPECTED_LAYER_MAP, SPECIAL_LAYERS
+    data = json.loads(path.read_text())
+    layer_data = data.get("verification_layer_map", {})
+    special_data = data.get("special_layers", {})
+    layer_map = {
+        str(align_name): str(info["official"])
+        for align_name, info in layer_data.items()
+        if isinstance(info, dict) and "official" in info
+    }
+    special = {str(key): str(value) for key, value in special_data.items()}
+    return layer_map or EXPECTED_LAYER_MAP, special or SPECIAL_LAYERS
+
+
 def load_align_layers(path: Path) -> dict[str, dict]:
     with path.open() as fp:
         data = json.load(fp)
@@ -81,6 +96,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--align-layers", type=Path, default=Path("SKY130_PDK/layers.json"))
     parser.add_argument(
+        "--compat-map",
+        type=Path,
+        default=Path("SKY130_PDK/openpdks_compat.json"),
+        help="Compatibility metadata JSON containing verification_layer_map.",
+    )
+    parser.add_argument(
         "--skywater-gds",
         type=Path,
         default=Path("upstream/skywater-pdk/docs/rules/gds_layers.csv"),
@@ -89,23 +110,24 @@ def main() -> int:
 
     align = load_align_layers(args.align_layers)
     skywater = load_skywater_gds(args.skywater_gds)
+    expected_layer_map, special_layers = load_compat(args.compat_map)
 
     rows = []
     failures = 0
     for align_name, entry in align.items():
         got = align_gds(entry)
-        if align_name in EXPECTED_LAYER_MAP:
-            official_name = EXPECTED_LAYER_MAP[align_name]
+        if align_name in expected_layer_map:
+            official_name = expected_layer_map[align_name]
             expected = skywater.get(official_name)
             status = "ok" if got == expected else "mismatch"
             if status != "ok":
                 failures += 1
             note = ""
-        elif align_name in SPECIAL_LAYERS:
+        elif align_name in special_layers:
             official_name = ""
             expected = ""
             status = "skip"
-            note = SPECIAL_LAYERS[align_name]
+            note = special_layers[align_name]
         else:
             official_name = ""
             expected = ""

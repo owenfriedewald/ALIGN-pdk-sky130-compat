@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -43,6 +44,16 @@ def official_names(paths: list[Path]) -> set[str]:
     return names
 
 
+def load_alias_targets(path: Path) -> dict[str, str]:
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text())
+    aliases = data.get("model_aliases", {})
+    if not isinstance(aliases, dict):
+        return {}
+    return {str(key): str(value) for key, value in aliases.items()}
+
+
 def print_set(label: str, values: set[str]) -> None:
     print(f"{label} ({len(values)}):")
     for value in sorted(values):
@@ -53,6 +64,12 @@ def print_set(label: str, values: set[str]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models", type=Path, default=Path("SKY130_PDK/models.sp"))
+    parser.add_argument(
+        "--compat-map",
+        type=Path,
+        default=Path("SKY130_PDK/openpdks_compat.json"),
+        help="Compatibility metadata JSON containing model_aliases.",
+    )
     parser.add_argument("--examples", type=Path, default=Path("examples"), help="Directory of example SPICE files")
     parser.add_argument(
         "--official-docs",
@@ -69,6 +86,7 @@ def main() -> int:
 
     used_models, used_params = example_usage(example_paths)
     official = official_names(doc_paths)
+    alias_targets = load_alias_targets(args.compat_map)
 
     print(f"ALIGN model file: {args.models}")
     print_set("ALIGN .model definitions", set(models))
@@ -79,6 +97,10 @@ def main() -> int:
     aliases = {name for name in models if name not in official and not name.startswith("sky130_fd_pr__")}
     missing_defs = {name for name in used_models if name not in models}
     print_set("ALIGN aliases not seen as official SkyWater names", aliases)
+    print("Compatibility alias targets:")
+    for alias in sorted(aliases):
+        print(f"  - {alias} -> {alias_targets.get(alias, '<no target>')}")
+    print()
     print_set("Example MOS models missing from ALIGN models.sp", missing_defs)
 
     return 1 if missing_defs else 0

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -11,12 +12,12 @@ from pathlib import Path
 
 MODEL_ALIASES = {
     "nmos_rvt": "sky130_fd_pr__nfet_01v8",
-    "nmos_lvt": "sky130_fd_pr__nfet_01v8",
+    "nmos_lvt": "sky130_fd_pr__nfet_01v8_lvt",
     "nmos_hvt": "sky130_fd_pr__nfet_01v8",
     "nfet": "sky130_fd_pr__nfet_01v8",
     "pmos_rvt": "sky130_fd_pr__pfet_01v8",
-    "pmos_lvt": "sky130_fd_pr__pfet_01v8",
-    "pmos_hvt": "sky130_fd_pr__pfet_01v8",
+    "pmos_lvt": "sky130_fd_pr__pfet_01v8_lvt",
+    "pmos_hvt": "sky130_fd_pr__pfet_01v8_hvt",
     "pfet": "sky130_fd_pr__pfet_01v8",
     "sky130_fd_pr__cap_mim_m3_1": "sky130_fd_pr__cap_mim_m3_1",
 }
@@ -35,6 +36,16 @@ def parse_rename(values: list[str]) -> dict[str, str]:
         old, new = value.split("=", 1)
         renames[old.lower()] = new
     return renames
+
+
+def load_model_aliases(path: Path | None) -> dict[str, str]:
+    if path is None:
+        return MODEL_ALIASES
+    data = json.loads(path.read_text())
+    aliases = data.get("model_aliases")
+    if not isinstance(aliases, dict):
+        raise ValueError(f"No model_aliases object found in {path}")
+    return {str(key).lower(): str(value) for key, value in aliases.items()}
 
 
 def normalize_params(suffix: str, drop: set[str], rename: dict[str, str]) -> str:
@@ -57,14 +68,19 @@ def normalize_params(suffix: str, drop: set[str], rename: dict[str, str]) -> str
     return (" " + " ".join(kept)) if kept else ""
 
 
-def normalize_line(line: str, drop_params: set[str], rename_params: dict[str, str]) -> str:
+def normalize_line(
+    line: str,
+    model_aliases: dict[str, str],
+    drop_params: set[str],
+    rename_params: dict[str, str],
+) -> str:
     if not line.strip() or line.lstrip().startswith(("*", ".", "+")):
         return line
     match = MOS_RE.match(line.rstrip("\n"))
     if not match:
         return line
     model = match.group("model")
-    replacement = MODEL_ALIASES.get(model.lower())
+    replacement = model_aliases.get(model.lower())
     suffix = normalize_params(match.group("suffix"), drop_params, rename_params)
     if not replacement and suffix == match.group("suffix"):
         return line
@@ -73,13 +89,16 @@ def normalize_line(line: str, drop_params: set[str], rename_params: dict[str, st
 
 def normalize_text(
     text: str,
+    model_aliases: dict[str, str] | None = None,
     drop_params: set[str] | None = None,
     rename_params: dict[str, str] | None = None,
 ) -> str:
+    model_aliases = model_aliases or MODEL_ALIASES
     drop_params = drop_params or set()
     rename_params = rename_params or {}
     return "".join(
-        normalize_line(line, drop_params, rename_params) for line in text.splitlines(keepends=True)
+        normalize_line(line, model_aliases, drop_params, rename_params)
+        for line in text.splitlines(keepends=True)
     )
 
 
@@ -87,6 +106,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", type=Path, help="Input SPICE netlist")
     parser.add_argument("-o", "--output", type=Path, help="Output path; defaults to stdout")
+    parser.add_argument(
+        "--compat-map",
+        type=Path,
+        default=Path("SKY130_PDK/openpdks_compat.json"),
+        help="Compatibility metadata JSON containing model_aliases.",
+    )
     parser.add_argument(
         "--drop-param",
         action="append",
@@ -102,8 +127,10 @@ def main() -> int:
     args = parser.parse_args()
 
     rename_params = parse_rename(args.rename_param)
+    model_aliases = load_model_aliases(args.compat_map if args.compat_map.exists() else None)
     normalized = normalize_text(
         args.input.read_text(),
+        model_aliases=model_aliases,
         drop_params={name.lower() for name in args.drop_param},
         rename_params=rename_params,
     )

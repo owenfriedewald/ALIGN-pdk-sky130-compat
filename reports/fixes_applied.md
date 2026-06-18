@@ -160,3 +160,72 @@ python3 scripts/check_verification_refs.py --search-common
 
 Remaining limitations:
 The current environment still lacks Magic, Netgen, ALIGN CLI, open_pdks runtime files, and generated GDS.
+
+## 6. Experimental open_pdks Compatibility Metadata
+
+Issue:
+Layer/model compatibility knowledge was spread across reports and scripts, making it harder to audit future wrapper behavior against the PDK collateral.
+
+Source diagnostic:
+Layer naming and model-name mismatch classes from the diagnostic report and follow-up triage.
+
+Files changed:
+`SKY130_PDK/openpdks_compat.json`
+`scripts/compare_layer_map.py`
+`scripts/compare_model_names.py`
+`scripts/normalize_netlist.py`
+
+Before behavior:
+The layer-map and model alias decisions were hardcoded in scripts.
+
+Patch made:
+Added `SKY130_PDK/openpdks_compat.json` with the experimental ALIGN-to-SkyWater layer map, special-layer notes, model aliases, and recommended LVS parameter drops. Updated helper scripts to read this metadata.
+
+Why the patch is safe:
+The file is metadata only. ALIGN generation does not consume it unless a wrapper or diagnostic script opts into it.
+
+How to verify:
+
+```sh
+python3 scripts/compare_layer_map.py
+python3 scripts/compare_model_names.py
+```
+
+Remaining limitations:
+This is static compatibility metadata, not physical verification evidence.
+
+## 7. Official LVT/HVT Model Alias Support
+
+Issue:
+The previous netlist normalizer collapsed `nmos_lvt` and `pmos_lvt` aliases to generic 1.8 V FET models, losing VT intent before LVS.
+
+Source diagnostic:
+Official SkyWater docs list `sky130_fd_pr__nfet_01v8_lvt`, `sky130_fd_pr__pfet_01v8_lvt`, and `sky130_fd_pr__pfet_01v8_hvt`.
+
+Files changed:
+`SKY130_PDK/models.sp`
+`SKY130_PDK/openpdks_compat.json`
+`scripts/normalize_netlist.py`
+`tests/fixtures/normalize_expected.sp`
+
+Before behavior:
+ALIGN aliases normalized to generic `sky130_fd_pr__nfet_01v8` / `sky130_fd_pr__pfet_01v8`.
+
+Patch made:
+Mapped `nmos_lvt` to `sky130_fd_pr__nfet_01v8_lvt`, `pmos_lvt` to `sky130_fd_pr__pfet_01v8_lvt`, and `pmos_hvt` to `sky130_fd_pr__pfet_01v8_hvt`. Added official LVT/HVT model stubs to `models.sp` so schematics using official variant names can be parsed by the ALIGN-side model parser.
+
+Also added official MIM capacitor parser stubs for `sky130_fd_pr__cap_mim_m3_2`, `sky130_fd_pr__cap_mim_m4`, and `sky130_fd_pr__model__cap_mim`, while keeping the existing ALIGN `sky130_fd_pr__cap_mim_m3_1` stub.
+
+Why the patch is safe:
+This affects model naming/parsing and optional LVS normalization only; it does not change layout geometry.
+
+How to verify:
+
+```sh
+python3 scripts/normalize_netlist.py examples/inverter/inverter.sp --drop-param stack -o /tmp/inverter.normalized.sp
+```
+
+Remaining limitations:
+Whether Magic extraction emits these exact variant model names depends on generated geometry/marker layers and the open_pdks Magic extraction setup.
+
+Whether ALIGN-generated MIM capacitor geometry matches official/open_pdks extraction still requires a generated capacitor layout and Magic/Netgen evidence.
