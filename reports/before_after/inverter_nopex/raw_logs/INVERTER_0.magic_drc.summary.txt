@@ -1,0 +1,8 @@
+DRC log: /work/reports/before_after/inverter_nopex/raw_logs/INVERTER_0.magic_drc.log
+lines: 28
+numeric count candidates: 60
+
+Key lines:
+26: DRC style is now "drc(full)"
+27: Loading DRC CIF style.
+28: Total DRC errors found: 60

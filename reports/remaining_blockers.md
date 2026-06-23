@@ -10,7 +10,7 @@ Date: 2026-06-18
 | No open_pdks `sky130A` install path found | No runtime `sky130A.tech`, Magic rc, or Netgen setup | Install or point to open_pdks `sky130A`; then run `scripts/check_verification_refs.py --open-pdks-root`. |
 | `magic` not found on PATH | Cannot run DRC/extraction | Install Magic or activate environment containing Magic. |
 | `netgen` not found on PATH | Cannot run LVS | Install Netgen or activate environment containing Netgen. |
-| `schematic2layout.py` not found on PATH | Cannot generate new ALIGN layout from examples here | Provide generated GDS or activate ALIGN environment. |
+| Host `schematic2layout.py` not found on PATH | Host cannot generate new ALIGN layout directly | Use local Docker image `darpaalign/align-public:latest` or install ALIGN locally. |
 
 ## Compatibility Questions Waiting For Evidence
 
@@ -30,6 +30,14 @@ Date: 2026-06-18
 - Via width edits from the diagnostic report.
 - Metal width/pitch changes.
 - Removing or remapping `Fin`.
-- Patching `Hvt=970:0`.
 - Adding full density/antenna/device-specific signoff rules into `layers.json`.
 - Filtering or waiving DRC/LVS output.
+
+## Updated Blockers From Inverter Tuple
+
+| Blocker | Evidence | Next action |
+|---|---|---|
+| Helper layers still stream from generated GDS | Regenerated inverter still emits `100:5`, `104:0`, `235:5`; Magic rejects them. Removing GDS mapping from `Bbox` breaks ALIGN `gen_gds_json.py`. | Patch or vendor ALIGN GDS exporter to suppress helper layers, or keep sanitizer as bridge. |
+| MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Redesign MOS schematic/generator contract for planar Sky130, or make LVS netlists physically expanded before comparison. |
+| Top-level pins are not LVS-clean | Expanded LVS matched 120 devices and 564 nets on both sides but failed pin/net matching. | Fix pin label/export/extraction semantics and net naming/case policy. |
+| DRC remains nonzero | Magic reports 60 DRC errors on sanitized inverter GDS. | Obtain/classify detailed DRC feedback; then patch actual geometry/rules, not waivers. |

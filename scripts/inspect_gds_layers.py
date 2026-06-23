@@ -27,9 +27,12 @@ def load_layout(path: Path):
 def load_expected(path: Path) -> dict[str, str]:
     data = json.loads(path.read_text())
     expected: dict[str, str] = {}
-    for align_name, info in data.get("verification_layer_map", {}).items():
-        if isinstance(info, dict) and "gds" in info:
-            expected[str(info["gds"])] = f"{align_name}->{info.get('official', '')}"
+    for section in ("verification_layer_map", "verification_purpose_layers"):
+        for align_name, info in data.get(section, {}).items():
+            if isinstance(info, dict) and "gds" in info:
+                expected[str(info["gds"])] = f"{align_name}->{info.get('official', '')}"
+    for gds, reason in data.get("verification_drop_layers", {}).items():
+        expected[str(gds)] = f"<drop candidate: {reason}>"
     return expected
 
 

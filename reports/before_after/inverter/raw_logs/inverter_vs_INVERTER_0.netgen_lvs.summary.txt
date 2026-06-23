@@ -1,0 +1,327 @@
+LVS file: /work/reports/before_after/inverter/raw_logs/inverter_vs_INVERTER_0.netgen_lvs.log
+lines: 113
+Key lines:
+1: Netgen 1.5.316 compiled on Sat Feb 14 01:07:44 AM CET 2026
+2: Warning: netgen command 'format' use fully-qualified name '::netgen::format'
+3: Warning: netgen command 'global' use fully-qualified name '::netgen::global'
+4: Reading netlist file /work/reports/before_after/inverter/extracted/INVERTER_0.extracted.spice for /work/reports/before_after/inverter/extracted/INVERTER_0.extracted.spice INVERTER_0
+9: Reading netlist file /work/reports/before_after/inverter/normalized/inverter.normalized.sp for /work/reports/before_after/inverter/normalized/inverter.normalized.sp inverter
+11: Reading setup file /foss/pdks/sky130A/libs.tech/netgen/sky130A_setup.tcl
+13: No property area found for device c
+14: No property as found for device sky130_fd_pr__nfet_01v8_lvt
+15: No property ad found for device sky130_fd_pr__nfet_01v8_lvt
+16: No property ps found for device sky130_fd_pr__nfet_01v8_lvt
+17: No property pd found for device sky130_fd_pr__nfet_01v8_lvt
+18: No property as found for device sky130_fd_pr__pfet_01v8_lvt
+19: No property ad found for device sky130_fd_pr__pfet_01v8_lvt
+20: No property ps found for device sky130_fd_pr__pfet_01v8_lvt
+21: No property pd found for device sky130_fd_pr__pfet_01v8_lvt
+23: No property mult found for device sky130_fd_pr__nfet_01v8_lvt
+24: No property sa found for device sky130_fd_pr__nfet_01v8_lvt
+25: No property sb found for device sky130_fd_pr__nfet_01v8_lvt
+26: No property sd found for device sky130_fd_pr__nfet_01v8_lvt
+27: No property nf found for device sky130_fd_pr__nfet_01v8_lvt
+28: No property nrd found for device sky130_fd_pr__nfet_01v8_lvt
+29: No property nrs found for device sky130_fd_pr__nfet_01v8_lvt
+30: No property area found for device sky130_fd_pr__nfet_01v8_lvt
+31: No property perim found for device sky130_fd_pr__nfet_01v8_lvt
+32: No property topography found for device sky130_fd_pr__nfet_01v8_lvt
+34: No property as found for device sky130_fd_pr__nfet_01v8_lvt
+35: No property ad found for device sky130_fd_pr__nfet_01v8_lvt
+36: No property ps found for device sky130_fd_pr__nfet_01v8_lvt
+37: No property pd found for device sky130_fd_pr__nfet_01v8_lvt
+38: No property mult found for device sky130_fd_pr__nfet_01v8_lvt
+39: No property sa found for device sky130_fd_pr__nfet_01v8_lvt
+40: No property sb found for device sky130_fd_pr__nfet_01v8_lvt
+41: No property sd found for device sky130_fd_pr__nfet_01v8_lvt
+42: No property nrd found for device sky130_fd_pr__nfet_01v8_lvt
+43: No property nrs found for device sky130_fd_pr__nfet_01v8_lvt
+44: No property area found for device sky130_fd_pr__nfet_01v8_lvt
+45: No property perim found for device sky130_fd_pr__nfet_01v8_lvt
+46: No property topography found for device sky130_fd_pr__nfet_01v8_lvt
+48: No property mult found for device sky130_fd_pr__pfet_01v8_lvt
+49: No property sa found for device sky130_fd_pr__pfet_01v8_lvt
+50: No property sb found for device sky130_fd_pr__pfet_01v8_lvt
+51: No property sd found for device sky130_fd_pr__pfet_01v8_lvt
+52: No property nf found for device sky130_fd_pr__pfet_01v8_lvt
+53: No property nrd found for device sky130_fd_pr__pfet_01v8_lvt
+54: No property nrs found for device sky130_fd_pr__pfet_01v8_lvt
+55: No property area found for device sky130_fd_pr__pfet_01v8_lvt
+56: No property perim found for device sky130_fd_pr__pfet_01v8_lvt
+57: No property topography found for device sky130_fd_pr__pfet_01v8_lvt
+59: No property as found for device sky130_fd_pr__pfet_01v8_lvt
+60: No property ad found for device sky130_fd_pr__pfet_01v8_lvt
+61: No property ps found for device sky130_fd_pr__pfet_01v8_lvt
+62: No property pd found for device sky130_fd_pr__pfet_01v8_lvt
+63: No property mult found for device sky130_fd_pr__pfet_01v8_lvt
+64: No property sa found for device sky130_fd_pr__pfet_01v8_lvt
+65: No property sb found for device sky130_fd_pr__pfet_01v8_lvt
+66: No property sd found for device sky130_fd_pr__pfet_01v8_lvt
+67: No property nrd found for device sky130_fd_pr__pfet_01v8_lvt
+68: No property nrs found for device sky130_fd_pr__pfet_01v8_lvt
+69: No property area found for device sky130_fd_pr__pfet_01v8_lvt
+70: No property perim found for device sky130_fd_pr__pfet_01v8_lvt
+71: No property topography found for device sky130_fd_pr__pfet_01v8_lvt
+76: Circuit sky130_fd_pr__nfet_01v8_lvt contains 0 device instances.
+77: Circuit contains 0 nets.
+79: Circuit sky130_fd_pr__nfet_01v8_lvt contains 0 device instances.
+80: Circuit contains 0 nets, and 4 disconnected pins.
+82: Circuit sky130_fd_pr__nfet_01v8_lvt contains no devices.
+85: Circuit sky130_fd_pr__pfet_01v8_lvt contains 0 device instances.
+86: Circuit contains 0 nets.
+88: Circuit sky130_fd_pr__pfet_01v8_lvt contains 0 device instances.
+89: Circuit contains 0 nets, and 4 disconnected pins.
+91: Circuit sky130_fd_pr__pfet_01v8_lvt contains no devices.
+94: Circuit INVERTER_0 contains 365 device instances.
+98: Circuit contains 564 nets.
+100: Circuit inverter contains 2 device instances.
+103: Circuit contains 12 nets.
+105: Circuit 1 contains 365 devices, Circuit 2 contains 2 devices. *** MISMATCH ***
+106: Circuit 1 contains 564 nets,    Circuit 2 contains 12 nets. *** MISMATCH ***
+110: Top level cell failed pin matching.
+
+LVS file: /work/reports/before_after/inverter/raw_logs/inverter_vs_INVERTER_0.lvs.report
+lines: 4059
+Key lines:
+11: (no matching pin)                          |drain                                      
+12: (no matching pin)                          |drain                                      
+13: (no matching pin)                          |gate                                       
+14: (no matching pin)                          |gate                                       
+15: (no matching pin)                          |source                                     
+16: (no matching pin)                          |source                                     
+17: (no matching pin)                          |bulk                                       
+18: (no matching pin)                          |bulk                                       
+19: 1                                          |(no matching pin)                          
+20: 2                                          |(no matching pin)                          
+21: 3                                          |(no matching pin)                          
+22: 4                                          |(no matching pin)                          
+25: Device classes sky130_fd_pr__nfet_01v8_lvt and sky130_fd_pr__nfet_01v8_lvt are equivalent.
+36: (no matching pin)                          |drain                                      
+37: (no matching pin)                          |drain                                      
+38: (no matching pin)                          |gate                                       
+39: (no matching pin)                          |gate                                       
+40: (no matching pin)                          |source                                     
+41: (no matching pin)                          |source                                     
+42: (no matching pin)                          |bulk                                       
+43: (no matching pin)                          |bulk                                       
+44: 1                                          |(no matching pin)                          
+45: 2                                          |(no matching pin)                          
+46: 3                                          |(no matching pin)                          
+47: 4                                          |(no matching pin)                          
+50: Device classes sky130_fd_pr__pfet_01v8_lvt and sky130_fd_pr__pfet_01v8_lvt are equivalent.
+51: Flattening unmatched subcell INV_3799024_0_0_1782175707 in circuit INVERTER_0 (0)(1 instance)
+52: Flattening unmatched subcell NMOS_S_10961373_X5_Y2_1782175707_1782175707 in circuit INVERTER_0 (0)(1 instance)
+53: Flattening unmatched subcell PMOS_S_70655723_X5_Y2_1782175708_1782175707 in circuit INVERTER_0 (0)(1 instance)
+58: sky130_fd_pr__nfet_01v8_lvt (60)           |sky130_fd_pr__nfet_01v8_lvt (1) **Mismatch 
+59: c (245)                                    |(no matching element)                      
+60: sky130_fd_pr__pfet_01v8_lvt (60)           |sky130_fd_pr__pfet_01v8_lvt (1) **Mismatch 
+61: Number of devices: 365 **Mismatch**        |Number of devices: 2 **Mismatch**          
+62: Number of nets: 564 **Mismatch**           |Number of nets: 12 **Mismatch**            
+64: NET mismatches: Class fragments follow (with fanout counts):
+68: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |Net: dummy_5                               
+72: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |Net: dummy_6                               
+76: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |Net: dummy_7                               
+80: Net: (no pins)                             |Net: dummy_8                               
+85: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |Net: dummy_9                               
+89: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |Net: dummy_10                              
+93: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |Net: dummy_11                              
+97: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |Net: dummy_12                              
+101: Net: OUT                                   |Net: out                                   
+107: Net: IN                                    |Net: in                                    
+113: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |Net: vss                                   
+117: Net: VDD                                   |Net: vdd                                   
+123: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+127: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+131: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+135: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+139: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+143: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+147: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+151: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+155: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+159: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+163: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+167: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+171: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+175: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+179: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+183: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+187: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+191: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+195: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+200: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+205: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+210: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+215: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+220: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+225: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+230: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+235: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+239: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+243: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+247: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+251: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+255: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+259: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+263: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+267: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+271: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+275: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+279: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+283: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+287: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+291: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+295: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+299: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+303: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+307: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+311: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+315: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+319: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+323: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+327: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+331: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+335: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+339: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+343: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+347: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+351: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+355: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+359: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+363: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+367: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+372: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+376: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+380: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+384: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+389: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+394: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+399: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+403: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+407: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+411: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+415: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+419: Net: /INV_3799024_0_0_1782175707_0//PMOS_S |(no matching net)                          
+423: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+426: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+429: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+432: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+435: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+438: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+441: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+444: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+447: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+450: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+453: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+456: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+459: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+462: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+465: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+468: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+471: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+474: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+477: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+480: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+483: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+486: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+489: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+492: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+495: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+498: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+501: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+504: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+507: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+510: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+513: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+516: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+519: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+522: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+525: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+528: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+531: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+534: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+537: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+540: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+543: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+546: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+549: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+552: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+555: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+558: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+561: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+564: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+567: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+570: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+573: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+576: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+579: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+582: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+585: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+588: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+591: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+594: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+597: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+600: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+603: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+606: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+609: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+612: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+615: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+618: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+621: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+624: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+627: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+630: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+633: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+636: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+639: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+642: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+645: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+648: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+651: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+654: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+657: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+660: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+663: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+666: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+669: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+672: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+675: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+678: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+681: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+684: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+687: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+690: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+693: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+696: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+699: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+702: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+705: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+708: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+711: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+714: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+717: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+720: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+723: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+726: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+729: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+732: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+735: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+738: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+741: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+744: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+747: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+750: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+753: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+756: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+759: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+762: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+765: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+768: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+771: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+774: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+777: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+780: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+783: Net: /INV_3799024_0_0_1782175707_0//NMOS_S |(no matching net)                          
+... truncated additional key lines
+

@@ -1,0 +1,36 @@
+ALIGN          SkyWater  ALIGN GDS  SkyWater GDS  Status  Note                                                                                             
+-------------  --------  ---------  ------------  ------  -------------------------------------------------------------------------------------------------
+Poly           poly      66:20      66:20         ok                                                                                                       
+Fin                      2:0                      skip    ALIGN template/grid artifact with no Sky130 planar drawing-layer equivalent.                     
+M1             li1       67:20      67:20         ok                                                                                                       
+V0             licon1    66:44      66:44         ok                                                                                                       
+M2             met1      68:20      68:20         ok                                                                                                       
+V1             mcon      67:44      67:44         ok                                                                                                       
+M3             met2      69:20      69:20         ok                                                                                                       
+V2             via       68:44      68:44         ok                                                                                                       
+M4             met3      70:20      70:20         ok                                                                                                       
+V3             via2      69:44      69:44         ok                                                                                                       
+M5             met4      71:20      71:20         ok                                                                                                       
+V4             via3      70:44      70:44         ok                                                                                                       
+M6             met5      72:20      72:20         ok                                                                                                       
+V5             via4      71:44      71:44         ok                                                                                                       
+Nwell          nwell     64:20      64:20         ok                                                                                                       
+Tap            tap       65:44      65:44         ok                                                                                                       
+Active         diff      65:20      65:20         ok                                                                                                       
+Nselect        nsdm      93:44      93:44         ok                                                                                                       
+Pselect        psdm      94:20      94:20         ok                                                                                                       
+Lvt            lvtn      125:44     125:44        ok                                                                                                       
+Npc            npc       95:20      95:20         ok                                                                                                       
+Pc                       66:20                    skip    ALIGN poly-contact generator config; mos.py emits this wire on Poly.                             
+Rvt                      11:0                     skip    VT helper/id layer; no direct base drawing-layer match in current SkyWater docs.                 
+Slvt                     97:0                     skip    VT helper/id layer; no direct base drawing-layer match in current SkyWater docs.                 
+Hvt                      970:0                    skip    VT helper/id layer with nonstandard current GDS value; requires generated GDS and Magic evidence.
+CapMIMLayer    capm      89:44      89:44         ok                                                                                                       
+CapMIMContact            70:44                    skip    MIM helper/contact layer; validate against generated capacitor topology.                         
+Bbox                     100:5                    skip    ALIGN boundary/helper layer.                                                                     
+Boundary                 101:0                    skip    ALIGN boundary/helper layer.                                                                     
+Rboundary                102:0                    skip    ALIGN boundary/helper layer.                                                                     
+Cboundary                103:0                    skip    ALIGN boundary/helper layer.                                                                     
+Outline                  104:0                    skip    ALIGN boundary/helper layer.                                                                     
+GuardRing                                         skip    Generator config, not a streamed GDS layer entry.                                                
+Cap                                               skip    Generator config, not a streamed GDS layer entry.                                                

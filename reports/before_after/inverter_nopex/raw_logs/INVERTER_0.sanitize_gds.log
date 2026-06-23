@@ -1,0 +1,22 @@
+Input GDS: /tuple/generated/inverter.gds
+Output GDS: /work/reports/before_after/inverter_nopex/normalized/INVERTER_0.magic_sanitized.gds
+Top cells: INVERTER_0
+Layer decision:
+  keep 64:20 shapes=1
+  keep 65:20 shapes=4
+  keep 65:44 shapes=10
+  keep 66:20 shapes=140
+  keep 66:44 shapes=220
+  keep 67:20 shapes=74
+  keep 67:44 shapes=74
+  keep 68:20 shapes=14
+  keep 68:44 shapes=14
+  keep 69:5 shapes=4
+  keep 69:20 shapes=26
+  keep 93:44 shapes=2
+  keep 94:20 shapes=2
+  drop 100:5 shapes=2 reason=ALIGN Bbox helper layer rejected by open_pdks Magic sky130A GDS reader.
+  drop 104:0 shapes=1 reason=ALIGN Outline/helper layer rejected by open_pdks Magic sky130A GDS reader.
+  keep 125:44 shapes=4
+  drop 235:5 shapes=2 reason=ALIGN boundary/helper layer rejected by open_pdks Magic sky130A GDS reader.
+Wrote /work/reports/before_after/inverter_nopex/normalized/INVERTER_0.magic_sanitized.gds

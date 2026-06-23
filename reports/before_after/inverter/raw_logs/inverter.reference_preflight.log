@@ -1,0 +1,71 @@
+Sky130 verification reference preflight
+repo-root: /work
+open-pdks-root: /foss/pdks/ciel/sky130/versions/54435919abffb937387ec956209f9cf5fd2dfbee/sky130A
+tools:
+  magic: /foss/tools/bin/magic
+  netgen: /foss/tools/bin/netgen
+  klayout: /foss/tools/klayout/klayout
+  schematic2layout.py: missing
+
+Magic tech: found
+  - libs.tech/magic/sky130A.tech
+
+Magic rc: found
+  - libs.tech/magic/seal_ring_generator/.magicrc
+  - libs.tech/magic/sky130A.magicrc
+
+Netgen setup Tcl: found
+  - libs.tech/netgen/sky130A_setup.tcl
+  - libs.tech/netgen/setup.tcl
+
+Magic extraction: missing
+
+GDS layer maps: found
+  - upstream/skywater-pdk/docs/rules/gds_layers.csv
+
+SPICE model files: found
+  - SKY130_PDK/models.sp
+  - artifacts/inverter_tuple/inverter/input/inverter.sp
+  - examples/buffer/buffer.sp
+  - examples/current_mirror_ota/current_mirror_ota.sp
+  - examples/five_transistor_ota/five_transistor_ota.sp
+  - examples/inverter/inverter.sp
+  - examples/telescopic_ota/telescopic_ota.sp
+  - examples/umich_test_case/umich_test_case.sp
+  - reports/before_after/inverter/normalized/inverter.normalized.sp
+  - tests/fixtures/normalize_expected.sp
+  - tests/fixtures/normalize_input.sp
+  - libs.ref/sky130_fd_io/spice/sky130_ef_io__analog.spice
+
+Primitive device docs: found
+  - upstream/skywater-pdk/docs/rules/device-details/cap_mim/cap_mim-table0.rst
+  - upstream/skywater-pdk/docs/rules/device-details/cap_mim/index.rst
+  - upstream/skywater-pdk/docs/rules/device-details/cap_var/cap_var-table0.rst
+  - upstream/skywater-pdk/docs/rules/device-details/cap_var/index.rst
+  - upstream/skywater-pdk/docs/rules/device-details/cap_vpp/cap_vpp-table0.rst
+  - upstream/skywater-pdk/docs/rules/device-details/cap_vpp/index.rst
+  - upstream/skywater-pdk/docs/rules/device-details/diodes/diodes-table0.rst
+  - upstream/skywater-pdk/docs/rules/device-details/diodes/index.rst
+  - upstream/skywater-pdk/docs/rules/device-details/esd_nfet/esd_nfet-table0.rst
+  - upstream/skywater-pdk/docs/rules/device-details/esd_nfet/index.rst
+  - upstream/skywater-pdk/docs/rules/device-details/nfet_01v8/index.rst
+  - upstream/skywater-pdk/docs/rules/device-details/nfet_01v8/nfet_01v8-table0.rst
+
+Rule CSVs/docs: found
+  - upstream/skywater-pdk/docs/rules/antenna/definitions.csv
+  - upstream/skywater-pdk/docs/rules/antenna/table-Ia-antenna-rules-s8d.csv
+  - upstream/skywater-pdk/docs/rules/antenna/table-Ib-antenna-rules-s8tnv-5r.csv
+  - upstream/skywater-pdk/docs/rules/antenna/table-Ic-antenna-rules-s8tm.csv
+  - upstream/skywater-pdk/docs/rules/antenna/table-Ie-antenna-rules-s8p.csv
+  - upstream/skywater-pdk/docs/rules/antenna/table-Ig-antenna-rules-s8p12.csv
+  - upstream/skywater-pdk/docs/rules/assumptions/01-general.csv
+  - upstream/skywater-pdk/docs/rules/assumptions/02-mins.csv
+  - upstream/skywater-pdk/docs/rules/assumptions/04-physical.csv
+  - upstream/skywater-pdk/docs/rules/assumptions/05-laser-fuse.csv
+  - upstream/skywater-pdk/docs/rules/assumptions/07-other.csv
+  - upstream/skywater-pdk/docs/rules/assumptions/08-hv.csv
+
+Expected open_pdks sky130A files:
+  ok  /foss/pdks/sky130A/libs.tech/magic/sky130A.tech
+  ok  /foss/pdks/sky130A/libs.tech/magic/sky130A.magicrc
+  ok  /foss/pdks/sky130A/libs.tech/netgen/sky130A_setup.tcl

@@ -289,3 +289,94 @@ python3 scripts/discover_validation_inputs.py --root . --limit 12
 
 Remaining limitations:
 No complete validation tuple is currently present because GDS and open_pdks are missing.
+
+## 10. Tuple-Backed Magic/Netgen Flow Fixes
+
+Issue:
+The provided inverter tuple showed that a single `--top inverter` value caused Magic to load a new empty cell while the GDS top cell was actually `INVERTER_0`.
+
+Source diagnostic:
+Real run on `artifacts/inverter_tuple/inverter/generated/inverter.gds`.
+
+Files changed:
+`scripts/run_magic_drc.sh`
+`scripts/run_magic_extract.sh`
+`scripts/run_netgen_lvs.sh`
+`scripts/run_one_circuit_validation.sh`
+`scripts/sanitize_gds_for_magic.py`
+`SKY130_PDK/openpdks_compat.json`
+
+Before result:
+Magic reported unknown helper layers and then created an empty `inverter` cell. The apparent DRC count of zero was invalid.
+
+Patch made:
+Added separate layout/schematic top support, hard failure on Magic empty-cell/load failures, and a KLayout-based verification GDS sanitizer that drops known ALIGN helper layers rejected by Magic: `100:5`, `104:0`, and `235:5`. Preserved official `69:5` met2 label shapes.
+
+Why the patch is safe:
+The source GDS is not modified. The sanitized GDS is a derived verification artifact, and every dropped layer is logged.
+
+After result:
+Magic loaded `INVERTER_0`, reported 60 DRC errors, produced extracted SPICE, and Netgen ran. This advanced the state from setup failure to real DRC/LVS mismatch evidence.
+
+Remaining problems:
+Helper-layer dropping is still a wrapper/export bridge. A direct PDK-only removal attempt using `NoGDS` failed because ALIGN's installed `gen_gds_json.py` hard-codes `Bbox['GdsLayerNo']`.
+
+## 11. HVT GDS Mapping Correction
+
+Issue:
+`SKY130_PDK/layers.json` encoded `Hvt` as `970:0`, which is not a SkyWater GDS layer.
+
+Source diagnostic:
+SkyWater `upstream/skywater-pdk/docs/rules/gds_layers.csv` lists `hvtp,drawing,78:44`.
+
+Files changed:
+`SKY130_PDK/layers.json`
+`SKY130_PDK/openpdks_compat.json`
+`scripts/compare_layer_map.py`
+
+Before result:
+`compare_layer_map.py` classified `Hvt` as a skipped nonstandard layer.
+
+Patch made:
+Changed `Hvt` to official `hvtp` GDS `78:44` and added it to the static layer comparison map.
+
+Why the patch is safe:
+This is an upstream-backed name/layer correction. The inverter tuple uses LVT, so no inverter geometry changed from this patch.
+
+How to verify:
+
+```sh
+python3 scripts/compare_layer_map.py
+```
+
+Remaining problems:
+PMOS HVT extraction still needs an HVT layout test.
+
+## 12. LVS nf/stack Physical Expansion Experiment
+
+Issue:
+ALIGN Sky130 schematics describe a MOS as one device with `nf=20 stack=3`, but Magic/open_pdks extracts the generated planar layout as 60 physical MOS segments per device. This is inherited from the mock FinFET-style abstraction.
+
+Source diagnostic:
+Inverter tuple LVS before expansion: layout had 60 NFET + 60 PFET instances; normalized schematic had 1 NFET + 1 PFET.
+
+Files changed:
+`scripts/normalize_netlist.py`
+`scripts/run_one_circuit_validation.sh`
+
+Patch made:
+Added opt-in `--expand-nf-stack` and `--scale-wl-to-um` normalizer modes. The one-circuit wrapper can now pass these options through.
+
+Why the patch is safe:
+This is an explicit LVS experiment mode, not default behavior and not a DRC waiver.
+
+After result:
+Against no-PEX extracted inverter SPICE, expanded schematic LVS reached matching top-level counts:
+
+```text
+Circuit 1 contains 120 devices, Circuit 2 contains 120 devices.
+Circuit 1 contains 564 nets,    Circuit 2 contains 564 nets.
+```
+
+Remaining problems:
+Netgen still failed top-level pin/net matching. The next PDK/generator fix is connectivity/pin semantics, not just model naming or raw device count.

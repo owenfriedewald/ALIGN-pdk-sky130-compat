@@ -1,0 +1,28 @@
+
+Magic 8.3 revision 603 - Compiled on Sat Feb 14 01:20:09 AM CET 2026.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+Using NULL graphics device.
+Processing system .magicrc file
+Switching to WIRING tool.
+Switching to NETLIST tool.
+Switching to PICK tool.
+Switching to BOX tool.
+Sourcing design .magicrc for technology sky130A ...
+2 Magic internal units = 1 Lambda
+Input style sky130(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    ubm 
+Scaled tech values by 2 / 1 to match internal grid scaling
+Loading sky130A Device Generator Menu ...
+Using technology "sky130A", version 1.0.571-1-g5443591
+Warning: Calma reading is not undoable!  I hope that's OK.
+Library written using GDS-II Release 6.0
+Library name: test
+Reading "PMOS_S_70655723_X5_Y2_1782175708_1782175707".
+Reading "NMOS_S_10961373_X5_Y2_1782175707_1782175707".
+Reading "INV_3799024_0_0_1782175707".
+Reading "INVERTER_0".
+DRC style is now "drc(full)"
+Loading DRC CIF style.
+Total DRC errors found: 60

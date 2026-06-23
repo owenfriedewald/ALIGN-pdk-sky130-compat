@@ -333,8 +333,8 @@
 
 {
 "Layer": "Hvt",
-"GdsLayerNo": 970,
-"GdsDatatype": {"Draw":0},
+"GdsLayerNo": 78,
+"GdsDatatype": {"Draw":44},
 "poly_enclosure": 325
 },
 
@@ -404,4 +404,3 @@
 
 ]
 }
-

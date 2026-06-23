@@ -29,6 +29,7 @@ EXPECTED_LAYER_MAP = {
     "Nselect": "nsdm",
     "Pselect": "psdm",
     "Lvt": "lvtn",
+    "Hvt": "hvtp",
     "Npc": "npc",
     "CapMIMLayer": "capm",
 }
@@ -38,7 +39,6 @@ SPECIAL_LAYERS = {
     "Pc": "ALIGN generator parameter layer; mos.py emits the pc wire on Poly.",
     "Rvt": "VT helper/id layer; no direct base drawing layer match in docs.",
     "Slvt": "VT helper/id layer; no direct base drawing layer match in docs.",
-    "Hvt": "VT helper/id layer; nonstandard GDS number in current collateral.",
     "CapMIMContact": "MIM-contact helper; validate against generated cap topology.",
     "Bbox": "ALIGN boundary/helper layer.",
     "Boundary": "ALIGN boundary/helper layer.",

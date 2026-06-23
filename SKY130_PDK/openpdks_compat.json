@@ -20,15 +20,37 @@
     "Nselect": {"official": "nsdm", "gds": "93:44", "purpose": "drawing"},
     "Pselect": {"official": "psdm", "gds": "94:20", "purpose": "drawing"},
     "Lvt": {"official": "lvtn", "gds": "125:44", "purpose": "drawing"},
+    "Hvt": {"official": "hvtp", "gds": "78:44", "purpose": "drawing"},
     "Npc": {"official": "npc", "gds": "95:20", "purpose": "drawing"},
     "CapMIMLayer": {"official": "capm", "gds": "89:44", "purpose": "drawing"}
+  },
+  "verification_purpose_layers": {
+    "Poly.label": {"official": "poly.label", "gds": "66:5", "purpose": "label"},
+    "Poly.pin": {"official": "poly.pin", "gds": "66:16", "purpose": "pin"},
+    "M1.label": {"official": "li1.label", "gds": "67:5", "purpose": "label"},
+    "M1.pin": {"official": "li1.pin", "gds": "67:16", "purpose": "pin"},
+    "M2.label": {"official": "met1.label", "gds": "68:5", "purpose": "label"},
+    "M2.pin": {"official": "met1.pin", "gds": "68:16", "purpose": "pin"},
+    "M3.label": {"official": "met2.label", "gds": "69:5", "purpose": "label"},
+    "M3.pin": {"official": "met2.pin", "gds": "69:16", "purpose": "pin"},
+    "M4.label": {"official": "met3.label", "gds": "70:5", "purpose": "label"},
+    "M4.pin": {"official": "met3.pin", "gds": "70:16", "purpose": "pin"},
+    "M5.label": {"official": "met4.label", "gds": "71:5", "purpose": "label"},
+    "M5.pin": {"official": "met4.pin", "gds": "71:16", "purpose": "pin"},
+    "M6.label": {"official": "met5.label", "gds": "72:5", "purpose": "label"},
+    "M6.pin": {"official": "met5.pin", "gds": "72:16", "purpose": "pin"}
+  },
+  "verification_drop_layers": {
+    "100:5": "ALIGN Bbox helper layer rejected by open_pdks Magic sky130A GDS reader.",
+    "104:0": "ALIGN Outline/helper layer rejected by open_pdks Magic sky130A GDS reader.",
+    "235:5": "ALIGN boundary/helper layer rejected by open_pdks Magic sky130A GDS reader."
   },
   "special_layers": {
     "Fin": "ALIGN template/grid artifact with no Sky130 planar drawing-layer equivalent.",
     "Pc": "ALIGN poly-contact generator config; mos.py emits this wire on Poly.",
     "Rvt": "VT helper/id layer; no direct base drawing-layer match in current SkyWater docs.",
     "Slvt": "VT helper/id layer; no direct base drawing-layer match in current SkyWater docs.",
-    "Hvt": "VT helper/id layer with nonstandard current GDS value; requires generated GDS and Magic evidence.",
+    "Hvt": "High-Vt LVPMOS implant. Corrected from non-SkyWater 970:0 to official hvtp 78:44.",
     "CapMIMContact": "MIM helper/contact layer; validate against generated capacitor topology.",
     "Bbox": "ALIGN boundary/helper layer.",
     "Boundary": "ALIGN boundary/helper layer.",

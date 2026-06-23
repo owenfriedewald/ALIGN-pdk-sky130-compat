@@ -115,3 +115,14 @@ Date: 2026-06-18
 | `python3 scripts/discover_validation_inputs.py --root . --limit 12` | Passed. Found example SPICE candidates and no GDS/open_pdks candidates; reported missing Magic/Netgen/ALIGN CLI. |
 | `python3 scripts/discover_validation_inputs.py --help` | Passed. Discovery helper exposes help text. |
 | `python3 -m py_compile scripts/discover_validation_inputs.py` | Passed. |
+| `docker image ls --format ... \| rg -i 'align\|daarp\|layout\|iic\|osic\|sky130'` | Passed with escalation. Found `darpaalign/align-public:latest` and `hpretl/iic-osic-tools:latest`. |
+| `docker run ... darpaalign/align-public:latest ... import align ... schematic2layout.py` | Passed. Confirmed ALIGN Python package and `schematic2layout.py` are available in Docker. |
+| `docker run ... hpretl/iic-osic-tools:latest ... run_one_circuit_validation.sh ... --layout-top INVERTER_0 --schematic-top inverter` | Passed. Magic loaded real top, DRC reported 60 errors, extraction produced SPICE, Netgen ran and failed LVS. |
+| `docker run ... inspect_gds_layers.py /tuple/generated/inverter.gds` | Passed. Confirmed `69:5` is an official met2 label and helper layers `100:5`, `104:0`, `235:5` are drop candidates. |
+| `python3 scripts/compare_layer_map.py` | Passed after HVT patch. `Hvt` now maps to official `hvtp 78:44`. |
+| `docker run ... schematic2layout.py ... generated_runs/inverter_input` | Passed. Regenerated inverter with `darpaalign/align-public:latest` and workspace `SKY130_PDK`. |
+| `docker run ... inspect_gds_layers.py generated_runs/inverter_align/INVERTER_0.gds` | Passed. Regenerated GDS still emits helper layers, proving sanitizer/exporter fix is still needed. |
+| `docker run ... schematic2layout.py ... after NoGDS helper-layer experiment` | Failed as useful evidence. ALIGN `gen_gds_json.py` requires `Bbox['GdsLayerNo']`; PDK-only removal of Bbox GDS mapping breaks generation. Reverted. |
+| `docker run ... run_one_circuit_validation.sh ... inverter_nopex` | Passed. No-PEX LVS extraction removed parasitic capacitor count mismatch; layout had 120 MOS devices versus schematic 2 MOS devices. |
+| `python3 scripts/normalize_netlist.py ... --expand-nf-stack --scale-wl-to-um` | Passed. Expanded inverter schematic to 120 physical MOS devices. |
+| `docker run ... run_netgen_lvs.sh ... inverter.expanded.sp` | Passed. Netgen matched 120 devices and 564 nets on both sides, but top-level pin matching still failed. |

@@ -61,4 +61,9 @@ drc why
 quit -noprompt
 EOF
 
+if grep -Eq "Cell .* couldn't be read|Creating new cell|There is nothing here" "$LOG"; then
+  echo "ERROR: Magic did not load an existing non-empty cell for top '$TOP'. See $LOG" >&2
+  exit 1
+fi
+
 echo "Wrote $LOG"

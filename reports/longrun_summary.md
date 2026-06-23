@@ -93,6 +93,21 @@ Before that, verify the open_pdks path:
 python3 scripts/check_verification_refs.py --open-pdks-root /path/to/share/pdk/sky130A
 ```
 
+## Tuple Update
+
+After `inverter_tuple.tar.gz` was provided, the local images were:
+
+- `darpaalign/align-public:latest`: ALIGN available, including `schematic2layout.py`.
+- `hpretl/iic-osic-tools:latest`: Magic, Netgen, KLayout Python, and open_pdks `/foss/pdks/sky130A` available.
+
+Real inverter validation is now possible and was run. The current branch is no longer only verification prep:
+
+- Corrected `Hvt` from non-SkyWater `970:0` to official `hvtp 78:44`.
+- Added GDS sanitizer for helper layers rejected by Magic.
+- Added no-PEX default extraction for LVS, with `--pex` opt-in.
+- Added explicit `nf/stack` schematic expansion. This changed inverter LVS from raw device-count mismatch to matching `120` devices and `564` nets on both sides, with remaining pin/net mismatch.
+- Regenerated inverter with `darpaalign/align-public:latest`; helper layers still stream, proving this needs an ALIGN exporter patch or sanitizer bridge.
+
 ## Branch Risk
 
 This branch is safe to keep as a compatibility-prep branch. It should still be treated as experimental until a real one-circuit Magic/Netgen run is completed, because no physical DRC/LVS claims have been validated.

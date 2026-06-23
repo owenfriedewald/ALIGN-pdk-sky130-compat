@@ -71,9 +71,49 @@ This is an opt-in LVS dialect normalization, not a claim that LVS will pass.
 
 ## Runtime Result
 
-No Magic/Netgen run was performed. Required runtime inputs are missing:
+Initial static pass had no Magic/Netgen run because required runtime inputs were missing:
 
 - generated inverter GDS,
 - open_pdks `sky130A` install,
 - Magic executable,
 - Netgen executable.
+
+## Tuple Runtime Result
+
+Status: `diagnostic_only`
+
+Tuple used:
+
+- GDS: `artifacts/inverter_tuple/inverter/generated/inverter.gds`
+- Schematic: `artifacts/inverter_tuple/inverter/input/inverter.sp`
+- Layout top: `INVERTER_0`
+- Schematic top: `inverter`
+- open_pdks path inside Docker: `/foss/pdks/sky130A`
+- Magic/Netgen image: `hpretl/iic-osic-tools:latest`
+- ALIGN image found later: `darpaalign/align-public:latest`
+
+The wrapper now sanitizes a verification copy of the GDS, dropping `100:5`, `104:0`, and `235:5` helper layers. It keeps `69:5` because SkyWater documents it as `met2,label`.
+
+Results:
+
+- Magic DRC loaded the real `INVERTER_0` top and reported `60` DRC errors.
+- Magic extraction produced `reports/before_after/inverter_nopex/extracted/INVERTER_0.extracted.spice`.
+- LVS with normal model/parameter normalization failed with `120` extracted MOS devices versus `2` schematic MOS devices.
+- LVS with `--expand-nf-stack --scale-wl-to-um` matched device and net counts at `120` devices and `564` nets on both sides, but still failed top-level pin/net matching.
+
+Best current command:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root "$OPEN_PDKS_SKY130A" \
+  --gds "$LAYOUT_GDS" \
+  --layout-top INVERTER_0 \
+  --schematic "$SCHEMATIC_SPICE" \
+  --schematic-top inverter \
+  --out-dir reports/before_after/inverter_expanded \
+  --expand-nf-stack \
+  --scale-wl-to-um
+```
+
+Interpretation:
+The dominant LVS mismatch is no longer model naming. It is the inherited mock-FinFET MOS abstraction: ALIGN encodes physical multiplicity as `nf/stack`, while Magic extracts every planar poly/diff crossing as an individual device. Expansion confirms the count mismatch, and remaining failures point to pin/connectivity semantics.
