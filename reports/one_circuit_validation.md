@@ -241,3 +241,42 @@ reports/before_after/buffer_label_patch_xsubckt_full/
 
 Interpretation:
 The compatibility flow now has two clean MOS-only examples: inverter under the explicit RVT compatibility policy and buffer under regular RVT aliases. The buffer result validates the top-level-label patch independently of the LVT marker policy.
+
+## Five-Transistor OTA Validation
+
+Status: `drc_clean`, `lvs_clean` for a modest MOS-only analog block.
+
+Full command used inside `hpretl/iic-osic-tools:latest`:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/five_transistor_ota_label_patch/FIVE_TRANSISTOR_OTA_0.python.gds \
+  --layout-top FIVE_TRANSISTOR_OTA \
+  --schematic examples/five_transistor_ota/five_transistor_ota.sp \
+  --schematic-top five_transistor_ota \
+  --out-dir reports/before_after/five_transistor_ota_label_patch_xsubckt_full \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um \
+  --mos-as-subckt \
+  --uppercase-nets
+```
+
+Results:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 300 devices, Circuit 2 contains 300 devices.
+Circuit 1 contains 208 nets,    Circuit 2 contains 208 nets.
+Final result: Circuits match uniquely.
+```
+
+Evidence directory:
+
+```text
+reports/before_after/five_transistor_ota_label_patch_xsubckt_full/
+```
+
+Interpretation:
+This extends the clean flow beyond toy inverter/buffer cases to a small analog block. It still covers only MOS-only regular 1.8V devices; capacitor, resistor, HVT/LVT, and larger OTA/current mirror behavior remain separate validation targets.

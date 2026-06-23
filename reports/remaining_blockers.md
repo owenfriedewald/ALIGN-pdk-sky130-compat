@@ -20,9 +20,13 @@ Netgen LVS: Final result: Circuits match uniquely.
 reports/before_after/buffer_label_patch_xsubckt_full/
 Magic DRC: Total DRC errors found: 0
 Netgen LVS: Final result: Circuits match uniquely.
+
+reports/before_after/five_transistor_ota_label_patch_xsubckt_full/
+Magic DRC: Total DRC errors found: 0
+Netgen LVS: Final result: Circuits match uniquely.
 ```
 
-The inverter result depends on the experimental no-LVT-marker RVT compatibility policy and schematic subckt normalization. The buffer result uses regular RVT aliases and additionally validates the top-level-label patch in the ALIGN runtime patcher.
+The inverter result depends on the experimental no-LVT-marker RVT compatibility policy and schematic subckt normalization. The buffer and five-transistor OTA results use regular 1.8V model aliases and additionally validate the top-level-label patch in the ALIGN runtime patcher.
 
 ## Remaining Runtime Blockers Outside Docker / Outside Inverter
 
@@ -62,7 +66,7 @@ The inverter result depends on the experimental no-LVT-marker RVT compatibility 
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Redesign MOS schematic/generator contract for planar Sky130, or make LVS netlists physically expanded before comparison. |
 | Default/native PnR GDS writer still emits helper boundary records | The patched Python stream-out path removes helper layers, but default native `*.gds` still emits non-Sky130 boundary records such as `235:5`. | Patch downstream native GDS writer or keep using `.python.gds`/sanitizer for verification. |
 | Official LVT support is not solved | The clean inverter path suppresses LVT marker generation and coerces schematic aliases to RVT. | Either generate official-compliant LVT geometry or reject/remap invalid LVT requests intentionally. |
-| Larger circuits are unvalidated | Inverter and buffer have clean Magic/Netgen runs; OTA/current mirror examples have not. | Repeat the same flow on the next small circuit before changing broad rules. |
+| Larger/mixed-device circuits are unvalidated | Inverter, buffer, and five-transistor OTA have clean Magic/Netgen runs; current mirror OTA, telescopic OTA, MIM caps, resistors, HVT, and true LVT are not validated. | Repeat the same flow on the next small or mixed-device circuit before changing broad rules. |
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Keep LVS physical expansion for verification or redesign the schematic/generator contract for planar Sky130. |
 
 ## Current Practical Verification Path

@@ -55,3 +55,13 @@ Date: 2026-06-23
 | 1 | Patch ALIGN Python stream-out top-level label allow-list | High | High: changes buffer from port-mismatch LVS fail to clean LVS | Low/medium: export-label behavior only, but must be applied before generation | Yes | Generation/export only | Yes | Applied in runtime patcher |
 | 2 | Keep Python stream-out `.python.gds` as primary verification artifact | High | High: avoids helper-layer import failures and now has correct top-level labels | Low | Yes | Export path selection | Yes | Continue |
 | 3 | Patch native/default PnR GDS helper-boundary records | Medium | Medium: would make default `*.gds` usable without sanitizer | Medium/high: writer source path still needs tighter evidence | Yes | Generation/export only | Yes | Investigate later |
+
+## Updated Ranking After Five-Transistor OTA Evidence
+
+Date: 2026-06-23
+
+| Rank | Candidate fix | Confidence | Expected impact | Risk | Runtime GDS required? | Changes generation or only verification? | Fair for baseline ALIGN and AnalogDSL? | Action |
+|---:|---|---|---|---|---|---|---|---|
+| 1 | Keep current patched Python stream-out + LVS normalization flow for MOS-only RVT circuits | High | High: clean inverter, buffer, and five-transistor OTA evidence | Low/medium: experimental but now repeatable | Yes | Export + verification | Yes | Use as current baseline |
+| 2 | Validate next mixed/more complex circuit before changing geometry | High | High: prevents unnecessary PDK rewrites | Low for validation | Yes | Verification only | Yes | Next |
+| 3 | True LVT support via geometry/policy | Medium | High, but separate from current clean RVT path | High | Yes | Device-generation semantics | Yes | Defer pending review |

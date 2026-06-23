@@ -167,3 +167,15 @@ labels = [i.name for i in hN.blockPins].extend([i.name for i in hN.PowerNets])
 ```
 
 `list.extend()` returns `None`, so the GDS translator did not receive the intended top-level label allow-list. `scripts/patch_align_gds_export.py` now patches this to list concatenation and also skips `Outline` injection when the PDK marks it `NoGDS`.
+
+## Five-Transistor OTA Clean Run
+
+The same patched Python stream-out and LVS normalization flow was applied to `examples/five_transistor_ota/five_transistor_ota.sp`:
+
+- GDS: `generated_runs/five_transistor_ota_label_patch/FIVE_TRANSISTOR_OTA_0.python.gds`
+- Report: `reports/before_after/five_transistor_ota_label_patch_xsubckt_full/`
+- Magic DRC: `Total DRC errors found: 0`
+- Netgen LVS: `Final result: Circuits match uniquely.`
+- LVS scale: 300 device instances and 208 nets on both sides before matching.
+
+This is the first clean modest analog block in the branch. It uses regular `sky130_fd_pr__nfet_01v8` and `sky130_fd_pr__pfet_01v8` models and does not depend on the LVT-to-RVT compatibility policy.
