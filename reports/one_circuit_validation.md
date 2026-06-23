@@ -280,3 +280,43 @@ reports/before_after/five_transistor_ota_label_patch_xsubckt_full/
 
 Interpretation:
 This extends the clean flow beyond toy inverter/buffer cases to a small analog block. It still covers only MOS-only regular 1.8V devices; capacitor, resistor, HVT/LVT, and larger OTA/current mirror behavior remain separate validation targets.
+
+## Current-Mirror OTA Validation
+
+Status: `drc_clean`, `lvs_mismatch`.
+
+Full command used inside `hpretl/iic-osic-tools:latest`:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/current_mirror_ota_label_patch/CURRENT_MIRROR_OTA_0.python.gds \
+  --layout-top CURRENT_MIRROR_OTA \
+  --schematic examples/current_mirror_ota/current_mirror_ota.sp \
+  --schematic-top current_mirror_ota \
+  --out-dir reports/before_after/current_mirror_ota_label_patch_xsubckt_full \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um \
+  --mos-as-subckt \
+  --uppercase-nets
+```
+
+Results:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 192 devices, Circuit 2 contains 184 devices. *** MISMATCH ***
+Circuit 1 contains 106 nets,    Circuit 2 contains 102 nets. *** MISMATCH ***
+sky130_fd_pr__pfet_01v8 (80) | sky130_fd_pr__pfet_01v8 (72) **Mismatch**
+Final result: Netlists do not match.
+```
+
+Evidence directory:
+
+```text
+reports/before_after/current_mirror_ota_label_patch_xsubckt_full/
+```
+
+Interpretation:
+The same patched stream-out and LVS normalization path gets this larger current-mirror OTA to a clean Magic DRC run, but LVS exposes a real PFET count mismatch. `scripts/analyze_mos_array_units.py` flags the two generated PMOS grouped primitives as `fractional_unit_rounding,unequal_nf_group,high_lvs_count_risk`: the source PMOS mirror pair has `NF=6` and `NF=12` with `stack=2`, while the current generator rounds a `4.5` unit-cell calculation up to `5`. This is now the highest-priority device-generation mismatch; it should not be papered over in Netgen.

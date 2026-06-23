@@ -1,0 +1,31 @@
+[32malign.main INFO : Reading netlist: /work/generated_runs/current_mirror_ota_input_label_patch/current_mirror_ota.sp subckt=CURRENT_MIRROR_OTA, flat=0[0m
+[32malign.compiler.compiler INFO : Starting topology identification...[0m
+[32malign.compiler.compiler INFO : Power and ground nets not found. Power grid will not be constructed.[0m
+[32malign.compiler.compiler INFO : Completed topology identification.[0m
+[32malign.pnr.main INFO : Running Place & Route for CURRENT_MIRROR_OTA[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file CURRENT_MIRROR_OTA.pnr.const.json[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file CURRENT_MIRROR_OTA.pnr.const.json[0m
+[32malign.pnr.placer INFO : Starting bottom-up placement on CURRENT_MIRROR_OTA 0[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : Required 1 perturbations to generate a feasible solution.[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 10 %[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 20 %[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 30 %[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 40 %[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 50 %[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 60 %[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 70 %[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 80 %[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : ..... 90 %[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file CURRENT_MIRROR_OTA.pnr.const.json[0m
+[32malign.pnr.router INFO : Starting top_down routing on CURRENT_MIRROR_OTA 0 restricted to None[0m
+[32mPnR.router.Router.RouteWork INFO : GcellGlobalRouter: CURRENT_MIRROR_OTA[0m
+[33mPnR.router.GlobalGraph.dijkstra WARNING : Router-Warning: feasible path might not be found[0m
+[33mPnR.router.GlobalGraph.dijkstra WARNING : Router-Warning: feasible path might not be found[0m
+[33mPnR.router.GlobalGraph.dijkstra WARNING : Router-Warning: feasible path might not be found[0m
+[32mPnR.router.Router.RouteWork INFO : GcellDetailRouter: CURRENT_MIRROR_OTA[0m
+[32mPnR.router.Router.RouteWork INFO : Create power grid: CURRENT_MIRROR_OTA[0m
+[32mPnR.router.Router.RouteWork INFO : Power routing CURRENT_MIRROR_OTA[0m
+[32malign.pnr.main INFO : OUTPUT json at /work/generated_runs/current_mirror_ota_label_patch/3_pnr/CURRENT_MIRROR_OTA_0.json[0m
+[32malign.pnr.main INFO : OUTPUT gds.json /work/generated_runs/current_mirror_ota_label_patch/3_pnr/CURRENT_MIRROR_OTA_0.python.gds.json[0m
+Use KLayout to visualize the generated GDS: /work/generated_runs/current_mirror_ota_label_patch/CURRENT_MIRROR_OTA_0.gds
+Use KLayout to visualize the python generated GDS: /work/generated_runs/current_mirror_ota_label_patch/CURRENT_MIRROR_OTA_0.python.gds

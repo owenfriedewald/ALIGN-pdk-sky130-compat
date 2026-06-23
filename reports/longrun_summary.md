@@ -179,3 +179,23 @@ The same patched Python stream-out and LVS normalization flow was applied to `ex
 - LVS scale: 300 device instances and 208 nets on both sides before matching.
 
 This is the first clean modest analog block in the branch. It uses regular `sky130_fd_pr__nfet_01v8` and `sky130_fd_pr__pfet_01v8` models and does not depend on the LVT-to-RVT compatibility policy.
+
+## Current-Mirror OTA DRC-Clean / LVS-Failing Run
+
+The next larger MOS-only circuit, `examples/current_mirror_ota/current_mirror_ota.sp`, was generated and run through the same patched stream-out and normalization flow:
+
+- GDS: `generated_runs/current_mirror_ota_label_patch/CURRENT_MIRROR_OTA_0.python.gds`
+- Report: `reports/before_after/current_mirror_ota_label_patch_xsubckt_full/`
+- Magic DRC: `Total DRC errors found: 0`
+- Netgen LVS: `Final result: Netlists do not match.`
+- Mismatch: layout has 192 devices and 106 nets; normalized schematic has 184 devices and 102 nets.
+- Device class mismatch: layout extracts 80 PFETs; normalized schematic expects 72 PFETs. NFET count matches.
+
+The mismatch is now tied to generated PMOS grouped primitives with unequal finger counts:
+
+```text
+SCM_PMOS_85912433_X1_Y5: M1 NF=6, M2 NF=12, stack=2, formula_units=4.5, emitted unit_cells=5
+SCM_PMOS_85912433_X5_Y1: M1 NF=6, M2 NF=12, stack=2, formula_units=4.5, emitted unit_cells=5
+```
+
+This is useful negative evidence. The next real PDK/device rewrite target is the grouped MOS array sizing logic, not Magic/Netgen setup.

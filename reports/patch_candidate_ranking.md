@@ -65,3 +65,14 @@ Date: 2026-06-23
 | 1 | Keep current patched Python stream-out + LVS normalization flow for MOS-only RVT circuits | High | High: clean inverter, buffer, and five-transistor OTA evidence | Low/medium: experimental but now repeatable | Yes | Export + verification | Yes | Use as current baseline |
 | 2 | Validate next mixed/more complex circuit before changing geometry | High | High: prevents unnecessary PDK rewrites | Low for validation | Yes | Verification only | Yes | Next |
 | 3 | True LVT support via geometry/policy | Medium | High, but separate from current clean RVT path | High | Yes | Device-generation semantics | Yes | Defer pending review |
+
+## Updated Ranking After Current-Mirror OTA Evidence
+
+Date: 2026-06-23
+
+| Rank | Candidate fix | Confidence | Expected impact | Risk | Runtime GDS required? | Changes generation or only verification? | Fair for baseline ALIGN and AnalogDSL? | Action |
+|---:|---|---|---|---|---|---|---|---|
+| 1 | Fix grouped MOS array sizing for unequal-NF pairs | High that it is the current LVS blocker | High: current_mirror_ota is DRC-clean but fails LVS by exactly 8 extra PFETs | High: changes MOS primitive generation semantics | Yes | Generation/device topology | Yes if applied globally | Investigate with a targeted primitive-level rewrite |
+| 2 | Add/read `scripts/analyze_mos_array_units.py` before validating larger grouped-MOS circuits | High | Medium/high: predicts LVS count risk from generated primitives before Magic/Netgen | Low | No after generation; yes to correlate with LVS | Verification/diagnostic only | Yes | Added |
+| 3 | Force schematic normalizer to match rounded-up grouped arrays | Low | Could make current LVS pass artificially | High: would hide real layout-vs-schematic topology mismatch | Yes | Verification only, but unsafe | No | Do not apply |
+| 4 | Continue validating circuits with equal-NF grouped MOS arrays | High | Medium: clean five-transistor OTA shows equal-NF groups are currently usable | Low | Yes | Verification only | Yes | Continue as regression coverage |
