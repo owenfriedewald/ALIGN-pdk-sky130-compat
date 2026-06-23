@@ -117,3 +117,46 @@ scripts/run_one_circuit_validation.sh \
 
 Interpretation:
 The dominant LVS mismatch is no longer model naming. It is the inherited mock-FinFET MOS abstraction: ALIGN encodes physical multiplicity as `nf/stack`, while Magic extracts every planar poly/diff crossing as an individual device. Expansion confirms the count mismatch, and remaining failures point to pin/connectivity semantics.
+
+## Patched Python Stream-Out Result
+
+Status: `diagnostic_only`
+
+The ALIGN runtime was patched inside `darpaalign/align-public:latest` with:
+
+```sh
+python3 scripts/patch_align_gds_export.py
+```
+
+and `SKY130_PDK/layers.json` now marks helper layers `Bbox`, `Boundary`, `Rboundary`, `Cboundary`, and `Outline` as `NoGDS`.
+
+Regenerated artifact:
+
+- `generated_runs/inverter_align_nogds_patch/INVERTER_0.python.gds`
+- Layout top in that GDS: `INVERTER`
+
+Layer inspection with KLayout Python showed no `100:5`, `104:0`, or `235:5` records in the patched Python stream-out. The default PnR GDS still has `104:0` and `235:5`, so use `.python.gds` or the sanitizer until the downstream writer is patched.
+
+No-sanitizer validation command:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/inverter_align_nogds_patch/INVERTER_0.python.gds \
+  --layout-top INVERTER \
+  --schematic artifacts/inverter_tuple/inverter/input/inverter.sp \
+  --schematic-top inverter \
+  --out-dir reports/before_after/inverter_patched_python_streamout \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um
+```
+
+Results:
+
+- Magic import had no unknown helper-layer errors.
+- Magic DRC still reported `60` errors.
+- Magic extraction produced `reports/before_after/inverter_patched_python_streamout/extracted/INVERTER.extracted.spice`.
+- Netgen LVS still failed, but reached `120` devices and `564` nets on both sides.
+
+Current best next command is the no-sanitizer patched Python stream-out command above. The next actual PDK/generator work is DRC classification and pin/connectivity semantics.

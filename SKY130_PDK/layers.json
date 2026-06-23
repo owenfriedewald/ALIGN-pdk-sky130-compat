@@ -357,32 +357,37 @@
 {
 "Layer": "Bbox",
 "GdsLayerNo": 100,
-"GdsDatatype": {"Draw":5}
+"GdsDatatype": {"Draw":5},
+"NoGDS": true
 },
 
 {
 "Layer": "Boundary",
 "GdsLayerNo": 101,
 "GdsDatatype": {"Draw":0},
-"TrackX": 0
+"TrackX": 0,
+"NoGDS": true
 },
 
 {
 "Layer": "Rboundary",
 "GdsLayerNo": 102,
-"GdsDatatype": {"Draw":0}
+"GdsDatatype": {"Draw":0},
+"NoGDS": true
 },
 
 {
 "Layer": "Cboundary",
 "GdsLayerNo": 103,
-"GdsDatatype": {"Draw":0}
+"GdsDatatype": {"Draw":0},
+"NoGDS": true
 },
     
 {
 "Layer": "Outline",
 "GdsLayerNo": 104,
-"GdsDatatype": {"Draw":0}
+"GdsDatatype": {"Draw":0},
+"NoGDS": true
 },
 
 {

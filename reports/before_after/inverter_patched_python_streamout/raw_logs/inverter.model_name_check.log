@@ -1,0 +1,180 @@
+ALIGN model file: SKY130_PDK/models.sp
+ALIGN .model definitions (19):
+  - inductor
+  - nfet
+  - nmos_hvt
+  - nmos_lvt
+  - nmos_rvt
+  - pfet
+  - pmos_hvt
+  - pmos_lvt
+  - pmos_rvt
+  - resistor
+  - sky130_fd_pr__cap_mim_m3_1
+  - sky130_fd_pr__cap_mim_m3_2
+  - sky130_fd_pr__cap_mim_m4
+  - sky130_fd_pr__model__cap_mim
+  - sky130_fd_pr__nfet_01v8
+  - sky130_fd_pr__nfet_01v8_lvt
+  - sky130_fd_pr__pfet_01v8
+  - sky130_fd_pr__pfet_01v8_hvt
+  - sky130_fd_pr__pfet_01v8_lvt
+
+MOS models used by examples (6):
+  - nmos_lvt
+  - nmos_rvt
+  - pmos_lvt
+  - pmos_rvt
+  - sky130_fd_pr__nfet_01v8
+  - sky130_fd_pr__pfet_01v8
+
+Official-looking model names in SkyWater docs (115):
+  - sky130_fd_pr__cap_mim_m3_2
+  - sky130_fd_pr__cap_mim_m3__base
+  - sky130_fd_pr__cap_mim_m4
+  - sky130_fd_pr__cap_mim_m4__base
+  - sky130_fd_pr__cap_var_XXXX
+  - sky130_fd_pr__cap_var_hvt
+  - sky130_fd_pr__cap_var_lvt
+  - sky130_fd_pr__cap_vpp_
+  - sky130_fd_pr__cap_vpp_01p8x01p8_m1m2_noshield
+  - sky130_fd_pr__cap_vpp_02p4x04p6_m1m2_noshield
+  - sky130_fd_pr__cap_vpp_02p7x06p1_m1m2m3m4_shieldl1_fingercap
+  - sky130_fd_pr__cap_vpp_02p7x11p1_m1m2m3m4_shieldl1_fingercap
+  - sky130_fd_pr__cap_vpp_02p7x21p1_m1m2m3m4_shieldl1_fingercap
+  - sky130_fd_pr__cap_vpp_02p7x41p1_m1m2m3m4_shieldl1_fingercap
+  - sky130_fd_pr__cap_vpp_02p9x06p1_m1m2m3m4_shieldl1_fingercap2
+  - sky130_fd_pr__cap_vpp_04p4x04p6_m1m2_noshield
+  - sky130_fd_pr__cap_vpp_04p4x04p6_m1m2_noshield_o2
+  - sky130_fd_pr__cap_vpp_04p4x04p6_m1m2m3_shieldl1
+  - sky130_fd_pr__cap_vpp_04p4x04p6_m1m2m3_shieldl1m5_floatm4
+  - sky130_fd_pr__cap_vpp_06p8x06p1_l1m1m2m3_shieldpom4
+  - sky130_fd_pr__cap_vpp_06p8x06p1_l1m1m2m3m4_shieldpo_floatm5
+  - sky130_fd_pr__cap_vpp_06p8x06p1_m1m2m3_shieldl1m4
+  - sky130_fd_pr__cap_vpp_08p6x07p8_m1m2_noshield
+  - sky130_fd_pr__cap_vpp_08p6x07p8_m1m2m3_shieldl1
+  - sky130_fd_pr__cap_vpp_08p6x07p8_m1m2m3_shieldl1m5_floatm4
+  - sky130_fd_pr__cap_vpp_11p3x11p8_l1m1m2m3m4_shieldm5
+  - sky130_fd_pr__cap_vpp_11p3x11p8_l1m1m2m3m4_shieldm5_nhv
+  - sky130_fd_pr__cap_vpp_11p5x11p7_l1m1m2_shieldpom3
+  - sky130_fd_pr__cap_vpp_11p5x11p7_l1m1m2m3_shieldm4
+  - sky130_fd_pr__cap_vpp_11p5x11p7_l1m1m2m3_shieldpom4
+  - sky130_fd_pr__cap_vpp_11p5x11p7_l1m1m2m3m4_shieldm5
+  - sky130_fd_pr__cap_vpp_11p5x11p7_l1m1m2m3m4_shieldpom5
+  - sky130_fd_pr__cap_vpp_11p5x11p7_m1m2_noshield
+  - sky130_fd_pr__cap_vpp_11p5x11p7_m1m2m3_shieldl1
+  - sky130_fd_pr__cap_vpp_11p5x11p7_m1m2m3_shieldl1m5_floatm4
+  - sky130_fd_pr__cap_vpp_11p5x11p7_m1m2m3m4_shieldl1m5
+  - sky130_fd_pr__cap_vpp_11p5x11p7_m1m2m3m4_shieldm5
+  - sky130_fd_pr__cap_vpp_44p7x23p1_pol1m1m2m3m4m5_noshield
+  - sky130_fd_pr__cap_vpp_XXXX
+  - sky130_fd_pr__cap_vpp_XXXXX
+  - sky130_fd_pr__cap_vpp_XXXXXX
+  - sky130_fd_pr__cap_vpp_XXpXxYYpY_
+  - sky130_fd_pr__diode_pd2nw_05v5
+  - sky130_fd_pr__diode_pd2nw_05v5_hvt
+  - sky130_fd_pr__diode_pd2nw_05v5_lvt
+  - sky130_fd_pr__diode_pd2nw_11v0
+  - sky130_fd_pr__diode_pw2nd_05v5
+  - sky130_fd_pr__diode_pw2nd_05v5_lvt
+  - sky130_fd_pr__diode_pw2nd_05v5_nvt
+  - sky130_fd_pr__diode_pw2nd_11v0
+  - sky130_fd_pr__esd_nfet_01v8
+  - sky130_fd_pr__esd_nfet_g5v0d10v5
+  - sky130_fd_pr__esd_nfet_g5v0d10v5_nvt
+  - sky130_fd_pr__esd_pfet_g5v0d10v5
+  - sky130_fd_pr__ind
+  - sky130_fd_pr__model__cap_mim
+  - sky130_fd_pr__model__parasitic__diode_ps2dn
+  - sky130_fd_pr__model__parasitic__diode_ps2dn__hv
+  - sky130_fd_pr__model__parasitic__diode_ps2nw
+  - sky130_fd_pr__model__parasitic__diode_pw2dn
+  - sky130_fd_pr__model__parasitic__rf_diode_ps2nw
+  - sky130_fd_pr__model__parasitic__rf_diode_pw2dn
+  - sky130_fd_pr__nfet_01v8
+  - sky130_fd_pr__nfet_01v8_lvt
+  - sky130_fd_pr__nfet_03v3_nvt
+  - sky130_fd_pr__nfet_05v0_nvt
+  - sky130_fd_pr__nfet_20v0
+  - sky130_fd_pr__nfet_20v0_iso
+  - sky130_fd_pr__nfet_20v0_nvt
+  - sky130_fd_pr__nfet_20v0_zvt
+  - sky130_fd_pr__nfet_extenddrain
+  - sky130_fd_pr__nfet_g5v0d10v5
+  - sky130_fd_pr__nfet_g5v0d16v0
+  - sky130_fd_pr__npn_05v5
+  - sky130_fd_pr__npn_11v0
+  - sky130_fd_pr__pfet_01v8
+  - sky130_fd_pr__pfet_01v8_hvt
+  - sky130_fd_pr__pfet_01v8_lvt
+  - sky130_fd_pr__pfet_20v0
+  - sky130_fd_pr__pfet_extenddrain
+  - sky130_fd_pr__pfet_g5v0d10v5
+  - sky130_fd_pr__pfet_g5v0d16v0
+  - sky130_fd_pr__pnp_05v5
+  - sky130_fd_pr__pnp_05v5_W0p68L0p68
+  - sky130_fd_pr__pnp_05v5_W3p40L3p40
+  - sky130_fd_pr__res_generic_l1
+  - sky130_fd_pr__res_generic_m1
+  - sky130_fd_pr__res_generic_m2
+  - sky130_fd_pr__res_generic_m3
+  - sky130_fd_pr__res_generic_m4
+  - sky130_fd_pr__res_generic_m5
+  - sky130_fd_pr__res_generic_nd
+  - sky130_fd_pr__res_generic_pd
+  - sky130_fd_pr__res_generic_po
+  - sky130_fd_pr__res_generic_pw
+  - sky130_fd_pr__res_high_po
+  - sky130_fd_pr__res_high_po_0p35
+  - sky130_fd_pr__res_high_po_0p69
+  - sky130_fd_pr__res_high_po_1p41
+  - sky130_fd_pr__res_high_po_2p85
+  - sky130_fd_pr__res_high_po_5p73
+  - sky130_fd_pr__res_iso_pw
+  - sky130_fd_pr__res_xhigh_po
+  - sky130_fd_pr__res_xhigh_po_0p35
+  - sky130_fd_pr__res_xhigh_po_0p69
+  - sky130_fd_pr__res_xhigh_po_1p41
+  - sky130_fd_pr__res_xhigh_po_2p85
+  - sky130_fd_pr__res_xhigh_po_5p73
+  - sky130_fd_pr__special_nfet_latch
+  - sky130_fd_pr__special_nfet_latch_lowleakage
+  - sky130_fd_pr__special_nfet_pass
+  - sky130_fd_pr__special_nfet_pass_flash
+  - sky130_fd_pr__special_nfet_pass_lowleakage
+  - sky130_fd_pr__special_pfet_pass
+  - sky130_fd_pr__special_pfet_pass_lowleakage
+
+MOS parameter names used by examples (5):
+  - l
+  - m
+  - nf
+  - stack
+  - w
+
+ALIGN aliases not seen as official SkyWater names (10):
+  - inductor
+  - nfet
+  - nmos_hvt
+  - nmos_lvt
+  - nmos_rvt
+  - pfet
+  - pmos_hvt
+  - pmos_lvt
+  - pmos_rvt
+  - resistor
+
+Compatibility alias targets:
+  - inductor -> <no target>
+  - nfet -> sky130_fd_pr__nfet_01v8
+  - nmos_hvt -> sky130_fd_pr__nfet_01v8
+  - nmos_lvt -> sky130_fd_pr__nfet_01v8_lvt
+  - nmos_rvt -> sky130_fd_pr__nfet_01v8
+  - pfet -> sky130_fd_pr__pfet_01v8
+  - pmos_hvt -> sky130_fd_pr__pfet_01v8_hvt
+  - pmos_lvt -> sky130_fd_pr__pfet_01v8_lvt
+  - pmos_rvt -> sky130_fd_pr__pfet_01v8
+  - resistor -> <no target>
+
+Example MOS models missing from ALIGN models.sp (0):
+

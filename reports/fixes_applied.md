@@ -380,3 +380,42 @@ Circuit 1 contains 564 nets,    Circuit 2 contains 564 nets.
 
 Remaining problems:
 Netgen still failed top-level pin/net matching. The next PDK/generator fix is connectivity/pin semantics, not just model naming or raw device count.
+
+## 13. Generation-Time Helper Layer Suppression
+
+Issue:
+ALIGN-generated Sky130 GDS includes helper/boundary layers rejected by open_pdks Magic. Post-generation sanitization works, but it is better to stop non-fabric helper layers from streaming where possible.
+
+Source diagnostic:
+Magic import rejected helper layer-purpose pairs `100:5`, `104:0`, and `235:5`. A first PDK-only `NoGDS` experiment failed because ALIGN's installed Python GDS exporter always accessed `Bbox['GdsLayerNo']`.
+
+Files changed:
+`SKY130_PDK/layers.json`
+`scripts/patch_align_gds_export.py`
+
+Patch made:
+Marked `Bbox`, `Boundary`, `Rboundary`, `Cboundary`, and `Outline` as `"NoGDS": true` in `layers.json`. Added an opt-in runtime patcher for ALIGN's installed `align/cell_fabric/gen_gds_json.py` so the Python exporter skips `NoGDS` layers and does not unconditionally append `Bbox`.
+
+Why the patch is safe:
+The PDK metadata change applies only to non-fabric helper layers. The runtime patcher creates a backup and only changes exporter stream-out behavior for layers explicitly marked `NoGDS`; it does not change placement, routing, transistor geometry, or electrical layers.
+
+After result:
+Regenerated inverter with `darpaalign/align-public:latest` after applying the patcher. The Python stream-out GDS no longer contains helper layers:
+
+```text
+GDS: generated_runs/inverter_align_nogds_patch/INVERTER_0.python.gds
+Used layers include official SkyWater layers and met2 labels/pins only.
+No 100:5, 104:0, or 235:5 records were present.
+```
+
+Then ran the one-circuit flow without the GDS sanitizer:
+
+```text
+Magic loaded INVERTER without unknown-layer errors.
+Magic DRC still reported 60 errors.
+Magic extraction produced extracted SPICE.
+Expanded LVS reached 120 devices and 564 nets on both sides, but netlists still did not match.
+```
+
+Remaining problems:
+The default non-Python PnR GDS (`INVERTER_0.gds`) still contains `104:0` and `235:5`, apparently from downstream PnR result JSON/GDS writer behavior. For open_pdks verification, use patched `.python.gds` or the sanitizer until that writer path is patched too.

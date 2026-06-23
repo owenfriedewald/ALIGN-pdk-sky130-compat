@@ -37,7 +37,11 @@ Date: 2026-06-18
 
 | Blocker | Evidence | Next action |
 |---|---|---|
-| Helper layers still stream from generated GDS | Regenerated inverter still emits `100:5`, `104:0`, `235:5`; Magic rejects them. Removing GDS mapping from `Bbox` breaks ALIGN `gen_gds_json.py`. | Patch or vendor ALIGN GDS exporter to suppress helper layers, or keep sanitizer as bridge. |
+| Helper layers still stream from default PnR GDS | The patched Python stream-out path now removes helper layers, but default `INVERTER_0.gds` still emits `104:0` and `235:5` from downstream PnR result writing. | Use patched `.python.gds` or sanitizer for verification; next patch target is the downstream PnR GDS writer. |
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Redesign MOS schematic/generator contract for planar Sky130, or make LVS netlists physically expanded before comparison. |
 | Top-level pins are not LVS-clean | Expanded LVS matched 120 devices and 564 nets on both sides but failed pin/net matching. | Fix pin label/export/extraction semantics and net naming/case policy. |
 | DRC remains nonzero | Magic reports 60 DRC errors on sanitized inverter GDS. | Obtain/classify detailed DRC feedback; then patch actual geometry/rules, not waivers. |
+
+## Current Practical Verification Path
+
+Use `scripts/patch_align_gds_export.py` inside the ALIGN runtime before generation, then verify the generated `.python.gds` with `--no-sanitize-gds`. This avoids Magic helper-layer import failures without post-processing GDS. It does not address the remaining 60 DRC errors or LVS connectivity mismatch.

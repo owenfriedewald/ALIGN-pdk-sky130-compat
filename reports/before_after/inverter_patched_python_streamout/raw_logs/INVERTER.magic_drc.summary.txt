@@ -1,0 +1,8 @@
+DRC log: /work/reports/before_after/inverter_patched_python_streamout/raw_logs/INVERTER.magic_drc.log
+lines: 25
+numeric count candidates: 60
+
+Key lines:
+23: DRC style is now "drc(full)"
+24: Loading DRC CIF style.
+25: Total DRC errors found: 60

@@ -126,3 +126,15 @@ Date: 2026-06-18
 | `docker run ... run_one_circuit_validation.sh ... inverter_nopex` | Passed. No-PEX LVS extraction removed parasitic capacitor count mismatch; layout had 120 MOS devices versus schematic 2 MOS devices. |
 | `python3 scripts/normalize_netlist.py ... --expand-nf-stack --scale-wl-to-um` | Passed. Expanded inverter schematic to 120 physical MOS devices. |
 | `docker run ... run_netgen_lvs.sh ... inverter.expanded.sp` | Passed. Netgen matched 120 devices and 564 nets on both sides, but top-level pin matching still failed. |
+| `docker image ls` | Passed. Confirmed local `darpaalign/align-public:latest` and `hpretl/iic-osic-tools:latest` images. |
+| `docker run ... python3 ... inspect align package path` | Passed. Installed ALIGN source path is `/usr/local/lib/python3.10/dist-packages/align`; `schematic2layout.py` is `/usr/local/bin/schematic2layout.py`. |
+| `docker run ... nl -ba /usr/local/lib/python3.10/dist-packages/align/cell_fabric/gen_gds_json.py` | Passed. Confirmed Python GDS exporter unconditionally appended `Bbox` and streamed all terminal layers by `GdsLayerNo`. |
+| `python3 -m py_compile scripts/patch_align_gds_export.py ...` | Passed. New ALIGN exporter patch helper compiles. |
+| `python3 scripts/patch_align_gds_export.py --help` | Passed. Help output available. |
+| `docker run ... scripts/patch_align_gds_export.py ... schematic2layout.py ...` | First attempt failed because ALIGN requires the working directory to exist. Useful setup evidence. |
+| `docker run ... scripts/patch_align_gds_export.py ... mkdir -p generated_runs/inverter_align_nogds_patch ... schematic2layout.py ...` | Passed through generation. Inspection inside ALIGN image failed only because KLayout Python is unavailable in that image. |
+| `docker run ... hpretl/iic-osic-tools ... inspect_gds_layers.py generated_runs/inverter_align_nogds_patch/INVERTER_0.gds` | Passed. Default PnR GDS still contains `104:0` and `235:5`, but no longer contains `100:5`. |
+| `python3 JSON walker on generated_runs/inverter_align_nogds_patch/**/*.gds.json` | Passed. Remaining `104:0` and `235:5` occur in `3_pnr/Results/*.gds.json`, not primitive Python stream-out. |
+| `docker run ... grep ALIGN runtime for Outline/boundary` | Passed. Found `align/pnr/main.py` explicitly inserts top-level `Outline`; no Python text source for `235` found, suggesting downstream writer behavior. |
+| `docker run ... inspect_gds_layers.py generated_runs/inverter_align_nogds_patch/INVERTER_0.python.gds` | Passed. Patched Python stream-out contains no `100:5`, `104:0`, or `235:5`; it contains official SkyWater electrical layers plus met2 label/pin layers. |
+| `docker run ... run_one_circuit_validation.sh --gds generated_runs/inverter_align_nogds_patch/INVERTER_0.python.gds --layout-top INVERTER --schematic ... --no-sanitize-gds --expand-nf-stack --scale-wl-to-um` | Passed. Magic import had no unknown helper-layer errors, DRC reported 60 errors, extraction produced SPICE, Netgen matched 120 devices/564 nets on both sides but LVS still failed. |

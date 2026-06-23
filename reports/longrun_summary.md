@@ -108,6 +108,21 @@ Real inverter validation is now possible and was run. The current branch is no l
 - Added explicit `nf/stack` schematic expansion. This changed inverter LVS from raw device-count mismatch to matching `120` devices and `564` nets on both sides, with remaining pin/net mismatch.
 - Regenerated inverter with `darpaalign/align-public:latest`; helper layers still stream, proving this needs an ALIGN exporter patch or sanitizer bridge.
 
+## Generation-Time Helper Layer Update
+
+After adding `scripts/patch_align_gds_export.py` and marking helper layers as `NoGDS` in `SKY130_PDK/layers.json`, the patched ALIGN Python stream-out path generated:
+
+- `generated_runs/inverter_align_nogds_patch/INVERTER_0.python.gds`
+
+Layer inspection showed this Python GDS no longer includes `100:5`, `104:0`, or `235:5`. Running the one-circuit flow on this file with `--no-sanitize-gds` succeeded through Magic import, DRC, extraction, and Netgen invocation:
+
+- Magic import: no unknown helper-layer errors.
+- Magic DRC: still 60 errors.
+- Magic extraction: extracted SPICE produced.
+- Netgen LVS with `--expand-nf-stack --scale-wl-to-um`: 120 devices and 564 nets on both sides, but LVS still failed due to pin/net matching.
+
+The default PnR GDS (`INVERTER_0.gds`) still emits `104:0` and `235:5`, so the patched Python stream-out or sanitizer remains the practical verification path for now.
+
 ## Branch Risk
 
-This branch is safe to keep as a compatibility-prep branch. It should still be treated as experimental until a real one-circuit Magic/Netgen run is completed, because no physical DRC/LVS claims have been validated.
+This branch is safe to keep as an experimental compatibility branch. It now has real one-circuit Magic/Netgen evidence, but it is not DRC-clean or LVS-clean.

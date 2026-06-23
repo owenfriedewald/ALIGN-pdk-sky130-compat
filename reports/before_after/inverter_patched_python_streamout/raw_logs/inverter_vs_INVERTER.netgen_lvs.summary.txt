@@ -1,0 +1,329 @@
+LVS file: /work/reports/before_after/inverter_patched_python_streamout/raw_logs/inverter_vs_INVERTER.netgen_lvs.log
+lines: 113
+Key lines:
+1: Netgen 1.5.316 compiled on Sat Feb 14 01:07:44 AM CET 2026
+2: Warning: netgen command 'format' use fully-qualified name '::netgen::format'
+3: Warning: netgen command 'global' use fully-qualified name '::netgen::global'
+4: Reading netlist file /work/reports/before_after/inverter_patched_python_streamout/extracted/INVERTER.extracted.spice for /work/reports/before_after/inverter_patched_python_streamout/extracted/INVERTER.extracted.spice INVERTER
+9: Reading netlist file /work/reports/before_after/inverter_patched_python_streamout/normalized/inverter.normalized.sp for /work/reports/before_after/inverter_patched_python_streamout/normalized/inverter.normalized.sp inverter
+11: Reading setup file /foss/pdks/sky130A/libs.tech/netgen/sky130A_setup.tcl
+13: No property as found for device sky130_fd_pr__nfet_01v8_lvt
+14: No property ad found for device sky130_fd_pr__nfet_01v8_lvt
+15: No property ps found for device sky130_fd_pr__nfet_01v8_lvt
+16: No property pd found for device sky130_fd_pr__nfet_01v8_lvt
+17: No property as found for device sky130_fd_pr__pfet_01v8_lvt
+18: No property ad found for device sky130_fd_pr__pfet_01v8_lvt
+19: No property ps found for device sky130_fd_pr__pfet_01v8_lvt
+20: No property pd found for device sky130_fd_pr__pfet_01v8_lvt
+22: No property mult found for device sky130_fd_pr__nfet_01v8_lvt
+23: No property sa found for device sky130_fd_pr__nfet_01v8_lvt
+24: No property sb found for device sky130_fd_pr__nfet_01v8_lvt
+25: No property sd found for device sky130_fd_pr__nfet_01v8_lvt
+26: No property nf found for device sky130_fd_pr__nfet_01v8_lvt
+27: No property nrd found for device sky130_fd_pr__nfet_01v8_lvt
+28: No property nrs found for device sky130_fd_pr__nfet_01v8_lvt
+29: No property area found for device sky130_fd_pr__nfet_01v8_lvt
+30: No property perim found for device sky130_fd_pr__nfet_01v8_lvt
+31: No property topography found for device sky130_fd_pr__nfet_01v8_lvt
+33: No property as found for device sky130_fd_pr__nfet_01v8_lvt
+34: No property ad found for device sky130_fd_pr__nfet_01v8_lvt
+35: No property ps found for device sky130_fd_pr__nfet_01v8_lvt
+36: No property pd found for device sky130_fd_pr__nfet_01v8_lvt
+37: No property mult found for device sky130_fd_pr__nfet_01v8_lvt
+38: No property sa found for device sky130_fd_pr__nfet_01v8_lvt
+39: No property sb found for device sky130_fd_pr__nfet_01v8_lvt
+40: No property sd found for device sky130_fd_pr__nfet_01v8_lvt
+41: No property nf found for device sky130_fd_pr__nfet_01v8_lvt
+42: No property nrd found for device sky130_fd_pr__nfet_01v8_lvt
+43: No property nrs found for device sky130_fd_pr__nfet_01v8_lvt
+44: No property area found for device sky130_fd_pr__nfet_01v8_lvt
+45: No property perim found for device sky130_fd_pr__nfet_01v8_lvt
+46: No property topography found for device sky130_fd_pr__nfet_01v8_lvt
+48: No property mult found for device sky130_fd_pr__pfet_01v8_lvt
+49: No property sa found for device sky130_fd_pr__pfet_01v8_lvt
+50: No property sb found for device sky130_fd_pr__pfet_01v8_lvt
+51: No property sd found for device sky130_fd_pr__pfet_01v8_lvt
+52: No property nf found for device sky130_fd_pr__pfet_01v8_lvt
+53: No property nrd found for device sky130_fd_pr__pfet_01v8_lvt
+54: No property nrs found for device sky130_fd_pr__pfet_01v8_lvt
+55: No property area found for device sky130_fd_pr__pfet_01v8_lvt
+56: No property perim found for device sky130_fd_pr__pfet_01v8_lvt
+57: No property topography found for device sky130_fd_pr__pfet_01v8_lvt
+59: No property as found for device sky130_fd_pr__pfet_01v8_lvt
+60: No property ad found for device sky130_fd_pr__pfet_01v8_lvt
+61: No property ps found for device sky130_fd_pr__pfet_01v8_lvt
+62: No property pd found for device sky130_fd_pr__pfet_01v8_lvt
+63: No property mult found for device sky130_fd_pr__pfet_01v8_lvt
+64: No property sa found for device sky130_fd_pr__pfet_01v8_lvt
+65: No property sb found for device sky130_fd_pr__pfet_01v8_lvt
+66: No property sd found for device sky130_fd_pr__pfet_01v8_lvt
+67: No property nf found for device sky130_fd_pr__pfet_01v8_lvt
+68: No property nrd found for device sky130_fd_pr__pfet_01v8_lvt
+69: No property nrs found for device sky130_fd_pr__pfet_01v8_lvt
+70: No property area found for device sky130_fd_pr__pfet_01v8_lvt
+71: No property perim found for device sky130_fd_pr__pfet_01v8_lvt
+72: No property topography found for device sky130_fd_pr__pfet_01v8_lvt
+77: Circuit sky130_fd_pr__nfet_01v8_lvt contains 0 device instances.
+78: Circuit contains 0 nets.
+80: Circuit sky130_fd_pr__nfet_01v8_lvt contains 0 device instances.
+81: Circuit contains 0 nets, and 4 disconnected pins.
+83: Circuit sky130_fd_pr__nfet_01v8_lvt contains no devices.
+86: Circuit sky130_fd_pr__pfet_01v8_lvt contains 0 device instances.
+87: Circuit contains 0 nets.
+89: Circuit sky130_fd_pr__pfet_01v8_lvt contains 0 device instances.
+90: Circuit contains 0 nets, and 4 disconnected pins.
+92: Circuit sky130_fd_pr__pfet_01v8_lvt contains no devices.
+95: Circuit INVERTER contains 120 device instances.
+98: Circuit contains 564 nets.
+100: Circuit inverter contains 120 device instances.
+103: Circuit contains 564 nets.
+105: Circuit 1 contains 120 devices, Circuit 2 contains 120 devices.
+106: Circuit 1 contains 564 nets,    Circuit 2 contains 564 nets.
+110: Netlists do not match.
+111: Port matching may fail to disambiguate symmetries.
+
+LVS file: /work/reports/before_after/inverter_patched_python_streamout/raw_logs/inverter_vs_INVERTER.lvs.report
+lines: 2869
+Key lines:
+11: (no matching pin)                          |drain                                      
+12: (no matching pin)                          |drain                                      
+13: (no matching pin)                          |gate                                       
+14: (no matching pin)                          |gate                                       
+15: (no matching pin)                          |source                                     
+16: (no matching pin)                          |source                                     
+17: (no matching pin)                          |bulk                                       
+18: (no matching pin)                          |bulk                                       
+19: 1                                          |(no matching pin)                          
+20: 2                                          |(no matching pin)                          
+21: 3                                          |(no matching pin)                          
+22: 4                                          |(no matching pin)                          
+25: Device classes sky130_fd_pr__nfet_01v8_lvt and sky130_fd_pr__nfet_01v8_lvt are equivalent.
+36: (no matching pin)                          |drain                                      
+37: (no matching pin)                          |drain                                      
+38: (no matching pin)                          |gate                                       
+39: (no matching pin)                          |gate                                       
+40: (no matching pin)                          |source                                     
+41: (no matching pin)                          |source                                     
+42: (no matching pin)                          |bulk                                       
+43: (no matching pin)                          |bulk                                       
+44: 1                                          |(no matching pin)                          
+45: 2                                          |(no matching pin)                          
+46: 3                                          |(no matching pin)                          
+47: 4                                          |(no matching pin)                          
+50: Device classes sky130_fd_pr__pfet_01v8_lvt and sky130_fd_pr__pfet_01v8_lvt are equivalent.
+57: Number of devices: 120                     |Number of devices: 120                     
+58: Number of nets: 564                        |Number of nets: 564                        
+60: NET mismatches: Class fragments follow (with fanout counts):
+64: Net: dummy_564                             |Net: dummy_564                             
+67: Net: dummy_552                             |Net: dummy_552                             
+70: Net: dummy_540                             |Net: dummy_540                             
+73: Net: dummy_528                             |Net: dummy_528                             
+76: Net: dummy_516                             |Net: dummy_516                             
+79: Net: dummy_504                             |Net: dummy_504                             
+82: Net: dummy_492                             |Net: dummy_492                             
+85: Net: dummy_480                             |Net: dummy_480                             
+88: Net: dummy_468                             |Net: dummy_468                             
+91: Net: dummy_456                             |Net: dummy_456                             
+94: Net: dummy_444                             |Net: dummy_444                             
+97: Net: dummy_432                             |Net: dummy_432                             
+100: Net: dummy_420                             |Net: dummy_420                             
+103: Net: dummy_408                             |Net: dummy_408                             
+106: Net: dummy_396                             |Net: dummy_396                             
+109: Net: dummy_384                             |Net: dummy_384                             
+112: Net: dummy_372                             |Net: dummy_372                             
+115: Net: dummy_360                             |Net: dummy_360                             
+118: Net: dummy_348                             |Net: dummy_348                             
+121: Net: dummy_336                             |Net: dummy_336                             
+124: Net: dummy_563                             |Net: dummy_563                             
+127: Net: dummy_551                             |Net: dummy_551                             
+130: Net: dummy_539                             |Net: dummy_539                             
+133: Net: dummy_527                             |Net: dummy_527                             
+136: Net: dummy_515                             |Net: dummy_515                             
+139: Net: dummy_503                             |Net: dummy_503                             
+142: Net: dummy_491                             |Net: dummy_491                             
+145: Net: dummy_479                             |Net: dummy_479                             
+148: Net: dummy_467                             |Net: dummy_467                             
+151: Net: dummy_455                             |Net: dummy_455                             
+154: Net: dummy_443                             |Net: dummy_443                             
+157: Net: dummy_431                             |Net: dummy_431                             
+160: Net: dummy_419                             |Net: dummy_419                             
+163: Net: dummy_407                             |Net: dummy_407                             
+166: Net: dummy_395                             |Net: dummy_395                             
+169: Net: dummy_383                             |Net: dummy_383                             
+172: Net: dummy_371                             |Net: dummy_371                             
+175: Net: dummy_359                             |Net: dummy_359                             
+178: Net: dummy_347                             |Net: dummy_347                             
+181: Net: dummy_335                             |Net: dummy_335                             
+184: Net: dummy_562                             |Net: dummy_562                             
+187: Net: dummy_550                             |Net: dummy_550                             
+190: Net: dummy_538                             |Net: dummy_538                             
+193: Net: dummy_526                             |Net: dummy_526                             
+196: Net: dummy_514                             |Net: dummy_514                             
+199: Net: dummy_502                             |Net: dummy_502                             
+202: Net: dummy_490                             |Net: dummy_490                             
+205: Net: dummy_478                             |Net: dummy_478                             
+208: Net: dummy_466                             |Net: dummy_466                             
+211: Net: dummy_454                             |Net: dummy_454                             
+214: Net: dummy_442                             |Net: dummy_442                             
+217: Net: dummy_430                             |Net: dummy_430                             
+220: Net: dummy_418                             |Net: dummy_418                             
+223: Net: dummy_406                             |Net: dummy_406                             
+226: Net: dummy_394                             |Net: dummy_394                             
+229: Net: dummy_382                             |Net: dummy_382                             
+232: Net: dummy_370                             |Net: dummy_370                             
+235: Net: dummy_358                             |Net: dummy_358                             
+238: Net: dummy_346                             |Net: dummy_346                             
+241: Net: dummy_334                             |Net: dummy_334                             
+244: Net: dummy_561                             |Net: dummy_561                             
+247: Net: dummy_549                             |Net: dummy_549                             
+250: Net: dummy_537                             |Net: dummy_537                             
+253: Net: dummy_525                             |Net: dummy_525                             
+256: Net: dummy_513                             |Net: dummy_513                             
+259: Net: dummy_501                             |Net: dummy_501                             
+262: Net: dummy_489                             |Net: dummy_489                             
+265: Net: dummy_477                             |Net: dummy_477                             
+268: Net: dummy_465                             |Net: dummy_465                             
+271: Net: dummy_453                             |Net: dummy_453                             
+274: Net: dummy_441                             |Net: dummy_441                             
+277: Net: dummy_429                             |Net: dummy_429                             
+280: Net: dummy_417                             |Net: dummy_417                             
+283: Net: dummy_405                             |Net: dummy_405                             
+286: Net: dummy_393                             |Net: dummy_393                             
+289: Net: dummy_381                             |Net: dummy_381                             
+292: Net: dummy_369                             |Net: dummy_369                             
+295: Net: dummy_357                             |Net: dummy_357                             
+298: Net: dummy_345                             |Net: dummy_345                             
+301: Net: dummy_333                             |Net: dummy_333                             
+304: Net: dummy_560                             |Net: dummy_560                             
+307: Net: dummy_548                             |Net: dummy_548                             
+310: Net: dummy_536                             |Net: dummy_536                             
+313: Net: dummy_524                             |Net: dummy_524                             
+316: Net: dummy_512                             |Net: dummy_512                             
+319: Net: dummy_500                             |Net: dummy_500                             
+322: Net: dummy_488                             |Net: dummy_488                             
+325: Net: dummy_476                             |Net: dummy_476                             
+328: Net: dummy_464                             |Net: dummy_464                             
+331: Net: dummy_452                             |Net: dummy_452                             
+334: Net: dummy_440                             |Net: dummy_440                             
+337: Net: dummy_428                             |Net: dummy_428                             
+340: Net: dummy_416                             |Net: dummy_416                             
+343: Net: dummy_404                             |Net: dummy_404                             
+346: Net: dummy_392                             |Net: dummy_392                             
+349: Net: dummy_380                             |Net: dummy_380                             
+352: Net: dummy_368                             |Net: dummy_368                             
+355: Net: dummy_356                             |Net: dummy_356                             
+358: Net: dummy_344                             |Net: dummy_344                             
+361: Net: dummy_332                             |Net: dummy_332                             
+364: Net: dummy_559                             |Net: dummy_559                             
+367: Net: dummy_547                             |Net: dummy_547                             
+370: Net: dummy_535                             |Net: dummy_535                             
+373: Net: dummy_523                             |Net: dummy_523                             
+376: Net: dummy_511                             |Net: dummy_511                             
+379: Net: dummy_499                             |Net: dummy_499                             
+382: Net: dummy_487                             |Net: dummy_487                             
+385: Net: dummy_475                             |Net: dummy_475                             
+388: Net: dummy_463                             |Net: dummy_463                             
+391: Net: dummy_451                             |Net: dummy_451                             
+394: Net: dummy_439                             |Net: dummy_439                             
+397: Net: dummy_427                             |Net: dummy_427                             
+400: Net: dummy_415                             |Net: dummy_415                             
+403: Net: dummy_403                             |Net: dummy_403                             
+406: Net: dummy_391                             |Net: dummy_391                             
+409: Net: dummy_379                             |Net: dummy_379                             
+412: Net: dummy_367                             |Net: dummy_367                             
+415: Net: dummy_355                             |Net: dummy_355                             
+418: Net: dummy_343                             |Net: dummy_343                             
+421: Net: dummy_331                             |Net: dummy_331                             
+424: Net: dummy_558                             |Net: dummy_558                             
+427: Net: dummy_546                             |Net: dummy_546                             
+430: Net: dummy_534                             |Net: dummy_534                             
+433: Net: dummy_522                             |Net: dummy_522                             
+436: Net: dummy_510                             |Net: dummy_510                             
+439: Net: dummy_498                             |Net: dummy_498                             
+442: Net: dummy_486                             |Net: dummy_486                             
+445: Net: dummy_474                             |Net: dummy_474                             
+448: Net: dummy_462                             |Net: dummy_462                             
+451: Net: dummy_450                             |Net: dummy_450                             
+454: Net: dummy_438                             |Net: dummy_438                             
+457: Net: dummy_426                             |Net: dummy_426                             
+460: Net: dummy_414                             |Net: dummy_414                             
+463: Net: dummy_402                             |Net: dummy_402                             
+466: Net: dummy_390                             |Net: dummy_390                             
+469: Net: dummy_378                             |Net: dummy_378                             
+472: Net: dummy_366                             |Net: dummy_366                             
+475: Net: dummy_354                             |Net: dummy_354                             
+478: Net: dummy_342                             |Net: dummy_342                             
+481: Net: dummy_330                             |Net: dummy_330                             
+484: Net: dummy_557                             |Net: dummy_557                             
+487: Net: dummy_545                             |Net: dummy_545                             
+490: Net: dummy_533                             |Net: dummy_533                             
+493: Net: dummy_521                             |Net: dummy_521                             
+496: Net: dummy_509                             |Net: dummy_509                             
+499: Net: dummy_497                             |Net: dummy_497                             
+502: Net: dummy_485                             |Net: dummy_485                             
+505: Net: dummy_473                             |Net: dummy_473                             
+508: Net: dummy_461                             |Net: dummy_461                             
+511: Net: dummy_449                             |Net: dummy_449                             
+514: Net: dummy_437                             |Net: dummy_437                             
+517: Net: dummy_425                             |Net: dummy_425                             
+520: Net: dummy_413                             |Net: dummy_413                             
+523: Net: dummy_401                             |Net: dummy_401                             
+526: Net: dummy_389                             |Net: dummy_389                             
+529: Net: dummy_377                             |Net: dummy_377                             
+532: Net: dummy_365                             |Net: dummy_365                             
+535: Net: dummy_353                             |Net: dummy_353                             
+538: Net: dummy_341                             |Net: dummy_341                             
+541: Net: dummy_329                             |Net: dummy_329                             
+544: Net: dummy_556                             |Net: dummy_556                             
+547: Net: dummy_544                             |Net: dummy_544                             
+550: Net: dummy_532                             |Net: dummy_532                             
+553: Net: dummy_520                             |Net: dummy_520                             
+556: Net: dummy_508                             |Net: dummy_508                             
+559: Net: dummy_496                             |Net: dummy_496                             
+562: Net: dummy_484                             |Net: dummy_484                             
+565: Net: dummy_472                             |Net: dummy_472                             
+568: Net: dummy_460                             |Net: dummy_460                             
+571: Net: dummy_448                             |Net: dummy_448                             
+574: Net: dummy_436                             |Net: dummy_436                             
+577: Net: dummy_424                             |Net: dummy_424                             
+580: Net: dummy_412                             |Net: dummy_412                             
+583: Net: dummy_400                             |Net: dummy_400                             
+586: Net: dummy_388                             |Net: dummy_388                             
+589: Net: dummy_376                             |Net: dummy_376                             
+592: Net: dummy_364                             |Net: dummy_364                             
+595: Net: dummy_352                             |Net: dummy_352                             
+598: Net: dummy_340                             |Net: dummy_340                             
+601: Net: dummy_328                             |Net: dummy_328                             
+604: Net: dummy_555                             |Net: dummy_555                             
+607: Net: dummy_543                             |Net: dummy_543                             
+610: Net: dummy_531                             |Net: dummy_531                             
+613: Net: dummy_519                             |Net: dummy_519                             
+616: Net: dummy_507                             |Net: dummy_507                             
+619: Net: dummy_495                             |Net: dummy_495                             
+622: Net: dummy_483                             |Net: dummy_483                             
+625: Net: dummy_471                             |Net: dummy_471                             
+628: Net: dummy_459                             |Net: dummy_459                             
+631: Net: dummy_447                             |Net: dummy_447                             
+634: Net: dummy_435                             |Net: dummy_435                             
+637: Net: dummy_423                             |Net: dummy_423                             
+640: Net: dummy_411                             |Net: dummy_411                             
+643: Net: dummy_399                             |Net: dummy_399                             
+646: Net: dummy_387                             |Net: dummy_387                             
+649: Net: dummy_375                             |Net: dummy_375                             
+652: Net: dummy_363                             |Net: dummy_363                             
+655: Net: dummy_351                             |Net: dummy_351                             
+658: Net: dummy_339                             |Net: dummy_339                             
+661: Net: dummy_327                             |Net: dummy_327                             
+664: Net: dummy_554                             |Net: dummy_554                             
+667: Net: dummy_542                             |Net: dummy_542                             
+670: Net: dummy_530                             |Net: dummy_530                             
+673: Net: dummy_518                             |Net: dummy_518                             
+676: Net: dummy_506                             |Net: dummy_506                             
+679: Net: dummy_494                             |Net: dummy_494                             
+682: Net: dummy_482                             |Net: dummy_482                             
+685: Net: dummy_470                             |Net: dummy_470                             
+688: Net: dummy_458                             |Net: dummy_458                             
+691: Net: dummy_446                             |Net: dummy_446                             
+694: Net: dummy_434                             |Net: dummy_434                             
+... truncated additional key lines
+
