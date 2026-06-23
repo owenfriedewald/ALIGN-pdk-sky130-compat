@@ -125,4 +125,27 @@ The default PnR GDS (`INVERTER_0.gds`) still emits `104:0` and `235:5`, so the p
 
 ## Branch Risk
 
-This branch is safe to keep as an experimental compatibility branch. It now has real one-circuit Magic/Netgen evidence, but it is not DRC-clean or LVS-clean.
+This branch is safe to keep as an experimental compatibility branch. It now has real one-circuit Magic/Netgen evidence, including one bounded `drc_clean` and `lvs_clean` inverter result under an explicit RVT compatibility policy.
+
+## No-LVT-Marker / Subckt LVS Update
+
+The earlier 60-error inverter DRC result was traced to official Sky130 LVT rules, not a generic poly-width issue:
+
+```text
+LVT PMOS gate length < 0.35um (poly.1b)
+```
+
+Because the current ALIGN Sky130 inverter is inherited from a mock-FinFET abstraction and asks for `pmos_lvt` at `L=150e-9`, the branch now treats legacy `*_lvt` aliases as regular 1.8V devices for this compatibility path:
+
+- `SKY130_PDK/layers.json` no longer lists `LVT` in `design_info.vt_type`, preventing `lvtn` marker generation.
+- `scripts/normalize_netlist.py --coerce-lvt-to-rvt` maps schematic `nmos_lvt`/`pmos_lvt` aliases to regular RVT Sky130 devices for LVS.
+- `--mos-as-subckt --uppercase-nets` normalizes the schematic to Magic's extracted SPICE dialect.
+
+Current best evidence:
+
+- GDS: `generated_runs/inverter_align_no_lvt_marker/INVERTER_0.python.gds`
+- Report: `reports/before_after/inverter_no_lvt_marker_xsubckt_full/`
+- Magic DRC: `Total DRC errors found: 0`
+- Netgen LVS: `Final result: Circuits match uniquely.`
+
+This is not a claim that official Sky130 LVT support is solved. It is a practical compatibility mode for current ALIGN Sky130 aliases and generated geometry.

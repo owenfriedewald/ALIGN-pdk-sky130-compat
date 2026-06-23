@@ -2,14 +2,31 @@
 
 Date: 2026-06-18
 
-## Hard Runtime Blockers
+## Resolved Runtime Blockers For Inverter Tuple
+
+The tuple plus Docker images removed the original hard runtime blockers for one inverter:
+
+- generated GDS available under `artifacts/` and regenerated under `generated_runs/`,
+- Magic/Netgen/open_pdks available in `hpretl/iic-osic-tools:latest`,
+- ALIGN generation available in `darpaalign/align-public:latest`.
+
+Current bounded best result:
+
+```text
+reports/before_after/inverter_no_lvt_marker_xsubckt_full/
+Magic DRC: Total DRC errors found: 0
+Netgen LVS: Final result: Circuits match uniquely.
+```
+
+This result depends on the experimental no-LVT-marker RVT compatibility policy and schematic subckt normalization.
+
+## Remaining Runtime Blockers Outside Docker / Outside Inverter
 
 | Blocker | Impact | Next action |
 |---|---|---|
-| No generated ALIGN Sky130 GDS found | Cannot run Magic DRC/import/extraction | Provide or generate one small GDS, preferably inverter. |
-| No open_pdks `sky130A` install path found | No runtime `sky130A.tech`, Magic rc, or Netgen setup | Install or point to open_pdks `sky130A`; then run `scripts/check_verification_refs.py --open-pdks-root`. |
-| `magic` not found on PATH | Cannot run DRC/extraction | Install Magic or activate environment containing Magic. |
-| `netgen` not found on PATH | Cannot run LVS | Install Netgen or activate environment containing Netgen. |
+| No host open_pdks `sky130A` install path found | Host cannot run without Docker | Use `/foss/pdks/sky130A` inside `hpretl/iic-osic-tools:latest`, or install/point host to open_pdks. |
+| `magic` not found on host PATH | Host cannot run DRC/extraction directly | Use Docker image or install Magic on host. |
+| `netgen` not found on host PATH | Host cannot run LVS directly | Use Docker image or install Netgen on host. |
 | Host `schematic2layout.py` not found on PATH | Host cannot generate new ALIGN layout directly | Use local Docker image `darpaalign/align-public:latest` or install ALIGN locally. |
 
 ## Compatibility Questions Waiting For Evidence
@@ -39,9 +56,29 @@ Date: 2026-06-18
 |---|---|---|
 | Helper layers still stream from default PnR GDS | The patched Python stream-out path now removes helper layers, but default `INVERTER_0.gds` still emits `104:0` and `235:5` from downstream PnR result writing. | Use patched `.python.gds` or sanitizer for verification; next patch target is the downstream PnR GDS writer. |
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Redesign MOS schematic/generator contract for planar Sky130, or make LVS netlists physically expanded before comparison. |
-| Top-level pins are not LVS-clean | Expanded LVS matched 120 devices and 564 nets on both sides but failed pin/net matching. | Fix pin label/export/extraction semantics and net naming/case policy. |
-| DRC remains nonzero | Magic reports 60 DRC errors on sanitized inverter GDS. | Obtain/classify detailed DRC feedback; then patch actual geometry/rules, not waivers. |
+| Default PnR GDS writer still emits helper layers | The patched Python stream-out path removes helper layers, but default `INVERTER_0.gds` still emits `104:0` and `235:5`. | Patch downstream PnR GDS writer or keep using `.python.gds`/sanitizer for verification. |
+| Official LVT support is not solved | The clean inverter path suppresses LVT marker generation and coerces schematic aliases to RVT. | Either generate official-compliant LVT geometry or reject/remap invalid LVT requests intentionally. |
+| Larger circuits are unvalidated | Only the inverter has a clean Magic/Netgen run. | Repeat the same flow on the next small circuit before changing broad rules. |
+| MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Keep LVS physical expansion for verification or redesign the schematic/generator contract for planar Sky130. |
 
 ## Current Practical Verification Path
 
-Use `scripts/patch_align_gds_export.py` inside the ALIGN runtime before generation, then verify the generated `.python.gds` with `--no-sanitize-gds`. This avoids Magic helper-layer import failures without post-processing GDS. It does not address the remaining 60 DRC errors or LVS connectivity mismatch.
+Use `scripts/patch_align_gds_export.py` inside the ALIGN runtime before generation, generate `.python.gds`, then verify with:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/inverter_align_no_lvt_marker/INVERTER_0.python.gds \
+  --layout-top INVERTER \
+  --schematic artifacts/inverter_tuple/inverter/input/inverter.sp \
+  --schematic-top inverter \
+  --out-dir reports/before_after/inverter_no_lvt_marker_xsubckt_full \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um \
+  --coerce-lvt-to-rvt \
+  --mos-as-subckt \
+  --uppercase-nets
+```
+
+This path is clean for the current inverter evidence but remains experimental because it intentionally treats legacy `*_lvt` aliases as regular 1.8V devices.

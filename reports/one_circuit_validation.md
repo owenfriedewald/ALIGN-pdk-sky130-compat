@@ -159,4 +159,44 @@ Results:
 - Magic extraction produced `reports/before_after/inverter_patched_python_streamout/extracted/INVERTER.extracted.spice`.
 - Netgen LVS still failed, but reached `120` devices and `564` nets on both sides.
 
-Current best next command is the no-sanitizer patched Python stream-out command above. The next actual PDK/generator work is DRC classification and pin/connectivity semantics.
+## DRC-Clean / LVS-Clean Inverter Result
+
+Status: `drc_clean`, `lvs_clean` for this bounded inverter experiment.
+
+The 60 DRC errors in the patched Python stream-out run were all classified as official Sky130 LVT PMOS gate-length violations. The current compatibility path suppresses LVT marker generation for legacy ALIGN `*_lvt` aliases and compares the schematic as regular 1.8V devices.
+
+Full command used inside `hpretl/iic-osic-tools:latest`:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/inverter_align_no_lvt_marker/INVERTER_0.python.gds \
+  --layout-top INVERTER \
+  --schematic artifacts/inverter_tuple/inverter/input/inverter.sp \
+  --schematic-top inverter \
+  --out-dir reports/before_after/inverter_no_lvt_marker_xsubckt_full \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um \
+  --coerce-lvt-to-rvt \
+  --mos-as-subckt \
+  --uppercase-nets
+```
+
+Results:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 120 devices, Circuit 2 contains 120 devices.
+Circuit 1 contains 84 nets,    Circuit 2 contains 84 nets.
+Final result: Circuits match uniquely.
+```
+
+Evidence directory:
+
+```text
+reports/before_after/inverter_no_lvt_marker_xsubckt_full/
+```
+
+Interpretation:
+The tested inverter is now clean through `GDS -> Magic DRC -> Magic extraction -> extracted SPICE -> Netgen LVS` when using patched Python stream-out and explicit RVT/subckt schematic normalization. This does not validate official LVT geometry, other devices, capacitors, resistors, or larger circuits.

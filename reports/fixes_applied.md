@@ -419,3 +419,92 @@ Expanded LVS reached 120 devices and 564 nets on both sides, but netlists still 
 
 Remaining problems:
 The default non-Python PnR GDS (`INVERTER_0.gds`) still contains `104:0` and `235:5`, apparently from downstream PnR result JSON/GDS writer behavior. For open_pdks verification, use patched `.python.gds` or the sanitizer until that writer path is patched too.
+
+## 14. No-LVT-Marker RVT Compatibility Mode
+
+Issue:
+The inverter example uses ALIGN mock-FinFET-era model names `nmos_lvt` and `pmos_lvt` with `L=150e-9`. When streamed with the official Sky130 `lvtn` marker, Magic DRC reports the official `poly.1b` LVT PMOS gate-length rule because `pfet_01v8_lvt` requires a longer channel than the ALIGN inverter supplies.
+
+Source diagnostic:
+`reports/before_after/inverter_patched_python_streamout/raw_logs/INVERTER.magic_drc.find_why.txt` classified all remaining DRC feedback as:
+
+```text
+LVT PMOS gate length < 0.35um (poly.1b)
+```
+
+Files changed:
+`SKY130_PDK/layers.json`
+`scripts/normalize_netlist.py`
+`scripts/run_one_circuit_validation.sh`
+
+Patch made:
+Removed `LVT` from `design_info.vt_type`, leaving `["HVT", "RVT"]`, so the ALIGN generator does not place the `lvtn` marker for these mock-FinFET-style `*_lvt` aliases. Added opt-in schematic normalization `--coerce-lvt-to-rvt` so LVS compares the resulting no-marker layout against regular `sky130_fd_pr__nfet_01v8` and `sky130_fd_pr__pfet_01v8` device names.
+
+Why the patch is safe:
+This is a narrow compatibility policy for the current ALIGN Sky130 fork: treat legacy `nmos_lvt`/`pmos_lvt` aliases as regular 1.8V devices unless and until the generator can create official LVT-compliant geometry. It does not claim LVT physical correctness.
+
+Before result:
+Patched Python stream-out without helper layers imported cleanly into Magic, but DRC reported 60 `poly.1b` LVT PMOS gate-length violations.
+
+After result:
+Regenerated inverter:
+
+```text
+generated_runs/inverter_align_no_lvt_marker/INVERTER_0.python.gds
+```
+
+Magic DRC result:
+
+```text
+Total DRC errors found: 0
+```
+
+Remaining problems:
+This mode intentionally drops LVT semantics for the tested inverter. Official LVT support still requires geometry changes to produce the longer LVT channel or a generator/model policy that refuses invalid LVT requests.
+
+## 15. Magic-Extracted Subckt LVS Dialect
+
+Issue:
+After no-LVT-marker generation, Magic extracted each MOS as an `X... sky130_fd_pr__*` subckt-style instance, while the normalized schematic still used SPICE `M... sky130_fd_pr__*` primitive MOS syntax and lower-case top-level pins. Netgen reached equal model classes/device counts but still failed matching.
+
+Source diagnostic:
+`reports/before_after/inverter_no_lvt_marker_rvt_full/raw_logs/inverter_vs_INVERTER.netgen_lvs.summary.txt` showed:
+
+```text
+Circuit 1 contains 120 devices, Circuit 2 contains 120 devices.
+Circuit 1 contains 564 nets,    Circuit 2 contains 564 nets.
+```
+
+but the final comparison did not match.
+
+Files changed:
+`scripts/normalize_netlist.py`
+`scripts/run_one_circuit_validation.sh`
+
+Patch made:
+Added opt-in normalizer flags:
+
+- `--mos-as-subckt`: emits expanded schematic MOS instances as `X... model` subckt calls, matching Magic extraction.
+- `--uppercase-nets`: uppercases MOS node names and `.subckt` ports, matching Magic's extracted top-pin style.
+
+Why the patch is safe:
+These are explicit LVS normalization modes. They do not modify generated GDS, hide DRC/LVS errors, or change ALIGN generation.
+
+After result:
+Full one-circuit validation:
+
+```text
+reports/before_after/inverter_no_lvt_marker_xsubckt_full/
+```
+
+Result:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 120 devices, Circuit 2 contains 120 devices.
+Circuit 1 contains 84 nets,    Circuit 2 contains 84 nets.
+Final result: Circuits match uniquely.
+```
+
+Remaining problems:
+The no-LVT-marker policy is experimental. The default PnR GDS writer still emits some helper layers, so the current clean path uses patched Python stream-out or a sanitizer. Larger circuits still need validation.

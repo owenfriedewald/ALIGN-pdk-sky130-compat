@@ -31,3 +31,17 @@ The verification wrappers now exist. The first likely safe runtime-driven patch 
 - Confirm whether official/open_pdks generated extracted SPICE uses model names that simple normalization can bridge.
 - Confirm whether `Fin` and special VT/helper layers actually appear in streamed GDS.
 - Confirm whether failures are reproducible on both unconstrained ALIGN baseline and AnalogDSL-constrained output under the same setup.
+
+## Updated Ranking After Inverter Evidence
+
+Date: 2026-06-23
+
+| Rank | Candidate fix | Confidence | Expected impact | Risk | Runtime GDS required? | Changes generation or only verification? | Fair for baseline ALIGN and AnalogDSL? | Action |
+|---:|---|---|---|---|---|---|---|---|
+| 1 | Suppress LVT marker generation for legacy ALIGN `*_lvt` aliases until official LVT geometry exists | High for current inverter | High: removed all 60 Magic `poly.1b` DRC errors on the regenerated inverter | Medium: changes VT semantics; must be documented as RVT compatibility, not true LVT | Yes to prove | Generation metadata and LVS normalization | Yes if applied to all ALIGN-generated Sky130 outputs | Applied experimentally |
+| 2 | Normalize LVS schematic to Magic extracted subckt dialect (`--mos-as-subckt --uppercase-nets`) | High for current inverter | High: changed equal-count LVS failure into unique match | Low/medium: verification-only but may mask schematic dialect issues if overused | Yes to prove | Verification only | Yes if both baseline and AnalogDSL use the same normalizer | Applied as opt-in |
+| 3 | Keep `--expand-nf-stack --scale-wl-to-um` for mock-FinFET-derived MOS schematics | High for current inverter | High: maps 2 schematic MOS with `nf=20 stack=3` to 120 physical devices | Medium: verification normalization reflects generated topology, not original schematic abstraction | Yes to prove | Verification only | Yes if applied equally | Applied as opt-in |
+| 4 | Patch downstream/default PnR GDS writer to honor `NoGDS` for `Outline`/boundary artifacts | Medium | Medium: would remove need for `.python.gds` or sanitizer path | Medium: writer path needs targeted source evidence | Yes | Generation/export only | Yes | Next useful patch |
+| 5 | Add official LVT geometry support or reject invalid LVT lengths | Medium | High for real LVT support | High: changes transistor generator semantics and sizing constraints | Yes | Generation geometry/device policy | Yes, but affects all comparisons | Defer until transistor policy review |
+| 6 | Broaden DRC/LVS validation to buffer/current mirror/OTA | Medium | High: determines whether inverter fix generalizes | Low for running checks, high for broad edits | Yes | Verification first | Yes | Next validation phase |
+| 7 | Global poly pitch/width widening | Low after experiment | Negative on inverter: increased DRC errors and worsened LVS | High: large geometry/topology blast radius | Yes | Generation geometry | Yes but harmful | Deferred; keep as negative evidence |

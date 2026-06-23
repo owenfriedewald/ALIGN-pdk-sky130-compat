@@ -22,6 +22,13 @@ MODEL_ALIASES = {
     "sky130_fd_pr__cap_mim_m3_1": "sky130_fd_pr__cap_mim_m3_1",
 }
 
+LVT_TO_RVT_ALIASES = {
+    "nmos_lvt": "sky130_fd_pr__nfet_01v8",
+    "pmos_lvt": "sky130_fd_pr__pfet_01v8",
+    "sky130_fd_pr__nfet_01v8_lvt": "sky130_fd_pr__nfet_01v8",
+    "sky130_fd_pr__pfet_01v8_lvt": "sky130_fd_pr__pfet_01v8",
+}
+
 MOS_RE = re.compile(
     r"^(?P<indent>\s*)(?P<name>[mM]\S*)\s+(?P<d>\S+)\s+(?P<g>\S+)\s+(?P<s>\S+)\s+(?P<b>\S+)\s+(?P<model>\S+)(?P<suffix>(?:\s+.*)?$)"
 )
@@ -46,6 +53,12 @@ def load_model_aliases(path: Path | None) -> dict[str, str]:
     if not isinstance(aliases, dict):
         raise ValueError(f"No model_aliases object found in {path}")
     return {str(key).lower(): str(value) for key, value in aliases.items()}
+
+
+def apply_lvt_to_rvt_aliases(model_aliases: dict[str, str]) -> dict[str, str]:
+    aliases = dict(model_aliases)
+    aliases.update(LVT_TO_RVT_ALIASES)
+    return aliases
 
 
 def normalize_params(suffix: str, drop: set[str], rename: dict[str, str]) -> str:
@@ -126,7 +139,34 @@ def normalize_wl_units(suffix: str) -> str:
     return (" " + " ".join(tokens)) if tokens else ""
 
 
-def expand_mos_instance(match: re.Match[str], model: str, suffix: str) -> str | None:
+def normalize_node_name(name: str, uppercase_nets: bool) -> str:
+    return name.upper() if uppercase_nets else name
+
+
+def normalize_instance_name(name: str, mos_as_subckt: bool) -> str:
+    if not mos_as_subckt or name[:1].lower() == "x":
+        return name
+    return f"X{name}"
+
+
+def normalize_subckt_line(line: str, uppercase_nets: bool) -> str:
+    if not uppercase_nets:
+        return line
+    stripped = line.rstrip("\n")
+    newline = "\n" if line.endswith("\n") else ""
+    tokens = stripped.split()
+    if len(tokens) <= 2 or tokens[0].lower() != ".subckt":
+        return line
+    return " ".join(tokens[:2] + [token.upper() for token in tokens[2:]]) + newline
+
+
+def expand_mos_instance(
+    match: re.Match[str],
+    model: str,
+    suffix: str,
+    mos_as_subckt: bool,
+    uppercase_nets: bool,
+) -> str | None:
     params = params_to_dict(suffix)
     try:
         nf = int(float(params.get("nf", "1")))
@@ -139,13 +179,20 @@ def expand_mos_instance(match: re.Match[str], model: str, suffix: str) -> str | 
     kept_suffix = normalize_params(suffix, {"nf", "stack"}, {})
     kept_suffix = normalize_wl_units(kept_suffix)
     lines: list[str] = []
+    instance_base = normalize_instance_name(match.group("name"), mos_as_subckt)
     for finger in range(nf):
-        previous = match.group("d")
+        previous = normalize_node_name(match.group("d"), uppercase_nets)
         for segment in range(stack):
-            next_node = match.group("s") if segment == stack - 1 else f"{match.group('name')}_nf{finger}_s{segment}"
+            next_node = (
+                normalize_node_name(match.group("s"), uppercase_nets)
+                if segment == stack - 1
+                else normalize_node_name(f"{match.group('name')}_nf{finger}_s{segment}", uppercase_nets)
+            )
             lines.append(
-                f"{match.group('indent')}{match.group('name')}_nf{finger}_stk{segment} "
-                f"{previous} {match.group('g')} {next_node} {match.group('b')} {model}{kept_suffix}\n"
+                f"{match.group('indent')}{instance_base}_nf{finger}_stk{segment} "
+                f"{previous} {normalize_node_name(match.group('g'), uppercase_nets)} "
+                f"{next_node} {normalize_node_name(match.group('b'), uppercase_nets)} "
+                f"{model}{kept_suffix}\n"
             )
             previous = next_node
     return "".join(lines)
@@ -158,8 +205,12 @@ def normalize_line(
     rename_params: dict[str, str],
     expand_nf_stack: bool,
     scale_wl_to_um: bool,
+    mos_as_subckt: bool,
+    uppercase_nets: bool,
 ) -> str:
     if not line.strip() or line.lstrip().startswith(("*", ".", "+")):
+        if line.lstrip().lower().startswith(".subckt"):
+            return normalize_subckt_line(line, uppercase_nets)
         return line
     match = MOS_RE.match(line.rstrip("\n"))
     if not match:
@@ -170,14 +221,17 @@ def normalize_line(
     if scale_wl_to_um:
         suffix = normalize_wl_units(suffix)
     if expand_nf_stack:
-        expanded = expand_mos_instance(match, replacement or model, suffix)
+        expanded = expand_mos_instance(match, replacement or model, suffix, mos_as_subckt, uppercase_nets)
         if expanded is not None:
             return expanded
     if not replacement and suffix == match.group("suffix"):
         return line
+    instance_name = normalize_instance_name(match.group("name"), mos_as_subckt)
     return (
-        f"{match.group('indent')}{match.group('name')} {match.group('d')} {match.group('g')} "
-        f"{match.group('s')} {match.group('b')} {replacement or model}{suffix}\n"
+        f"{match.group('indent')}{instance_name} {normalize_node_name(match.group('d'), uppercase_nets)} "
+        f"{normalize_node_name(match.group('g'), uppercase_nets)} "
+        f"{normalize_node_name(match.group('s'), uppercase_nets)} "
+        f"{normalize_node_name(match.group('b'), uppercase_nets)} {replacement or model}{suffix}\n"
     )
 
 
@@ -188,12 +242,26 @@ def normalize_text(
     rename_params: dict[str, str] | None = None,
     expand_nf_stack: bool = False,
     scale_wl_to_um: bool = False,
+    coerce_lvt_to_rvt: bool = False,
+    mos_as_subckt: bool = False,
+    uppercase_nets: bool = False,
 ) -> str:
     model_aliases = model_aliases or MODEL_ALIASES
+    if coerce_lvt_to_rvt:
+        model_aliases = apply_lvt_to_rvt_aliases(model_aliases)
     drop_params = drop_params or set()
     rename_params = rename_params or {}
     return "".join(
-        normalize_line(line, model_aliases, drop_params, rename_params, expand_nf_stack, scale_wl_to_um)
+        normalize_line(
+            line,
+            model_aliases,
+            drop_params,
+            rename_params,
+            expand_nf_stack,
+            scale_wl_to_um,
+            mos_as_subckt,
+            uppercase_nets,
+        )
         for line in text.splitlines(keepends=True)
     )
 
@@ -230,6 +298,21 @@ def main() -> int:
         action="store_true",
         help="Convert small SI-meter w/l values to micron-valued w/l to match Magic extraction style.",
     )
+    parser.add_argument(
+        "--coerce-lvt-to-rvt",
+        action="store_true",
+        help="Map LVT MOS model aliases to regular 1.8V FET models for LVS with no-LVT-marker layouts.",
+    )
+    parser.add_argument(
+        "--mos-as-subckt",
+        action="store_true",
+        help="Write MOS instances with X-prefix subcircuit syntax so schematics match Magic extracted device dialect.",
+    )
+    parser.add_argument(
+        "--uppercase-nets",
+        action="store_true",
+        help="Uppercase MOS node names and .subckt ports to match Magic extraction naming style.",
+    )
     args = parser.parse_args()
 
     rename_params = parse_rename(args.rename_param)
@@ -241,6 +324,9 @@ def main() -> int:
         rename_params=rename_params,
         expand_nf_stack=args.expand_nf_stack,
         scale_wl_to_um=args.scale_wl_to_um,
+        coerce_lvt_to_rvt=args.coerce_lvt_to_rvt,
+        mos_as_subckt=args.mos_as_subckt,
+        uppercase_nets=args.uppercase_nets,
     )
     if args.output:
         args.output.write_text(normalized)

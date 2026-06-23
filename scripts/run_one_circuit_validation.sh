@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage:
   run_one_circuit_validation.sh --open-pdks-root PATH --gds PATH --schematic PATH --top CELL --out-dir DIR [--drop-param NAME ...]
-  run_one_circuit_validation.sh --open-pdks-root PATH --gds PATH --layout-top CELL --schematic PATH --schematic-top CELL --out-dir DIR [--drop-param NAME ...] [--expand-nf-stack] [--scale-wl-to-um]
+  run_one_circuit_validation.sh --open-pdks-root PATH --gds PATH --layout-top CELL --schematic PATH --schematic-top CELL --out-dir DIR [--drop-param NAME ...] [--expand-nf-stack] [--scale-wl-to-um] [--coerce-lvt-to-rvt] [--mos-as-subckt] [--uppercase-nets]
 
 Runs the prepared one-circuit flow:
   reference preflight -> static layer/model checks -> schematic normalization ->
@@ -28,6 +28,9 @@ DROP_PARAMS=()
 SANITIZE_GDS=1
 EXPAND_NF_STACK=0
 SCALE_WL_TO_UM=0
+COERCE_LVT_TO_RVT=0
+MOS_AS_SUBCKT=0
+UPPERCASE_NETS=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -42,6 +45,9 @@ while [[ $# -gt 0 ]]; do
     --no-sanitize-gds) SANITIZE_GDS=0; shift ;;
     --expand-nf-stack) EXPAND_NF_STACK=1; shift ;;
     --scale-wl-to-um) SCALE_WL_TO_UM=1; shift ;;
+    --coerce-lvt-to-rvt) COERCE_LVT_TO_RVT=1; shift ;;
+    --mos-as-subckt) MOS_AS_SUBCKT=1; shift ;;
+    --uppercase-nets) UPPERCASE_NETS=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
@@ -77,6 +83,15 @@ COMMANDS="$OUT_DIR/commands.sh"
   if [[ "$SCALE_WL_TO_UM" -eq 1 ]]; then
     printf ' --scale-wl-to-um'
   fi
+  if [[ "$COERCE_LVT_TO_RVT" -eq 1 ]]; then
+    printf ' --coerce-lvt-to-rvt'
+  fi
+  if [[ "$MOS_AS_SUBCKT" -eq 1 ]]; then
+    printf ' --mos-as-subckt'
+  fi
+  if [[ "$UPPERCASE_NETS" -eq 1 ]]; then
+    printf ' --uppercase-nets'
+  fi
   printf '\n'
 } >> "$COMMANDS"
 
@@ -103,6 +118,15 @@ if [[ "$EXPAND_NF_STACK" -eq 1 ]]; then
 fi
 if [[ "$SCALE_WL_TO_UM" -eq 1 ]]; then
   NORMALIZE_ARGS+=(--scale-wl-to-um)
+fi
+if [[ "$COERCE_LVT_TO_RVT" -eq 1 ]]; then
+  NORMALIZE_ARGS+=(--coerce-lvt-to-rvt)
+fi
+if [[ "$MOS_AS_SUBCKT" -eq 1 ]]; then
+  NORMALIZE_ARGS+=(--mos-as-subckt)
+fi
+if [[ "$UPPERCASE_NETS" -eq 1 ]]; then
+  NORMALIZE_ARGS+=(--uppercase-nets)
 fi
 python3 scripts/normalize_netlist.py "$SCHEMATIC" "${NORMALIZE_ARGS[@]}" \
   -o "$NORMALIZED/${SCHEMATIC_TOP}.normalized.sp"
@@ -133,6 +157,9 @@ python3 scripts/summarize_drc_log.py "$RAW_LOGS/${LAYOUT_TOP}.magic_drc.log" \
 python3 scripts/summarize_lvs_log.py "$RAW_LOGS/${SCHEMATIC_TOP}_vs_${LAYOUT_TOP}.netgen_lvs.log" "$RAW_LOGS/${SCHEMATIC_TOP}_vs_${LAYOUT_TOP}.lvs.report" \
   | tee "$RAW_LOGS/${SCHEMATIC_TOP}_vs_${LAYOUT_TOP}.netgen_lvs.summary.txt"
 
+DRC_KEY="$(grep -E 'Total DRC errors found:|numeric count candidates:' "$RAW_LOGS/${LAYOUT_TOP}.magic_drc.summary.txt" | tail -1 || true)"
+LVS_KEY="$(grep -E 'Final result:|Circuits match uniquely|Netlists match|Circuit 1 contains' "$RAW_LOGS/${SCHEMATIC_TOP}_vs_${LAYOUT_TOP}.netgen_lvs.summary.txt" | tail -3 || true)"
+
 cat > "$OUT_DIR/summary.md" <<EOF
 # One-Circuit Validation Summary
 
@@ -147,6 +174,16 @@ Extracted SPICE: \`$LAYOUT_SPICE\`
 Review:
 - \`$RAW_LOGS/${LAYOUT_TOP}.magic_drc.summary.txt\`
 - \`$RAW_LOGS/${SCHEMATIC_TOP}_vs_${LAYOUT_TOP}.netgen_lvs.summary.txt\`
+
+DRC:
+\`\`\`text
+${DRC_KEY:-See DRC summary log.}
+\`\`\`
+
+LVS:
+\`\`\`text
+${LVS_KEY:-See LVS summary log.}
+\`\`\`
 EOF
 
 echo "Wrote $OUT_DIR/summary.md"
