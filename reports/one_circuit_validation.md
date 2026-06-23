@@ -200,3 +200,44 @@ reports/before_after/inverter_no_lvt_marker_xsubckt_full/
 
 Interpretation:
 The tested inverter is now clean through `GDS -> Magic DRC -> Magic extraction -> extracted SPICE -> Netgen LVS` when using patched Python stream-out and explicit RVT/subckt schematic normalization. This does not validate official LVT geometry, other devices, capacitors, resistors, or larger circuits.
+
+## Buffer Validation After Label Patch
+
+Status: `drc_clean`, `lvs_clean` for a second MOS-only circuit.
+
+The buffer initially reached DRC clean and topology-equivalent LVS, but failed top-level pin matching because an internal node was labeled as a Magic top-level port. Extending `scripts/patch_align_gds_export.py` to patch ALIGN `pnr/main.py` fixed the label filter bug.
+
+Full command used inside `hpretl/iic-osic-tools:latest`:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/buffer_align_label_patch/BUFFER_0.python.gds \
+  --layout-top BUFFER \
+  --schematic examples/buffer/buffer.sp \
+  --schematic-top buffer \
+  --out-dir reports/before_after/buffer_label_patch_xsubckt_full \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um \
+  --mos-as-subckt \
+  --uppercase-nets
+```
+
+Results:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 4 devices, Circuit 2 contains 4 devices.
+Circuit 1 contains 5 nets,    Circuit 2 contains 5 nets.
+Final result: Circuits match uniquely.
+```
+
+Evidence directory:
+
+```text
+reports/before_after/buffer_label_patch_xsubckt_full/
+```
+
+Interpretation:
+The compatibility flow now has two clean MOS-only examples: inverter under the explicit RVT compatibility policy and buffer under regular RVT aliases. The buffer result validates the top-level-label patch independently of the LVT marker policy.

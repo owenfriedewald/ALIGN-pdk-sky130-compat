@@ -10,15 +10,19 @@ The tuple plus Docker images removed the original hard runtime blockers for one 
 - Magic/Netgen/open_pdks available in `hpretl/iic-osic-tools:latest`,
 - ALIGN generation available in `darpaalign/align-public:latest`.
 
-Current bounded best result:
+Current bounded best results:
 
 ```text
 reports/before_after/inverter_no_lvt_marker_xsubckt_full/
 Magic DRC: Total DRC errors found: 0
 Netgen LVS: Final result: Circuits match uniquely.
+
+reports/before_after/buffer_label_patch_xsubckt_full/
+Magic DRC: Total DRC errors found: 0
+Netgen LVS: Final result: Circuits match uniquely.
 ```
 
-This result depends on the experimental no-LVT-marker RVT compatibility policy and schematic subckt normalization.
+The inverter result depends on the experimental no-LVT-marker RVT compatibility policy and schematic subckt normalization. The buffer result uses regular RVT aliases and additionally validates the top-level-label patch in the ALIGN runtime patcher.
 
 ## Remaining Runtime Blockers Outside Docker / Outside Inverter
 
@@ -56,9 +60,9 @@ This result depends on the experimental no-LVT-marker RVT compatibility policy a
 |---|---|---|
 | Helper layers still stream from default PnR GDS | The patched Python stream-out path now removes helper layers, but default `INVERTER_0.gds` still emits `104:0` and `235:5` from downstream PnR result writing. | Use patched `.python.gds` or sanitizer for verification; next patch target is the downstream PnR GDS writer. |
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Redesign MOS schematic/generator contract for planar Sky130, or make LVS netlists physically expanded before comparison. |
-| Default PnR GDS writer still emits helper layers | The patched Python stream-out path removes helper layers, but default `INVERTER_0.gds` still emits `104:0` and `235:5`. | Patch downstream PnR GDS writer or keep using `.python.gds`/sanitizer for verification. |
+| Default/native PnR GDS writer still emits helper boundary records | The patched Python stream-out path removes helper layers, but default native `*.gds` still emits non-Sky130 boundary records such as `235:5`. | Patch downstream native GDS writer or keep using `.python.gds`/sanitizer for verification. |
 | Official LVT support is not solved | The clean inverter path suppresses LVT marker generation and coerces schematic aliases to RVT. | Either generate official-compliant LVT geometry or reject/remap invalid LVT requests intentionally. |
-| Larger circuits are unvalidated | Only the inverter has a clean Magic/Netgen run. | Repeat the same flow on the next small circuit before changing broad rules. |
+| Larger circuits are unvalidated | Inverter and buffer have clean Magic/Netgen runs; OTA/current mirror examples have not. | Repeat the same flow on the next small circuit before changing broad rules. |
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Keep LVS physical expansion for verification or redesign the schematic/generator contract for planar Sky130. |
 
 ## Current Practical Verification Path
@@ -81,4 +85,4 @@ scripts/run_one_circuit_validation.sh \
   --uppercase-nets
 ```
 
-This path is clean for the current inverter evidence but remains experimental because it intentionally treats legacy `*_lvt` aliases as regular 1.8V devices.
+For regular RVT MOS-only examples such as buffer, omit `--coerce-lvt-to-rvt` and use the same `--mos-as-subckt --uppercase-nets --expand-nf-stack --scale-wl-to-um` LVS normalization. The Python stream-out patch is still required to avoid internal labels becoming top-level Magic pins.

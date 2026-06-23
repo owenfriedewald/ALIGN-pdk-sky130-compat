@@ -149,3 +149,21 @@ Current best evidence:
 - Netgen LVS: `Final result: Circuits match uniquely.`
 
 This is not a claim that official Sky130 LVT support is solved. It is a practical compatibility mode for current ALIGN Sky130 aliases and generated geometry.
+
+## Buffer Clean Run And Label Patch
+
+A second MOS-only circuit was generated and validated:
+
+- Source: `examples/buffer/buffer.sp`
+- GDS: `generated_runs/buffer_align_label_patch/BUFFER_0.python.gds`
+- Report: `reports/before_after/buffer_label_patch_xsubckt_full/`
+- Magic DRC: `Total DRC errors found: 0`
+- Netgen LVS: `Final result: Circuits match uniquely.`
+
+The first buffer run before the label patch was DRC-clean but LVS failed top-level port matching because the Python stream-out emitted an internal node label as a top-level Magic port. Root cause was in ALIGN `pnr/main.py`:
+
+```python
+labels = [i.name for i in hN.blockPins].extend([i.name for i in hN.PowerNets])
+```
+
+`list.extend()` returns `None`, so the GDS translator did not receive the intended top-level label allow-list. `scripts/patch_align_gds_export.py` now patches this to list concatenation and also skips `Outline` injection when the PDK marks it `NoGDS`.

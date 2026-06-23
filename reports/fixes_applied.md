@@ -508,3 +508,47 @@ Final result: Circuits match uniquely.
 
 Remaining problems:
 The no-LVT-marker policy is experimental. The default PnR GDS writer still emits some helper layers, so the current clean path uses patched Python stream-out or a sanitizer. Larger circuits still need validation.
+
+## 16. Top-Level Label Filtering In ALIGN Python Stream-Out
+
+Issue:
+The buffer layout was DRC-clean and topology-equivalent, but Magic extracted the internal net `OUT1` as a top-level port. Netgen reported `Netlists match uniquely with port errors` and failed top-level pin matching.
+
+Source diagnostic:
+`reports/before_after/buffer_xsubckt_full/raw_logs/buffer_vs_BUFFER.lvs.report` showed:
+
+```text
+X_MN0_MN1_MP0_MP1/VM | (no pin, node is OUT1)
+Final result: Top level cell failed pin matching.
+```
+
+ALIGN-side file:
+Runtime patch target: installed `align/pnr/main.py`.
+
+Files changed:
+`scripts/patch_align_gds_export.py`
+
+Patch made:
+Extended the runtime patcher to fix ALIGN's top-level `reqLabels` construction:
+
+```python
+labels = [i.name for i in hN.blockPins] + [i.name for i in hN.PowerNets]
+```
+
+instead of using `list.extend()`, which returns `None` and caused all pin terminals to be labeled. The patcher also prevents `pnr/main.py` from injecting top-level `Outline` when the PDK marks `Outline` as `NoGDS`.
+
+Why the patch is safe:
+This changes only Python stream-out labeling/filtering in the patched ALIGN runtime. It does not modify placement, routing, or electrical geometry. It removes internal labels from Magic extraction rather than waiving LVS.
+
+After result:
+Regenerated and validated buffer:
+
+```text
+GDS: generated_runs/buffer_align_label_patch/BUFFER_0.python.gds
+Report: reports/before_after/buffer_label_patch_xsubckt_full/
+Magic DRC: Total DRC errors found: 0
+Netgen LVS: Final result: Circuits match uniquely.
+```
+
+Remaining problems:
+The default native PnR GDS path still contains non-Sky130 helper boundary records. The verified path remains patched Python stream-out or sanitized verification GDS.

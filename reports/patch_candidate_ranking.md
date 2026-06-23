@@ -45,3 +45,13 @@ Date: 2026-06-23
 | 5 | Add official LVT geometry support or reject invalid LVT lengths | Medium | High for real LVT support | High: changes transistor generator semantics and sizing constraints | Yes | Generation geometry/device policy | Yes, but affects all comparisons | Defer until transistor policy review |
 | 6 | Broaden DRC/LVS validation to buffer/current mirror/OTA | Medium | High: determines whether inverter fix generalizes | Low for running checks, high for broad edits | Yes | Verification first | Yes | Next validation phase |
 | 7 | Global poly pitch/width widening | Low after experiment | Negative on inverter: increased DRC errors and worsened LVS | High: large geometry/topology blast radius | Yes | Generation geometry | Yes but harmful | Deferred; keep as negative evidence |
+
+## Updated Ranking After Buffer Evidence
+
+Date: 2026-06-23
+
+| Rank | Candidate fix | Confidence | Expected impact | Risk | Runtime GDS required? | Changes generation or only verification? | Fair for baseline ALIGN and AnalogDSL? | Action |
+|---:|---|---|---|---|---|---|---|---|
+| 1 | Patch ALIGN Python stream-out top-level label allow-list | High | High: changes buffer from port-mismatch LVS fail to clean LVS | Low/medium: export-label behavior only, but must be applied before generation | Yes | Generation/export only | Yes | Applied in runtime patcher |
+| 2 | Keep Python stream-out `.python.gds` as primary verification artifact | High | High: avoids helper-layer import failures and now has correct top-level labels | Low | Yes | Export path selection | Yes | Continue |
+| 3 | Patch native/default PnR GDS helper-boundary records | Medium | Medium: would make default `*.gds` usable without sanitizer | Medium/high: writer source path still needs tighter evidence | Yes | Generation/export only | Yes | Investigate later |
