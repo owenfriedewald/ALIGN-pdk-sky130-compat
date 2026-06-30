@@ -603,3 +603,48 @@ Circuit 1 contains 102 nets,    Circuit 2 contains 102 nets.
 
 Remaining problems:
 This validates the 6/12 PMOS grouped-current-mirror case and leaves more complex ratioed devices, true LVT/HVT geometry, capacitors, resistors, and default native GDS stream-out as separate targets.
+
+## 18. Direct ALIGN Default GDS Uses open_pdks-Safe Stream-Out
+
+Issue:
+The compatibility flow previously depended on manually patching ALIGN inside the Docker container and then validating `*.python.gds`. A normal `schematic2layout.py -p SKY130_PDK ...` run still wrote the ordinary `*_0.gds` from ALIGN's native PnR GDS JSON, which carried helper/boundary layers such as `104:0` and `235:5`. open_pdks Magic rejects those records during GDS import.
+
+Source diagnostic:
+Direct buffer generation before this fix produced:
+
+```text
+GDS: generated_runs/buffer_direct_main_gds/BUFFER_0.gds
+104:0 shapes=1
+235:5 shapes=2
+```
+
+ALIGN-side file:
+`SKY130_PDK/align_compat.py`
+`SKY130_PDK/__init__.py`
+
+Patch made:
+The PDK now applies the verified ALIGN stream-out compatibility patch when `SKY130_PDK` is imported. It patches ALIGN's Python GDS exporter to honor `NoGDS` layers, fixes the top-level label allow-list bug, skips top-level `Outline` injection for `NoGDS` layers, and refreshes `align.main.generate_pnr` so the current process uses the patched PnR module. The patched PnR file map points normal `gdsjson` at the open_pdks-safe Python GDS JSON, so the ordinary `variant.gds` is generated from the verified stream without a separate user script.
+
+Why the patch is safe:
+This changes stream-out selection and label filtering for this experimental PDK path. It does not modify placement, routing, or generated device geometry. The old behavior can be disabled with `ALIGN_SKY130_DISABLE_AUTO_PATCH=1`.
+
+After result:
+A direct, unwrapped ALIGN command generated a normal default GDS:
+
+```sh
+schematic2layout.py -p SKY130_PDK -w generated_runs/buffer_direct_binding_patch \
+  -s buffer -n 1 -e 0 --router_mode top_down --router astar --placer python \
+  generated_runs/buffer_input_direct_binding_patch
+```
+
+The ordinary output validated without GDS sanitization:
+
+```text
+GDS: generated_runs/buffer_direct_binding_patch/BUFFER_0.gds
+Report: reports/before_after/buffer_direct_binding_patch_xsubckt_full/
+Magic DRC: Total DRC errors found: 0
+Netgen LVS: Final result: Circuits match uniquely.
+```
+
+Remaining problems:
+This makes default GDS stream-out behave normally for the validated MOS-only buffer path. LVS still requires schematic dialect normalization for Magic/Netgen (`--expand-nf-stack --scale-wl-to-um --mos-as-subckt --uppercase-nets`, plus `--coerce-lvt-to-rvt` for legacy LVT-alias examples). True LVT/HVT geometry, capacitors, resistors, PEX accuracy, and broader circuit coverage are still not globally solved.

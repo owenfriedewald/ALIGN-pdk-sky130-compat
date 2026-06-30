@@ -399,3 +399,54 @@ reports/before_after/telescopic_ota_unit_counts_xsubckt_full/
 
 Interpretation:
 This is another MOS-only analog block validated after the grouped-MOS unit-count rewrite. It uses legacy `nmos_lvt`/`pmos_lvt` aliases, so the clean result depends on the documented RVT compatibility policy (`--coerce-lvt-to-rvt`) and is not true official LVT support.
+
+## Direct Default-GDS Buffer Validation
+
+Status: `drc_clean`, `lvs_clean`.
+
+This run validated the normal ALIGN output GDS, not the sidecar `*.python.gds` and not a sanitized GDS copy. The PDK import path self-applied the stream-out compatibility patch.
+
+Generation command inside `darpaalign/align-public:latest`:
+
+```sh
+schematic2layout.py -p SKY130_PDK \
+  -w generated_runs/buffer_direct_binding_patch \
+  -s buffer -n 1 -e 0 \
+  --router_mode top_down --router astar --placer python \
+  generated_runs/buffer_input_direct_binding_patch
+```
+
+Validation command inside `hpretl/iic-osic-tools:latest`:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/buffer_direct_binding_patch/BUFFER_0.gds \
+  --layout-top BUFFER \
+  --schematic examples/buffer/buffer.sp \
+  --schematic-top buffer \
+  --out-dir reports/before_after/buffer_direct_binding_patch_xsubckt_full \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um \
+  --mos-as-subckt \
+  --uppercase-nets
+```
+
+Results:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 4 devices, Circuit 2 contains 4 devices.
+Circuit 1 contains 5 nets,    Circuit 2 contains 5 nets.
+Final result: Circuits match uniquely.
+```
+
+Evidence directory:
+
+```text
+reports/before_after/buffer_direct_binding_patch_xsubckt_full/
+```
+
+Interpretation:
+This is the current best proof that the PDK can be fed directly to ALIGN for a small MOS-only circuit and produce a normal default GDS that Magic can import and validate. It does not remove the need for schematic normalization in the LVS harness, and it does not validate non-MOS devices or true LVT/HVT behavior.

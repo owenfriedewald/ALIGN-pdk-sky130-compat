@@ -1,0 +1,84 @@
+LVS file: /work/reports/before_after/buffer_direct_binding_patch_xsubckt_full/raw_logs/buffer_vs_BUFFER.netgen_lvs.log
+lines: 107
+Key lines:
+1: Netgen 1.5.316 compiled on Sat Feb 14 01:07:44 AM CET 2026
+2: Warning: netgen command 'format' use fully-qualified name '::netgen::format'
+3: Warning: netgen command 'global' use fully-qualified name '::netgen::global'
+4: Reading netlist file /work/reports/before_after/buffer_direct_binding_patch_xsubckt_full/extracted/BUFFER.extracted.spice for /work/reports/before_after/buffer_direct_binding_patch_xsubckt_full/extracted/BUFFER.extracted.spice BUFFER
+9: Reading netlist file /work/reports/before_after/buffer_direct_binding_patch_xsubckt_full/normalized/buffer.normalized.sp for /work/reports/before_after/buffer_direct_binding_patch_xsubckt_full/normalized/buffer.normalized.sp buffer
+15: Reading setup file /foss/pdks/sky130A/libs.tech/netgen/sky130A_setup.tcl
+18: No property mult found for device sky130_fd_pr__nfet_01v8
+19: No property sa found for device sky130_fd_pr__nfet_01v8
+20: No property sb found for device sky130_fd_pr__nfet_01v8
+21: No property sd found for device sky130_fd_pr__nfet_01v8
+22: No property nf found for device sky130_fd_pr__nfet_01v8
+23: No property nrd found for device sky130_fd_pr__nfet_01v8
+24: No property nrs found for device sky130_fd_pr__nfet_01v8
+25: No property area found for device sky130_fd_pr__nfet_01v8
+26: No property perim found for device sky130_fd_pr__nfet_01v8
+27: No property topography found for device sky130_fd_pr__nfet_01v8
+29: No property as found for device sky130_fd_pr__nfet_01v8
+30: No property ad found for device sky130_fd_pr__nfet_01v8
+31: No property ps found for device sky130_fd_pr__nfet_01v8
+32: No property pd found for device sky130_fd_pr__nfet_01v8
+33: No property mult found for device sky130_fd_pr__nfet_01v8
+34: No property sa found for device sky130_fd_pr__nfet_01v8
+35: No property sb found for device sky130_fd_pr__nfet_01v8
+36: No property sd found for device sky130_fd_pr__nfet_01v8
+37: No property nf found for device sky130_fd_pr__nfet_01v8
+38: No property nrd found for device sky130_fd_pr__nfet_01v8
+39: No property nrs found for device sky130_fd_pr__nfet_01v8
+40: No property area found for device sky130_fd_pr__nfet_01v8
+41: No property perim found for device sky130_fd_pr__nfet_01v8
+42: No property topography found for device sky130_fd_pr__nfet_01v8
+44: No property mult found for device sky130_fd_pr__pfet_01v8
+45: No property sa found for device sky130_fd_pr__pfet_01v8
+46: No property sb found for device sky130_fd_pr__pfet_01v8
+47: No property sd found for device sky130_fd_pr__pfet_01v8
+48: No property nf found for device sky130_fd_pr__pfet_01v8
+49: No property nrd found for device sky130_fd_pr__pfet_01v8
+50: No property nrs found for device sky130_fd_pr__pfet_01v8
+51: No property area found for device sky130_fd_pr__pfet_01v8
+52: No property perim found for device sky130_fd_pr__pfet_01v8
+53: No property topography found for device sky130_fd_pr__pfet_01v8
+55: No property as found for device sky130_fd_pr__pfet_01v8
+56: No property ad found for device sky130_fd_pr__pfet_01v8
+57: No property ps found for device sky130_fd_pr__pfet_01v8
+58: No property pd found for device sky130_fd_pr__pfet_01v8
+59: No property mult found for device sky130_fd_pr__pfet_01v8
+60: No property sa found for device sky130_fd_pr__pfet_01v8
+61: No property sb found for device sky130_fd_pr__pfet_01v8
+62: No property sd found for device sky130_fd_pr__pfet_01v8
+63: No property nf found for device sky130_fd_pr__pfet_01v8
+64: No property nrd found for device sky130_fd_pr__pfet_01v8
+65: No property nrs found for device sky130_fd_pr__pfet_01v8
+66: No property area found for device sky130_fd_pr__pfet_01v8
+67: No property perim found for device sky130_fd_pr__pfet_01v8
+68: No property topography found for device sky130_fd_pr__pfet_01v8
+71: Circuit sky130_fd_pr__pfet_01v8 contains no devices.
+72: Circuit sky130_fd_pr__nfet_01v8 contains no devices.
+75: Circuit BUFFER contains 40 device instances.
+78: Circuit contains 5 nets.
+80: Circuit buffer contains 40 device instances.
+83: Circuit contains 5 nets.
+85: Circuit was modified by parallel/series device merging.
+89: Circuit BUFFER contains 4 device instances.
+92: Circuit contains 5 nets.
+94: Circuit buffer contains 4 device instances.
+97: Circuit contains 5 nets.
+99: Circuit 1 contains 4 devices, Circuit 2 contains 4 devices.
+100: Circuit 1 contains 5 nets,    Circuit 2 contains 5 nets.
+104: Circuits match uniquely.
+
+LVS file: /work/reports/before_after/buffer_direct_binding_patch_xsubckt_full/raw_logs/buffer_vs_BUFFER.lvs.report
+lines: 56
+Key lines:
+15: Device classes sky130_fd_pr__pfet_01v8 and sky130_fd_pr__pfet_01v8 are equivalent.
+30: Device classes sky130_fd_pr__nfet_01v8 and sky130_fd_pr__nfet_01v8 are equivalent.
+32: Class BUFFER (0):  Merged 36 parallel devices.
+33: Class buffer (1):  Merged 36 parallel devices.
+39: Number of devices: 4                       |Number of devices: 4
+40: Number of nets: 5                          |Number of nets: 5
+42: Netlists match uniquely.
+53: Device classes BUFFER and buffer are equivalent.
+55: Final result: Circuits match uniquely.

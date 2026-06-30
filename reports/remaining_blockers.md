@@ -24,9 +24,13 @@ Netgen LVS: Final result: Circuits match uniquely.
 reports/before_after/five_transistor_ota_label_patch_xsubckt_full/
 Magic DRC: Total DRC errors found: 0
 Netgen LVS: Final result: Circuits match uniquely.
+
+reports/before_after/buffer_direct_binding_patch_xsubckt_full/
+Magic DRC: Total DRC errors found: 0
+Netgen LVS: Final result: Circuits match uniquely.
 ```
 
-The inverter result depends on the experimental no-LVT-marker RVT compatibility policy and schematic subckt normalization. The buffer and five-transistor OTA results use regular 1.8V model aliases and additionally validate the top-level-label patch in the ALIGN runtime patcher.
+The inverter result depends on the experimental no-LVT-marker RVT compatibility policy and schematic subckt normalization. The buffer and five-transistor OTA results use regular 1.8V model aliases. The `buffer_direct_binding_patch` result additionally validates that a normal `schematic2layout.py -p SKY130_PDK ...` run can produce a default `BUFFER_0.gds` that Magic imports without helper-layer errors.
 
 ## Remaining Runtime Blockers Outside Docker / Outside Inverter
 
@@ -62,32 +66,36 @@ The inverter result depends on the experimental no-LVT-marker RVT compatibility 
 
 | Blocker | Evidence | Next action |
 |---|---|---|
-| Helper layers still stream from default PnR GDS | The patched Python stream-out path now removes helper layers, but default `INVERTER_0.gds` still emits `104:0` and `235:5` from downstream PnR result writing. | Use patched `.python.gds` or sanitizer for verification; next patch target is the downstream PnR GDS writer. |
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Redesign MOS schematic/generator contract for planar Sky130, or make LVS netlists physically expanded before comparison. |
-| Default/native PnR GDS writer still emits helper boundary records | The patched Python stream-out path removes helper layers, but default native `*.gds` still emits non-Sky130 boundary records such as `235:5`. | Patch downstream native GDS writer or keep using `.python.gds`/sanitizer for verification. |
+| Default GDS stream-out is only validated through the PDK import hook | `generated_runs/buffer_direct_binding_patch/BUFFER_0.gds` is clean, but earlier default-GDS attempts before refreshing `align.main.generate_pnr` still emitted helper layers. | Keep this behavior in `SKY130_PDK/align_compat.py`; long-term, move equivalent fixes into the ALIGN fork rather than relying on runtime source patching. |
 | Official LVT support is not solved | The clean inverter path suppresses LVT marker generation and coerces schematic aliases to RVT. | Either generate official-compliant LVT geometry or reject/remap invalid LVT requests intentionally. |
-| Larger/mixed-device circuits are unvalidated | Inverter, buffer, and five-transistor OTA have clean Magic/Netgen runs; current mirror OTA, telescopic OTA, MIM caps, resistors, HVT, and true LVT are not validated. | Repeat the same flow on the next small or mixed-device circuit before changing broad rules. |
+| Larger/mixed-device circuits are unvalidated | Inverter, buffer, five-transistor OTA, current-mirror OTA, and telescopic OTA have clean Magic/Netgen runs under stated compatibility policies; MIM caps, resistors, HVT, and true LVT are not validated. | Repeat the same flow on the next small mixed-device circuit before changing broad rules. |
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Keep LVS physical expansion for verification or redesign the schematic/generator contract for planar Sky130. |
 | Broader ratioed grouped MOS coverage is still limited | The specific `current_mirror_ota` 6/12 PMOS grouped case is now clean after explicit `unit_counts`, but other unequal-ratio grouped devices have not been swept. | Use `scripts/analyze_mos_array_units.py` on each new generated run and validate representative ratioed NMOS/PMOS groups. |
 
 ## Current Practical Verification Path
 
-Use `scripts/patch_align_gds_export.py` inside the ALIGN runtime before generation, generate `.python.gds`, then verify with:
+For a regular MOS-only direct run, generate normally and validate the default GDS:
 
 ```sh
+schematic2layout.py -p SKY130_PDK \
+  -w generated_runs/buffer_direct_binding_patch \
+  -s buffer -n 1 -e 0 \
+  --router_mode top_down --router astar --placer python \
+  generated_runs/buffer_input_direct_binding_patch
+
 scripts/run_one_circuit_validation.sh \
   --open-pdks-root /foss/pdks/sky130A \
-  --gds generated_runs/inverter_align_no_lvt_marker/INVERTER_0.python.gds \
-  --layout-top INVERTER \
-  --schematic artifacts/inverter_tuple/inverter/input/inverter.sp \
-  --schematic-top inverter \
-  --out-dir reports/before_after/inverter_no_lvt_marker_xsubckt_full \
+  --gds generated_runs/buffer_direct_binding_patch/BUFFER_0.gds \
+  --layout-top BUFFER \
+  --schematic examples/buffer/buffer.sp \
+  --schematic-top buffer \
+  --out-dir reports/before_after/buffer_direct_binding_patch_xsubckt_full \
   --no-sanitize-gds \
   --expand-nf-stack \
   --scale-wl-to-um \
-  --coerce-lvt-to-rvt \
   --mos-as-subckt \
   --uppercase-nets
 ```
 
-For regular RVT MOS-only examples such as buffer, omit `--coerce-lvt-to-rvt` and use the same `--mos-as-subckt --uppercase-nets --expand-nf-stack --scale-wl-to-um` LVS normalization. The Python stream-out patch is still required to avoid internal labels becoming top-level Magic pins.
+For legacy LVT-alias examples, add `--coerce-lvt-to-rvt` until true LVT-compliant geometry is implemented. LVS normalization is still required because ALIGN source schematics and Magic extracted SPICE use different MOS netlist dialects.

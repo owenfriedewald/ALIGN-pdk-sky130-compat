@@ -1,0 +1,32 @@
+[32malign.main INFO : Reading netlist: /work/generated_runs/buffer_input_direct_binding_patch/buffer.sp subckt=BUFFER, flat=0[0m
+[32malign.compiler.compiler INFO : Starting topology identification...[0m
+[32malign.compiler.compiler INFO : Power and ground nets not found. Power grid will not be constructed.[0m
+[32malign.compiler.compiler INFO : Completed topology identification.[0m
+[32malign.pnr.main INFO : Running Place & Route for BUFFER[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file BUFFER.pnr.const.json[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file STAGE2_INV_15241980.pnr.const.json[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file BUFFER.pnr.const.json[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file STAGE2_INV_15241980.pnr.const.json[0m
+[32malign.pnr.placer INFO : Starting bottom-up placement on STAGE2_INV_15241980 1[0m
+[32mPnR.placer.SeqPair.SeqPair INFO : Enumerated search[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : Exhausted all permutations of seq pairs and found 1 placement solution(s)[0m
+[32malign.pnr.placer INFO : Starting bottom-up placement on BUFFER 0[0m
+[32mPnR.placer.SeqPair.SeqPair INFO : Enumerated search[0m
+[32mPnR.placer.Placer.PlacementCoreAspectRatio_ILP INFO : Exhausted all permutations of seq pairs and found 1 placement solution(s)[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file BUFFER.pnr.const.json[0m
+[32malign.pnr.build_pnr_model INFO : Reading contraint json file STAGE2_INV_15241980.pnr.const.json[0m
+[32mPnR.placer.SeqPair.SeqPair INFO : Enumerated search[0m
+[32mPnR.placer.SeqPair.SeqPair INFO : Enumerated search[0m
+[32malign.pnr.router INFO : Starting top_down routing on BUFFER 0 restricted to None[0m
+[32mPnR.router.Router.RouteWork INFO : GcellGlobalRouter: STAGE2_INV_15241980[0m
+[32mPnR.router.Router.RouteWork INFO : GcellDetailRouter: STAGE2_INV_15241980[0m
+[32mPnR.router.Router.RouteWork INFO : GcellGlobalRouter: BUFFER[0m
+[32mPnR.router.Router.RouteWork INFO : GcellDetailRouter: BUFFER[0m
+[32mPnR.router.Router.RouteWork INFO : Create power grid: BUFFER[0m
+[32mPnR.router.Router.RouteWork INFO : Power routing BUFFER[0m
+[32malign.pnr.main INFO : OUTPUT json at /work/generated_runs/buffer_direct_binding_patch/3_pnr/STAGE2_INV_15241980_0_0.json[0m
+[32malign.pnr.main INFO : OUTPUT gds.json /work/generated_runs/buffer_direct_binding_patch/3_pnr/STAGE2_INV_15241980_0_0.python.gds.json[0m
+[32malign.pnr.main INFO : OUTPUT json at /work/generated_runs/buffer_direct_binding_patch/3_pnr/BUFFER_0.json[0m
+[32malign.pnr.main INFO : OUTPUT gds.json /work/generated_runs/buffer_direct_binding_patch/3_pnr/BUFFER_0.python.gds.json[0m
+Use KLayout to visualize the generated GDS: /work/generated_runs/buffer_direct_binding_patch/BUFFER_0.gds
+Use KLayout to visualize the python generated GDS: /work/generated_runs/buffer_direct_binding_patch/BUFFER_0.python.gds

@@ -223,3 +223,23 @@ After the grouped-MOS rewrite, `examples/telescopic_ota/telescopic_ota.sp` was g
 - Counts after Netgen parallel/series merging: 10 devices and 15 nets on both sides.
 
 The telescopic source uses legacy `nmos_lvt`/`pmos_lvt` names, so this result depends on the experimental RVT compatibility policy and does not prove true LVT-compliant geometry.
+
+## Direct Default-GDS Run
+
+The PDK now self-applies the verified ALIGN stream-out compatibility patch when `SKY130_PDK` is imported. A normal ALIGN invocation, without `scripts/patch_align_gds_export.py`, generated a default `BUFFER_0.gds` from the open_pdks-safe Python stream:
+
+```sh
+schematic2layout.py -p SKY130_PDK -w generated_runs/buffer_direct_binding_patch \
+  -s buffer -n 1 -e 0 --router_mode top_down --router astar --placer python \
+  generated_runs/buffer_input_direct_binding_patch
+```
+
+Evidence:
+
+- Default GDS: `generated_runs/buffer_direct_binding_patch/BUFFER_0.gds`
+- Layer inspection: no helper layers `100:5`, `104:0`, or `235:5`; top cell is `BUFFER`.
+- Report: `reports/before_after/buffer_direct_binding_patch_xsubckt_full/`
+- Magic DRC: `Total DRC errors found: 0`
+- Netgen LVS: `Final result: Circuits match uniquely.`
+
+This is now much closer to the intended "use it as a PDK" behavior: ordinary ALIGN output is the validated GDS artifact. It remains experimental because the PDK is patching the installed ALIGN runtime at import time; the proper long-term form is either carrying these changes in the ALIGN fork or upstreaming equivalent stream-out fixes. LVS still uses explicit schematic normalization to compare against Magic-extracted SPICE.
