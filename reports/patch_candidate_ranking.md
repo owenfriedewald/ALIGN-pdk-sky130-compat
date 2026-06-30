@@ -76,3 +76,13 @@ Date: 2026-06-23
 | 2 | Add/read `scripts/analyze_mos_array_units.py` before validating larger grouped-MOS circuits | High | Medium/high: predicts LVS count risk from generated primitives before Magic/Netgen | Low | No after generation; yes to correlate with LVS | Verification/diagnostic only | Yes | Added |
 | 3 | Force schematic normalizer to match rounded-up grouped arrays | Low | Could make current LVS pass artificially | High: would hide real layout-vs-schematic topology mismatch | Yes | Verification only, but unsafe | No | Do not apply |
 | 4 | Continue validating circuits with equal-NF grouped MOS arrays | High | Medium: clean five-transistor OTA shows equal-NF groups are currently usable | Low | Yes | Verification only | Yes | Continue as regression coverage |
+
+## Updated Ranking After Unit-Count Rewrite
+
+Date: 2026-06-30
+
+| Rank | Candidate fix | Confidence | Expected impact | Risk | Runtime GDS required? | Changes generation or only verification? | Fair for baseline ALIGN and AnalogDSL? | Action |
+|---:|---|---|---|---|---|---|---|---|
+| 1 | Keep explicit `unit_counts` for unequal-NF SCM MOS groups | High for current_mirror_ota | High: changed current_mirror_ota from DRC-clean/LVS-failing to DRC-clean/LVS-clean | Medium/high: generator topology change, but targeted | Yes | Generation/device topology | Yes | Applied experimentally |
+| 2 | Sweep analyzer across all generated MOS primitives before each LVS run | High | Medium: catches future ratioed-group count risks early | Low | No after generation | Diagnostic only | Yes | Use as run preflight |
+| 3 | Validate telescopic OTA or another ratioed grouped circuit | Medium | High: checks generality beyond one PMOS 6/12 case | Low for validation, medium for follow-up patches | Yes | Verification first | Yes | Next |

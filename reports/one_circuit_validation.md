@@ -320,3 +320,42 @@ reports/before_after/current_mirror_ota_label_patch_xsubckt_full/
 
 Interpretation:
 The same patched stream-out and LVS normalization path gets this larger current-mirror OTA to a clean Magic DRC run, but LVS exposes a real PFET count mismatch. `scripts/analyze_mos_array_units.py` flags the two generated PMOS grouped primitives as `fractional_unit_rounding,unequal_nf_group,high_lvs_count_risk`: the source PMOS mirror pair has `NF=6` and `NF=12` with `stack=2`, while the current generator rounds a `4.5` unit-cell calculation up to `5`. This is now the highest-priority device-generation mismatch; it should not be papered over in Netgen.
+
+## Current-Mirror OTA Validation After Unit-Count Rewrite
+
+Status: `drc_clean`, `lvs_clean`.
+
+Full command used inside `hpretl/iic-osic-tools:latest`:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/current_mirror_ota_unit_counts/CURRENT_MIRROR_OTA_0.python.gds \
+  --layout-top CURRENT_MIRROR_OTA \
+  --schematic examples/current_mirror_ota/current_mirror_ota.sp \
+  --schematic-top current_mirror_ota \
+  --out-dir reports/before_after/current_mirror_ota_unit_counts_xsubckt_full \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um \
+  --mos-as-subckt \
+  --uppercase-nets
+```
+
+Results:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 184 devices, Circuit 2 contains 184 devices.
+Circuit 1 contains 102 nets,    Circuit 2 contains 102 nets.
+Final result: Circuits match uniquely.
+```
+
+Evidence directory:
+
+```text
+reports/before_after/current_mirror_ota_unit_counts_xsubckt_full/
+```
+
+Interpretation:
+The grouped-MOS unit-count rewrite fixed the +8 PFET over-generation without LVS filtering. The new generated PMOS primitives carry explicit `unit_counts` metadata, and `scripts/analyze_mos_array_units.py` reports `risk_count: 0` for the regenerated current-mirror OTA.

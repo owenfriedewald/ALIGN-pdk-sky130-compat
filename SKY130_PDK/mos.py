@@ -280,12 +280,26 @@ class MOSGenerator(DefaultCanvas):
         else:
             self.minvias = minvias
         names = ['M1'] if pattern == 0 else ['M1', 'M2']
+        unit_counts = parameters.pop('unit_counts', None)
+        unit_sequence = None
+        if unit_counts:
+            unit_sequence = self._unitSequence(unit_counts, names, pattern)
         self._nets = collections.defaultdict(lambda: collections.defaultdict(list)) # net:m2track:m1contacts (Updated by self._connectDevicePins)
+        unit_index = 0
         for y in range(y_cells):
             self._xpins = collections.defaultdict(lambda: collections.defaultdict(list)) # inst:pin:m1tracks (Updated by self._addMOS)
             
             for x in range(x_cells):
-                if pattern == 0: # None (single transistor
+                if unit_sequence is not None:
+                    if unit_index >= len(unit_sequence):
+                        continue
+                    name = unit_sequence[unit_index]
+                    unit_index += 1
+                    if name is None:
+                        continue
+                    self._addMOS(x, y, x_cells, vt_type, name, False, **parameters)
+                    if self.bodyswitch==1:self._addBodyContact(x, y, x_cells, y_cells - 1, name)
+                elif pattern == 0: # None (single transistor
                     # TODO: Not sure this works without dummies. Currently:
                     # A A A A A 
                     self._addMOS(x, y, x_cells, vt_type, names[0], False, **parameters)
@@ -315,6 +329,29 @@ class MOSGenerator(DefaultCanvas):
             self._connectDevicePins(y, y_cells, connections)
         self._connectNets(x_cells, y_cells) 
 
+    def _unitSequence(self, unit_counts, names, pattern):
+        counts = {name: int(unit_counts.get(name, 0)) for name in names}
+        assert all(count >= 0 for count in counts.values()), f"Invalid unit_counts {unit_counts}"
+        if pattern == 3 and len(names) == 2:
+            first, second = names
+            if counts[first] <= counts[second]:
+                middle = first
+                surround = second
+            else:
+                middle = second
+                surround = first
+            left = counts[surround] // 2
+            right = counts[surround] - left
+            return [surround] * left + [middle] * counts[middle] + [surround] * right
+        sequence = []
+        remaining = counts.copy()
+        while any(remaining.values()):
+            for name in names:
+                if remaining[name] > 0:
+                    sequence.append(name)
+                    remaining[name] -= 1
+        return sequence
+
     def addNMOSArray( self, x_cells, y_cells, pattern, vt_type, connections, **parameters):
 
         self._addMOSArray(x_cells, y_cells, pattern, vt_type, connections, **parameters)
@@ -330,4 +367,3 @@ class MOSGenerator(DefaultCanvas):
         self.addRegion( self.pselect, None, (1, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell)
         self.addRegion( self.nwell, None, (1, -1), 0, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
         if self.bodyswitch==1:self.addRegion( self.nselect, None, (1, -1), y_cells* self.finsPerUnitCell, (x_cells*self.gatesPerUnitCell+2*self.gateDummy*self.shared_diff-1, -1), y_cells* self.finsPerUnitCell+self.bodyswitch*self.pdk['Active']['Body_nfin'])
-

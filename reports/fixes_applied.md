@@ -552,3 +552,54 @@ Netgen LVS: Final result: Circuits match uniquely.
 
 Remaining problems:
 The default native PnR GDS path still contains non-Sky130 helper boundary records. The verified path remains patched Python stream-out or sanitized verification GDS.
+
+## 17. Unequal-NF Grouped MOS Unit Counts
+
+Issue:
+`current_mirror_ota` was DRC-clean but LVS-failing. Magic extracted 80 PFET devices while the normalized schematic expected 72 PFET devices. NFET counts matched, so the remaining mismatch was a real generated PMOS topology/count problem rather than a model-name, pin-name, or Netgen setup issue.
+
+Source diagnostic:
+`reports/before_after/current_mirror_ota_label_patch_xsubckt_full/summary.md` showed:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 192 devices, Circuit 2 contains 184 devices. *** MISMATCH ***
+Circuit 1 contains 106 nets,    Circuit 2 contains 102 nets. *** MISMATCH ***
+```
+
+`scripts/analyze_mos_array_units.py` identified the two generated PMOS grouped primitives:
+
+```text
+SCM_PMOS_85912433_X1_Y5: M1 NF=6, M2 NF=12, stack=2, formula_units=4.5
+SCM_PMOS_85912433_X5_Y1: M1 NF=6, M2 NF=12, stack=2, formula_units=4.5
+```
+
+ALIGN-side file:
+`SKY130_PDK/gen_param.py`
+`SKY130_PDK/mos.py`
+
+Patch made:
+`gen_param.py` now records explicit per-device `unit_counts` for unequal-NF SCM MOS groups. `mos.py` consumes that map and emits only the requested physical MOS unit count instead of drawing the rounded surplus device cell introduced by ALIGN's two-device primitive `x_cells` doubling. The helper `scripts/analyze_mos_array_units.py` now reports corrected explicit-unit cases as notes and still fails when an unequal fractional group has no explicit unit-count metadata.
+
+Why the patch is safe:
+This is a targeted generator-topology change for grouped MOS primitives whose source devices have unequal `NF*M`. Equal-NF groups continue down the prior path. The patch removes physically generated surplus PFETs; it does not hide LVS errors or alter Netgen output.
+
+After result:
+Regenerated and validated current-mirror OTA:
+
+```text
+GDS: generated_runs/current_mirror_ota_unit_counts/CURRENT_MIRROR_OTA_0.python.gds
+Report: reports/before_after/current_mirror_ota_unit_counts_xsubckt_full/
+Magic DRC: Total DRC errors found: 0
+Netgen LVS: Final result: Circuits match uniquely.
+```
+
+Device and net counts after the patch:
+
+```text
+Circuit 1 contains 184 devices, Circuit 2 contains 184 devices.
+Circuit 1 contains 102 nets,    Circuit 2 contains 102 nets.
+```
+
+Remaining problems:
+This validates the 6/12 PMOS grouped-current-mirror case and leaves more complex ratioed devices, true LVT/HVT geometry, capacitors, resistors, and default native GDS stream-out as separate targets.

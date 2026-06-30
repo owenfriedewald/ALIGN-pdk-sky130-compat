@@ -68,7 +68,7 @@ The inverter result depends on the experimental no-LVT-marker RVT compatibility 
 | Official LVT support is not solved | The clean inverter path suppresses LVT marker generation and coerces schematic aliases to RVT. | Either generate official-compliant LVT geometry or reject/remap invalid LVT requests intentionally. |
 | Larger/mixed-device circuits are unvalidated | Inverter, buffer, and five-transistor OTA have clean Magic/Netgen runs; current mirror OTA, telescopic OTA, MIM caps, resistors, HVT, and true LVT are not validated. | Repeat the same flow on the next small or mixed-device circuit before changing broad rules. |
 | MOS generator is still mock-FinFET-derived | Inverter schematic has 2 MOS with `nf=20 stack=3`; Magic extracts 120 MOS devices. | Keep LVS physical expansion for verification or redesign the schematic/generator contract for planar Sky130. |
-| Unequal-NF grouped PMOS arrays over-generate extracted devices | `current_mirror_ota` is DRC-clean but LVS-failing: layout has 80 PFETs, normalized schematic has 72. `SCM_PMOS_85912433_X1_Y5` and `_X5_Y1` both have `NF=6/12`, `stack=2`, a fractional `4.5` unit-cell calculation, and 5 emitted cells. | Rewrite or constrain grouped MOS array sizing in `SKY130_PDK/gen_param.py` / `SKY130_PDK/mos.py`; do not hide this in LVS normalization. |
+| Broader ratioed grouped MOS coverage is still limited | The specific `current_mirror_ota` 6/12 PMOS grouped case is now clean after explicit `unit_counts`, but other unequal-ratio grouped devices have not been swept. | Use `scripts/analyze_mos_array_units.py` on each new generated run and validate representative ratioed NMOS/PMOS groups. |
 
 ## Current Practical Verification Path
 

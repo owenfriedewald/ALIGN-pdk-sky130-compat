@@ -161,12 +161,19 @@ def gen_param(subckt, primitives, pdk_dir):
             yval = square_y
             xval = int(no_units / square_y)
 
+        unit_counts = None
         if 'SCM' in block_name:
             if int(mvalues[device_name_all[0]]["NFIN"])*int(mvalues[device_name_all[0]]["NF"])*int(mvalues[device_name_all[0]]["M"]) != \
                     int(mvalues[device_name_all[1]]["NFIN"])*int(mvalues[device_name_all[1]]["NF"])*int(mvalues[device_name_all[1]]["M"]):
                 square_y = 1
                 yval = square_y
                 xval = int(no_units / square_y)
+                unit_counts = {}
+                for key in device_name_all:
+                    nf = int(mvalues[key]["NF"])
+                    mult = int(mvalues[key]["M"])
+                    assert (nf * mult) % 2 == 0, f"NF*M must be even for grouped MOS device {key}:{mvalues[key]} in {name}"
+                    unit_counts[key] = (nf * mult) // 2
 
         block_args = {
             'primitive': generator_name,
@@ -175,6 +182,8 @@ def gen_param(subckt, primitives, pdk_dir):
             'y_cells': yval,
             'parameters': mvalues
         }
+        if unit_counts:
+            block_args['parameters']['unit_counts'] = unit_counts
         if 'STACK' in mvalues[device_name].keys() and int(mvalues[device_name]["STACK"]) > 1:
             block_args['stack'] = int(mvalues[device_name]["STACK"])
         if vt:

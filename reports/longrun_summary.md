@@ -199,3 +199,15 @@ SCM_PMOS_85912433_X5_Y1: M1 NF=6, M2 NF=12, stack=2, formula_units=4.5, emitted 
 ```
 
 This is useful negative evidence. The next real PDK/device rewrite target is the grouped MOS array sizing logic, not Magic/Netgen setup.
+
+## Current-Mirror OTA Clean After Grouped-MOS Rewrite
+
+`SKY130_PDK/gen_param.py` and `SKY130_PDK/mos.py` now carry explicit per-device unit counts for unequal-NF grouped MOS primitives. Regenerating `current_mirror_ota` after that rewrite produced:
+
+- GDS: `generated_runs/current_mirror_ota_unit_counts/CURRENT_MIRROR_OTA_0.python.gds`
+- Report: `reports/before_after/current_mirror_ota_unit_counts_xsubckt_full/`
+- Magic DRC: `Total DRC errors found: 0`
+- Netgen LVS: `Final result: Circuits match uniquely.`
+- Counts: 184 devices and 102 nets on both sides.
+
+This resolves the first larger ratioed-current-mirror LVS blocker with a real PDK/generator change. It does not validate all ratioed devices, native/default GDS stream-out, true LVT/HVT geometry, capacitors, or resistors.

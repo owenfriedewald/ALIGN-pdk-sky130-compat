@@ -161,3 +161,7 @@ Date: 2026-06-18
 | `python3 -m py_compile scripts/analyze_mos_array_units.py scripts/normalize_netlist.py scripts/patch_align_gds_export.py scripts/summarize_drc_log.py scripts/summarize_lvs_log.py` | Passed. Touched/related Python helpers compile cleanly. |
 | `git diff --check` | Passed. No whitespace errors in the working diff. |
 | `find scripts/__pycache__ ... -delete; find SKY130_PDK/__pycache__ ... -delete` | Passed with approval. Removed generated Python bytecode caches from validation. |
+| `docker run ... schematic2layout.py ... generated_runs/current_mirror_ota_unit_counts` | Passed. Regenerated current-mirror OTA after grouped-MOS `unit_counts` PDK rewrite. Output includes `CURRENT_MIRROR_OTA_0.python.gds`. |
+| `python3 scripts/analyze_mos_array_units.py generated_runs/current_mirror_ota_unit_counts/2_primitives/__primitives__.json` | Passed after analyzer update. PMOS grouped primitives now report `explicit_unit_counts`; `risk_count: 0`. |
+| `docker run ... run_one_circuit_validation.sh ... current_mirror_ota_unit_counts_xsubckt_full --no-sanitize-gds --expand-nf-stack --scale-wl-to-um --mos-as-subckt --uppercase-nets` | Passed. Full flow is clean for current-mirror OTA after PDK rewrite: Magic DRC `Total DRC errors found: 0`; Netgen LVS `Final result: Circuits match uniquely`; matched 184 devices and 102 nets. |
+| `python3 -m py_compile SKY130_PDK/gen_param.py SKY130_PDK/mos.py scripts/analyze_mos_array_units.py` | Passed. Generator rewrite and analyzer compile cleanly. |

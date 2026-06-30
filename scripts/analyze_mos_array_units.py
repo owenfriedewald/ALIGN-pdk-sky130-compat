@@ -49,6 +49,9 @@ def analyze(path: Path) -> int:
         y_cells = _as_int(primitive.get("y_cells"))
         unit_cells = x_cells * y_cells
         stack = _as_int(primitive.get("stack"), 1) or 1
+        unit_counts = params.get("unit_counts", {})
+        if not isinstance(unit_counts, dict):
+            unit_counts = {}
         nf_values = {
             dev_name: _as_int(dev_params.get("NF"))
             for dev_name, dev_params in devices.items()
@@ -62,11 +65,13 @@ def analyze(path: Path) -> int:
         current_formula_units = total_nf_m / (2 * len(devices))
         fractional = current_formula_units != int(current_formula_units)
         unequal_nf = len(set(nf_values.values())) > 1
+        explicit_units = sum(_as_int(v) for v in unit_counts.values())
 
         rows.append(
             {
                 "name": name,
                 "unit_cells": unit_cells,
+                "explicit_units": explicit_units,
                 "formula_units": current_formula_units,
                 "fractional": fractional,
                 "unequal_nf": unequal_nf,
@@ -78,24 +83,30 @@ def analyze(path: Path) -> int:
 
     print(f"source: {path}")
     print(
-        "primitive, unit_cells, formula_units, expanded_devices, stack, "
-        "nf_by_device, risk"
+        "primitive, unit_cells, explicit_units, formula_units, "
+        "expanded_devices, stack, nf_by_device, risk"
     )
     risky = 0
     for row in rows:
         risks = []
+        notes = []
         if row["fractional"]:
-            risks.append("fractional_unit_rounding")
+            notes.append("fractional_unit_rounding")
         if row["unequal_nf"]:
-            risks.append("unequal_nf_group")
+            notes.append("unequal_nf_group")
         if row["fractional"] and row["unequal_nf"]:
-            risks.append("high_lvs_count_risk")
+            if row["explicit_units"]:
+                notes.append("explicit_unit_counts")
+            else:
+                risks.append("high_lvs_count_risk")
         if risks:
             risky += 1
-        risk_text = ",".join(risks) if risks else "none"
+        labels = notes + risks
+        risk_text = ",".join(labels) if labels else "none"
         nf_text = ";".join(f"{k}={v}" for k, v in sorted(row["nf_values"].items()))
         print(
             f"{row['name']}, {row['unit_cells']}, "
+            f"{row['explicit_units']}, "
             f"{row['formula_units']:.3f}, {row['expanded_devices']}, "
             f"{row['stack']}, {nf_text}, {risk_text}"
         )
