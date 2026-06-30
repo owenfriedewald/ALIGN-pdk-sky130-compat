@@ -359,3 +359,43 @@ reports/before_after/current_mirror_ota_unit_counts_xsubckt_full/
 
 Interpretation:
 The grouped-MOS unit-count rewrite fixed the +8 PFET over-generation without LVS filtering. The new generated PMOS primitives carry explicit `unit_counts` metadata, and `scripts/analyze_mos_array_units.py` reports `risk_count: 0` for the regenerated current-mirror OTA.
+
+## Telescopic OTA Validation
+
+Status: `drc_clean`, `lvs_clean`.
+
+Full command used inside `hpretl/iic-osic-tools:latest`:
+
+```sh
+scripts/run_one_circuit_validation.sh \
+  --open-pdks-root /foss/pdks/sky130A \
+  --gds generated_runs/telescopic_ota_unit_counts/TELESCOPIC_OTA_0.python.gds \
+  --layout-top TELESCOPIC_OTA \
+  --schematic examples/telescopic_ota/telescopic_ota.sp \
+  --schematic-top telescopic_ota \
+  --out-dir reports/before_after/telescopic_ota_unit_counts_xsubckt_full \
+  --no-sanitize-gds \
+  --expand-nf-stack \
+  --scale-wl-to-um \
+  --coerce-lvt-to-rvt \
+  --mos-as-subckt \
+  --uppercase-nets
+```
+
+Results:
+
+```text
+Total DRC errors found: 0
+Circuit 1 contains 10 devices, Circuit 2 contains 10 devices.
+Circuit 1 contains 15 nets,    Circuit 2 contains 15 nets.
+Final result: Circuits match uniquely.
+```
+
+Evidence directory:
+
+```text
+reports/before_after/telescopic_ota_unit_counts_xsubckt_full/
+```
+
+Interpretation:
+This is another MOS-only analog block validated after the grouped-MOS unit-count rewrite. It uses legacy `nmos_lvt`/`pmos_lvt` aliases, so the clean result depends on the documented RVT compatibility policy (`--coerce-lvt-to-rvt`) and is not true official LVT support.

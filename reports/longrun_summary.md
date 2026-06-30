@@ -211,3 +211,15 @@ This is useful negative evidence. The next real PDK/device rewrite target is the
 - Counts: 184 devices and 102 nets on both sides.
 
 This resolves the first larger ratioed-current-mirror LVS blocker with a real PDK/generator change. It does not validate all ratioed devices, native/default GDS stream-out, true LVT/HVT geometry, capacitors, or resistors.
+
+## Telescopic OTA Clean Run
+
+After the grouped-MOS rewrite, `examples/telescopic_ota/telescopic_ota.sp` was generated and validated:
+
+- GDS: `generated_runs/telescopic_ota_unit_counts/TELESCOPIC_OTA_0.python.gds`
+- Report: `reports/before_after/telescopic_ota_unit_counts_xsubckt_full/`
+- Magic DRC: `Total DRC errors found: 0`
+- Netgen LVS: `Final result: Circuits match uniquely.`
+- Counts after Netgen parallel/series merging: 10 devices and 15 nets on both sides.
+
+The telescopic source uses legacy `nmos_lvt`/`pmos_lvt` names, so this result depends on the experimental RVT compatibility policy and does not prove true LVT-compliant geometry.

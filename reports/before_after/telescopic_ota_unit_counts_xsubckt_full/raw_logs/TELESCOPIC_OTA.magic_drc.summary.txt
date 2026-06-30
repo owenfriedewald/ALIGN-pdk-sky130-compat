@@ -1,0 +1,8 @@
+DRC log: /work/reports/before_after/telescopic_ota_unit_counts_xsubckt_full/raw_logs/TELESCOPIC_OTA.magic_drc.log
+lines: 25
+numeric count candidates: 0
+
+Key lines:
+23: DRC style is now "drc(full)"
+24: Loading DRC CIF style.
+25: Total DRC errors found: 0
