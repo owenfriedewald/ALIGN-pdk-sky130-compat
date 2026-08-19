@@ -12,8 +12,9 @@ Runs the prepared one-circuit flow:
   Magic DRC -> Magic extraction/ext2spice -> Netgen LVS -> log summaries.
 
 This script does not waive or filter errors. Raw logs are preserved under OUT_DIR/raw_logs.
-By default it writes a sanitized verification GDS under OUT_DIR/normalized that drops
-known ALIGN helper layers rejected by Magic; use --no-sanitize-gds to disable this.
+By default it verifies the native ALIGN GDS without rewriting it. The legacy
+--sanitize-gds-diagnostic-only option creates a post-processed diagnostic copy;
+results from that mode are never publication-grade physical evidence.
 EOF
 }
 
@@ -25,7 +26,7 @@ LAYOUT_TOP=""
 SCHEMATIC_TOP=""
 OUT_DIR=""
 DROP_PARAMS=()
-SANITIZE_GDS=1
+SANITIZE_GDS=0
 EXPAND_NF_STACK=0
 SCALE_WL_TO_UM=0
 COERCE_LVT_TO_RVT=0
@@ -43,6 +44,7 @@ while [[ $# -gt 0 ]]; do
     --out-dir) OUT_DIR="$2"; shift 2 ;;
     --drop-param) DROP_PARAMS+=("$2"); shift 2 ;;
     --no-sanitize-gds) SANITIZE_GDS=0; shift ;;
+    --sanitize-gds-diagnostic-only) SANITIZE_GDS=1; shift ;;
     --expand-nf-stack) EXPAND_NF_STACK=1; shift ;;
     --scale-wl-to-um) SCALE_WL_TO_UM=1; shift ;;
     --coerce-lvt-to-rvt) COERCE_LVT_TO_RVT=1; shift ;;
@@ -103,7 +105,9 @@ python3 scripts/compare_model_names.py \
   | tee "$RAW_LOGS/${SCHEMATIC_TOP}.model_name_check.log"
 
 VERIFY_GDS="$GDS"
+ARTIFACT_CLASS="native_align_gds"
 if [[ "$SANITIZE_GDS" -eq 1 ]]; then
+  ARTIFACT_CLASS="postprocessed_diagnostic_only"
   VERIFY_GDS="$NORMALIZED/${LAYOUT_TOP}.magic_sanitized.gds"
   python3 scripts/sanitize_gds_for_magic.py "$GDS" -o "$VERIFY_GDS" \
     | tee "$RAW_LOGS/${LAYOUT_TOP}.sanitize_gds.log"
@@ -165,6 +169,7 @@ cat > "$OUT_DIR/summary.md" <<EOF
 
 Layout top: \`$LAYOUT_TOP\`
 Schematic top: \`$SCHEMATIC_TOP\`
+Artifact class: \`$ARTIFACT_CLASS\`
 
 Raw logs: \`$RAW_LOGS\`
 Verification GDS: \`$VERIFY_GDS\`

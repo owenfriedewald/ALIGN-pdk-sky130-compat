@@ -1,6 +1,24 @@
 # ALIGN-pdk-sky130
 ## We are working to support [SKY130](https://github.com/google/skywater-pdk) with [ALIGN](https://github.com/ALIGN-analoglayout/ALIGN-public)
 
+## Verification contract for this compatibility branch
+
+Publication-grade checks use the normal final GDS emitted by ALIGN without
+post-generation layer deletion, remapping, or geometry rewriting. The
+verification wrapper now defaults to that native artifact. Its optional
+`--sanitize-gds-diagnostic-only` mode exists only to localize legacy streamout
+problems and must not be reported as physical evidence.
+
+The MOS generator also rejects grouped primitives whose members have different
+`STACK` values. One generated primitive has one stack geometry; silently using
+the first member's value produces a structurally incorrect layout. The proper
+upstream response is to prevent that unsupported grouping while retaining safe
+homogeneous groups.
+
+The current import-time ALIGN streamout patch is transitional. The target
+journal flow uses a pinned, rebuilt ALIGN source revision containing the
+equivalent exporter fixes natively.
+
 ## Getting started
 
 ### Step 1: Install ALIGN
@@ -24,4 +42,3 @@ $ cd ALIGN-public
 $ mkdir work && cd work
 $ schematic2layout.py ../ALIGN-pdk-sky130/examples/five_transistor_ota -p ../ALIGN-pdk-sky130/SKY130_PDK/
 ```
-

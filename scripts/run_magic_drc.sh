@@ -57,7 +57,11 @@ drc style drc(full)
 drc check
 drc catchup
 drc count total
-drc why
+puts "DRC_LISTALL_WHY_BEGIN"
+foreach violation [drc listall why] {
+  puts $violation
+}
+puts "DRC_LISTALL_WHY_END"
 quit -noprompt
 EOF
 

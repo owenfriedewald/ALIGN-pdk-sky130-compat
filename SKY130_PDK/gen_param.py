@@ -5,6 +5,30 @@ from copy import deepcopy
 logger = logging.getLogger(__name__)
 
 
+def uniform_int_parameter(mvalues, parameter, default, primitive_name):
+    """Return a generator-wide integer parameter or reject mixed values.
+
+    ``MOSGenerator`` has one geometry value for parameters such as ``stack``.
+    A grouped primitive therefore cannot safely contain devices with different
+    stack depths.  Reject that representation before layout generation instead
+    of silently taking the first member's value.
+    """
+
+    values = {
+        key: int(params.get(parameter, default))
+        for key, params in mvalues.items()
+    }
+    distinct = set(values.values())
+    if len(distinct) != 1:
+        rendered = ", ".join(f"{key}={value}" for key, value in sorted(values.items()))
+        raise ValueError(
+            f"Unsupported heterogeneous {parameter} in grouped MOS primitive "
+            f"{primitive_name}: {rendered}. The generator has one shared "
+            f"{parameter.lower()} geometry; prevent this grouping upstream."
+        )
+    return next(iter(distinct))
+
+
 def limit_pairs(pairs):
     # Hack to limit aspect ratios when there are a lot of choices
     if len(pairs) > 12:
@@ -120,6 +144,7 @@ def gen_param(subckt, primitives, pdk_dir):
             mvalues[ele.name] = ele.parameters
         device_name_all = [*mvalues.keys()]
         device_name = next(iter(mvalues))
+        stack = uniform_int_parameter(mvalues, "STACK", 1, block_name)
 
         for key in mvalues:
             assert mvalues[key]["W"] != str, f"unrecognized size of device {key}:{mvalues[key]['W']} in {block_name}"
@@ -184,8 +209,8 @@ def gen_param(subckt, primitives, pdk_dir):
         }
         if unit_counts:
             block_args['parameters']['unit_counts'] = unit_counts
-        if 'STACK' in mvalues[device_name].keys() and int(mvalues[device_name]["STACK"]) > 1:
-            block_args['stack'] = int(mvalues[device_name]["STACK"])
+        if stack > 1:
+            block_args['stack'] = stack
         if vt:
             block_args['vt_type'] = vt[0]
         add_primitive(primitives, block_name, block_args)

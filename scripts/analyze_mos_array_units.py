@@ -60,8 +60,14 @@ def analyze(path: Path) -> int:
             dev_name: _as_int(dev_params.get("M"), 1) or 1
             for dev_name, dev_params in devices.items()
         }
+        stack_values = {
+            dev_name: _as_int(dev_params.get("STACK"), 1) or 1
+            for dev_name, dev_params in devices.items()
+        }
         total_nf_m = sum(nf_values[d] * m_values[d] for d in devices)
-        expanded_devices = total_nf_m * stack
+        expanded_devices = sum(
+            nf_values[d] * m_values[d] * stack_values[d] for d in devices
+        )
         current_formula_units = total_nf_m / (2 * len(devices))
         fractional = current_formula_units != int(current_formula_units)
         unequal_nf = len(set(nf_values.values())) > 1
@@ -76,6 +82,8 @@ def analyze(path: Path) -> int:
                 "fractional": fractional,
                 "unequal_nf": unequal_nf,
                 "stack": stack,
+                "stack_values": stack_values,
+                "heterogeneous_stack": len(set(stack_values.values())) > 1,
                 "expanded_devices": expanded_devices,
                 "nf_values": nf_values,
             }
@@ -99,16 +107,21 @@ def analyze(path: Path) -> int:
                 notes.append("explicit_unit_counts")
             else:
                 risks.append("high_lvs_count_risk")
+        if row["heterogeneous_stack"]:
+            risks.append("unsupported_heterogeneous_stack")
         if risks:
             risky += 1
         labels = notes + risks
         risk_text = ",".join(labels) if labels else "none"
         nf_text = ";".join(f"{k}={v}" for k, v in sorted(row["nf_values"].items()))
+        stack_text = ";".join(
+            f"{k}={v}" for k, v in sorted(row["stack_values"].items())
+        )
         print(
             f"{row['name']}, {row['unit_cells']}, "
             f"{row['explicit_units']}, "
             f"{row['formula_units']:.3f}, {row['expanded_devices']}, "
-            f"{row['stack']}, {nf_text}, {risk_text}"
+            f"{row['stack']} ({stack_text}), {nf_text}, {risk_text}"
         )
 
     print(f"risk_count: {risky}")
