@@ -59,7 +59,7 @@ drc catchup
 drc count total
 puts "DRC_LISTALL_WHY_BEGIN"
 foreach violation [drc listall why] {
-  puts $violation
+  puts \$violation
 }
 puts "DRC_LISTALL_WHY_END"
 quit -noprompt
