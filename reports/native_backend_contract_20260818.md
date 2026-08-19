@@ -43,7 +43,9 @@ The source rule reference is the SkyWater PDK rule tree at commit
   opt-in and labeled `postprocessed_diagnostic_only`.
 - Make Magic emit `drc listall why` so every violation rule is preserved.
 - Add `gds_json_source: python` as an explicit PDK policy and recognize native
-  exporter support from ALIGN commit `e7201813` (`sky130-native-streamout`).
+  exporter support from ALIGN commit `482c9fa3`
+  (`sky130-native-streamout-current`), forward-ported onto upstream master
+  `e392ae47`.
   Publication mode can set `ALIGN_SKY130_REQUIRE_NATIVE_EXPORT=1` to prohibit
   fallback to the legacy runtime source patch.
 
@@ -66,16 +68,16 @@ completion.
 
 The preserved primitive is statically classified with four risky concrete
 shape variants. New generation will fail before geometry emission instead of
-silently producing that structure. Three focused PDK contract tests pass. No
+silently producing that structure. Four focused PDK contract tests pass. No
 new ALIGN or physical-verification run has been performed yet.
 
 ## Remaining problems
 
-1. Prevent unsupported mixed-stack grouping in the ALIGN compiler/input
-   contract so the current mirror can generate legally rather than merely fail
-   safely.
-2. Rebuild the Hellbender image from ALIGN commit `e7201813`; the source fix is
-   committed locally but has not yet been exercised in the Slurm environment.
+1. Confirm that the identical baseline/A4 `DoNotIdentify` input-safety controls
+   in AnalogDSL's `backend_native_gds_v2` package prevent the unsupported
+   mixed-stack current-mirror grouping in a complete ALIGN run.
+2. Rebuild the Hellbender image from ALIGN commit `482c9fa3`; the source fix is
+   focused-test verified but has not yet been exercised in the Slurm environment.
 3. Run detailed native-GDS Magic diagnostics for the buffer's one shared DRC
    violation and change only the responsible generator/rule abstraction.
 4. Execute outcome-paired baseline/A4 regressions under identical revisions.
