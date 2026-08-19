@@ -15,6 +15,12 @@ the first member's value produces a structurally incorrect layout. The proper
 upstream response is to prevent that unsupported grouping while retaining safe
 homogeneous groups.
 
+Concrete MOS aspect-ratio variants are limited by the official 15 um
+diffusion-to-body-tap latch-up distance. Because the current generator places
+the body contact on one outer edge of an array, and one MOS row is 28 fins at a
+210 nm pitch, only one- and two-row variants are legal. Taller variants are
+excluded before placement rather than repaired in the emitted GDS.
+
 PMOS primitive bounding boxes include a grid-aligned placement halo derived
 from the official `1.27 um` N-well spacing rule. ALIGN placement LEF excludes
 N-well because it is not a routing layer; without this halo, separately placed

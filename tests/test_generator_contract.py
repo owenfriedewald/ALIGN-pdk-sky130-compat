@@ -44,6 +44,38 @@ def test_uniform_stack_applies_default_per_member() -> None:
     assert MODULE.uniform_int_parameter(values, "STACK", 1, "SCM_PMOS") == 1
 
 
+def test_one_sided_body_tap_row_limit_matches_official_latchup_rule() -> None:
+    assert MODULE.maximum_one_sided_body_tap_rows(15000, 28, 210) == 2
+
+
+def test_mos_aspect_variants_exclude_rows_beyond_body_tap_reach() -> None:
+    primitives = {}
+    args = {
+        "primitive": "MOS",
+        "x_cells": 12,
+        "y_cells": 1,
+        "parameters": {},
+    }
+
+    MODULE.add_primitive(primitives, "PMOS_TEST", args, max_y_cells=2)
+
+    assert sorted(primitives) == ["PMOS_TEST_X12_Y1", "PMOS_TEST_X6_Y2"]
+    assert all(value["y_cells"] <= 2 for value in primitives.values())
+
+
+def test_non_mos_aspect_variants_remain_unfiltered_by_default() -> None:
+    primitives = {}
+    args = {
+        "primitive": "TEST",
+        "x_cells": 12,
+        "y_cells": 1,
+    }
+
+    MODULE.add_primitive(primitives, "GENERIC_TEST", args)
+
+    assert "GENERIC_TEST_X4_Y3" in primitives
+
+
 def test_native_export_capability_requires_all_three_generic_fixes() -> None:
     def translate_data():
         no_gds_layers = set()

@@ -42,7 +42,22 @@ def limit_pairs(pairs):
     else:
         return pairs
 
-def add_primitive(primitives, block_name, block_args):
+def maximum_one_sided_body_tap_rows(
+        max_distance_nm, unit_height_fins, fin_pitch_nm):
+    """Return the largest safe MOS row count for a one-sided body tap.
+
+    The current bulk-MOS generator places its body contact along one outer
+    edge of the generated array.  Concrete aspect-ratio variants must
+    therefore keep the opposite edge within the official latch-up distance.
+    """
+
+    unit_height_nm = int(unit_height_fins) * int(fin_pitch_nm)
+    if unit_height_nm <= 0 or int(max_distance_nm) <= 0:
+        raise ValueError("body-tap distance and MOS unit height must be positive")
+    return max(1, int(max_distance_nm) // unit_height_nm)
+
+
+def add_primitive(primitives, block_name, block_args, max_y_cells=None):
     if block_name in primitives:
         if not primitives[block_name] == block_args:
             logger.warning(f"Distinct devices mapped to the same primitive {block_name}: \
@@ -62,7 +77,18 @@ def add_primitive(primitives, block_name, block_args):
                     if y == 1:
                         break
                 pairs = limit_pairs((pairs))
-                for newx, newy in pairs:
+                if max_y_cells is not None:
+                    pairs = {
+                        (newx, newy)
+                        for newx, newy in pairs
+                        if newy <= max_y_cells
+                    }
+                    if not pairs:
+                        raise ValueError(
+                            f"No legal aspect ratio for {block_name}: all "
+                            f"variants exceed max_y_cells={max_y_cells}"
+                        )
+                for newx, newy in sorted(pairs):
                     concrete_name = f'{block_name}_X{newx}_Y{newy}'
                     if concrete_name not in primitives:
                         primitives[concrete_name] = deepcopy(block_args)
@@ -213,5 +239,15 @@ def gen_param(subckt, primitives, pdk_dir):
             block_args['stack'] = stack
         if vt:
             block_args['vt_type'] = vt[0]
-        add_primitive(primitives, block_name, block_args)
+        max_y_cells = maximum_one_sided_body_tap_rows(
+            design_config["max_diffusion_to_body_tap_nm"],
+            design_config["mos_unit_height_fins"],
+            design_config["Fin_pitch"],
+        )
+        add_primitive(
+            primitives,
+            block_name,
+            block_args,
+            max_y_cells=max_y_cells,
+        )
     return True

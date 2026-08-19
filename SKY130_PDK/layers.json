@@ -24,6 +24,8 @@
 "max_size_mos":48,
 "max_size_cap":1000,
 "Fin_pitch":210,
+"mos_unit_height_fins":28,
+"max_diffusion_to_body_tap_nm":15000,
 "unit_height_res":600,
 "pdk_type": "Bulk"
 },
