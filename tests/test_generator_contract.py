@@ -1,5 +1,6 @@
 from pathlib import Path
 import importlib.util
+from types import SimpleNamespace
 
 import pytest
 
@@ -11,6 +12,13 @@ SPEC = importlib.util.spec_from_file_location(
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
+
+COMPAT_SPEC = importlib.util.spec_from_file_location(
+    "sky130_align_compat_contract", ROOT / "SKY130_PDK" / "align_compat.py"
+)
+assert COMPAT_SPEC and COMPAT_SPEC.loader
+COMPAT = importlib.util.module_from_spec(COMPAT_SPEC)
+COMPAT_SPEC.loader.exec_module(COMPAT)
 
 
 def test_uniform_stack_accepts_homogeneous_group() -> None:
@@ -27,3 +35,19 @@ def test_uniform_stack_rejects_heterogeneous_group() -> None:
 def test_uniform_stack_applies_default_per_member() -> None:
     values = {"M1": {}, "M2": {"STACK": "1"}}
     assert MODULE.uniform_int_parameter(values, "STACK", 1, "SCM_PMOS") == 1
+
+
+def test_native_export_capability_requires_all_three_generic_fixes() -> None:
+    def translate_data():
+        no_gds_layers = set()
+        return no_gds_layers
+
+    native_pnr = SimpleNamespace(
+        _top_level_label_names=lambda hierarchy: [],
+        _use_python_gds_streamout=lambda pdk: True,
+    )
+    legacy_pnr = SimpleNamespace(_top_level_label_names=lambda hierarchy: [])
+    gds = SimpleNamespace(translate_data=translate_data)
+
+    assert COMPAT._native_export_supported(gds, native_pnr) is True
+    assert COMPAT._native_export_supported(gds, legacy_pnr) is False

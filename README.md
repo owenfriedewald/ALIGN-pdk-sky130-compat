@@ -17,7 +17,9 @@ homogeneous groups.
 
 The current import-time ALIGN streamout patch is transitional. The target
 journal flow uses a pinned, rebuilt ALIGN source revision containing the
-equivalent exporter fixes natively.
+equivalent exporter fixes natively. Set
+`ALIGN_SKY130_REQUIRE_NATIVE_EXPORT=1` in that flow: an older ALIGN build then
+fails immediately instead of falling back to runtime source mutation.
 
 ## Getting started
 

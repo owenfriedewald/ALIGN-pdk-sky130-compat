@@ -22,6 +22,21 @@ GDS_SENTINEL = "# ALIGN Sky130 compat: honor NoGDS layers"
 PNR_SENTINEL = "# ALIGN Sky130 compat: top-level labels and NoGDS outline"
 MAIN_SENTINEL = "# ALIGN Sky130 compat: promote Python stream-out to default GDS"
 CONVERTER_PATCH_MARKER = "_sky130_compat_python_gds_default"
+NATIVE_REQUIRED_ENV = "ALIGN_SKY130_REQUIRE_NATIVE_EXPORT"
+
+
+def _native_export_supported(gen_gds_json, pnr_main) -> bool:
+    """Return whether ALIGN contains the checked-in exporter capabilities."""
+
+    try:
+        gds_source = inspect.getsource(gen_gds_json.translate_data)
+    except (OSError, TypeError):
+        return False
+    return (
+        "no_gds_layers" in gds_source
+        and hasattr(pnr_main, "_top_level_label_names")
+        and hasattr(pnr_main, "_use_python_gds_streamout")
+    )
 
 
 def _patch_gds_source(text: str) -> str:
@@ -207,6 +222,14 @@ def apply_align_runtime_patches() -> None:
         import align.cell_fabric.gen_gds_json as gen_gds_json  # type: ignore
         import align.pnr.main as pnr_main  # type: ignore
 
+        if _native_export_supported(gen_gds_json, pnr_main):
+            return
+        if os.environ.get(NATIVE_REQUIRED_ENV):
+            raise RuntimeError(
+                "The publication flow requires a pinned ALIGN build with native "
+                "NoGDS, label, and PDK-selectable GDS streamout support."
+            )
+
         align_root = Path(inspect.getfile(align)).resolve().parent
         main_path = align_root / "main.py"
         gds_path = align_root / "cell_fabric" / "gen_gds_json.py"
@@ -225,4 +248,6 @@ def apply_align_runtime_patches() -> None:
         _refresh_align_main_bindings(align_main, pnr_main)
         _patch_runtime_gds_converter(align_main)
     except Exception as err:  # pragma: no cover - best-effort runtime bridge.
+        if os.environ.get(NATIVE_REQUIRED_ENV):
+            raise
         warnings.warn(f"ALIGN Sky130 runtime auto-patch failed: {err}", RuntimeWarning)

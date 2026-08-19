@@ -4,6 +4,7 @@
 "ScaleFactor":1,
 "design_info":
 {
+"gds_json_source": "python",
 "vt_type":["HVT", "RVT"],
 "top_signal_routing_layer": "M5",
 "bottom_signal_routing_layer": "M1",
