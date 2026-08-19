@@ -259,7 +259,9 @@
 {
 "Layer": "Nwell",
 "GdsLayerNo": 64,
-"GdsDatatype": {"Draw":20}
+"GdsDatatype": {"Draw":20},
+"SpaceX": 1270,
+"SpaceY": 1270
 },
 
 {

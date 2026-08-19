@@ -45,4 +45,6 @@ def test_magic_drc_tcl_variable_survives_strict_shell_expansion(tmp_path: Path) 
     log = (tmp_path / "out" / "raw_logs" / "TEST.magic_drc.log").read_text(
         encoding="utf-8"
     )
+    assert "select top cell" in log
+    assert "expand" in log
     assert "puts $violation" in log

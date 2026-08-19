@@ -53,6 +53,8 @@ COMMANDS="$OUT_DIR/commands.sh"
 magic -dnull -noconsole -rcfile "$MAGIC_RC" <<EOF | tee "$LOG"
 gds read $GDS
 load $TOP
+select top cell
+expand
 drc style drc(full)
 drc check
 drc catchup

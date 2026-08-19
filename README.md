@@ -15,6 +15,15 @@ the first member's value produces a structurally incorrect layout. The proper
 upstream response is to prevent that unsupported grouping while retaining safe
 homogeneous groups.
 
+PMOS primitive bounding boxes include a grid-aligned placement halo derived
+from the official `1.27 um` N-well spacing rule. ALIGN placement LEF excludes
+N-well because it is not a routing layer; without this halo, separately placed
+PMOS primitives can leave a legal-looking one-track gap that fails Magic rule
+`nwell.2a`. The halo changes placement abstraction before layout generation and
+does not rewrite or sanitize the emitted GDS. The Magic wrapper expands the
+loaded hierarchy before listing violations so preserved logs include rule names
+and bounding boxes for subcell errors.
+
 The current import-time ALIGN streamout patch is transitional. The target
 journal flow uses a pinned, rebuilt ALIGN source revision containing the
 equivalent exporter fixes natively. Set

@@ -4,6 +4,8 @@ from align.cell_fabric.grid import *
 from math import floor
 import collections
 
+from .placement_contract import expand_bbox, half_spacing_halo
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,8 @@ class MOSGenerator(DefaultCanvas):
         self.shared_diff = shared_diff
         self.stack = stack
         self.bodyswitch = bodyswitch
+        self._requires_nwell_placement_halo = False
+        self._nwell_placement_halo_applied = False
         self.gateDummy = gateDummy
         self.gate = (2*gate)*self.stack
         self.gatesPerUnitCell = self.gate + 2*self.gateDummy*(1-self.shared_diff)
@@ -122,6 +126,39 @@ class MOSGenerator(DefaultCanvas):
 
         self.v0.h_clg.addCenterLine( self.unitCellHeight,    self.pdk['V0']['WidthY'], False)
         info = self.pdk['V0']
+
+    def computeBbox(self):
+        """Include a grid-aligned N-well spacing halo in PMOS placement size.
+
+        ALIGN placement LEF intentionally excludes non-routing layers such as
+        N-well.  Without a halo, separately placed PMOS primitives can leave a
+        one-track N-well seam that is illegal under Sky130 ``nwell.2a`` even
+        though their routing abstractions do not overlap.
+        """
+
+        super().computeBbox()
+        if (
+            not self._requires_nwell_placement_halo
+            or self._nwell_placement_halo_applied
+        ):
+            return
+
+        halo_x = half_spacing_halo(
+            int(self.pdk['Nwell']['SpaceX']), int(self.pdk['M3']['Pitch'])
+        )
+        halo_y = half_spacing_halo(
+            int(self.pdk['Nwell']['SpaceY']), int(self.pdk['M2']['Pitch'])
+        )
+        llx, lly, urx, ury = expand_bbox(
+            (self.bbox.llx, self.bbox.lly, self.bbox.urx, self.bbox.ury),
+            halo_x=halo_x,
+            halo_y=halo_y,
+        )
+        self.bbox.llx = llx
+        self.bbox.lly = lly
+        self.bbox.urx = urx
+        self.bbox.ury = ury
+        self._nwell_placement_halo_applied = True
 
     def _addMOS( self, x, y, x_cells,  vt_type, name='M1', reflect=False, **parameters):
 
@@ -361,6 +398,7 @@ class MOSGenerator(DefaultCanvas):
 
     def addPMOSArray( self, x_cells, y_cells, pattern, vt_type, connections, **parameters):
 
+        self._requires_nwell_placement_halo = True
         self._addMOSArray(x_cells, y_cells, pattern, vt_type, connections, **parameters)
 
         #####   Pselect and Nwell Placement   #####

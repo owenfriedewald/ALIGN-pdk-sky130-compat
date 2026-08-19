@@ -20,6 +20,13 @@ assert COMPAT_SPEC and COMPAT_SPEC.loader
 COMPAT = importlib.util.module_from_spec(COMPAT_SPEC)
 COMPAT_SPEC.loader.exec_module(COMPAT)
 
+PLACEMENT_SPEC = importlib.util.spec_from_file_location(
+    "sky130_placement_contract", ROOT / "SKY130_PDK" / "placement_contract.py"
+)
+assert PLACEMENT_SPEC and PLACEMENT_SPEC.loader
+PLACEMENT = importlib.util.module_from_spec(PLACEMENT_SPEC)
+PLACEMENT_SPEC.loader.exec_module(PLACEMENT)
+
 
 def test_uniform_stack_accepts_homogeneous_group() -> None:
     values = {"M1": {"STACK": "2"}, "M2": {"STACK": "2"}}
@@ -51,3 +58,19 @@ def test_native_export_capability_requires_all_three_generic_fixes() -> None:
 
     assert COMPAT._native_export_supported(gds, native_pnr) is True
     assert COMPAT._native_export_supported(gds, legacy_pnr) is False
+
+
+def test_nwell_half_spacing_halo_is_placement_grid_aligned() -> None:
+    assert PLACEMENT.half_spacing_halo(1270, 430) == 860
+    assert PLACEMENT.half_spacing_halo(1270, 420) == 840
+
+
+def test_two_nwell_halos_guarantee_the_official_spacing() -> None:
+    halo_x = PLACEMENT.half_spacing_halo(1270, 430)
+    halo_y = PLACEMENT.half_spacing_halo(1270, 420)
+
+    assert 2 * halo_x >= 1270
+    assert 2 * halo_y >= 1270
+    assert PLACEMENT.expand_bbox(
+        (0, 0, 2580, 7560), halo_x=halo_x, halo_y=halo_y
+    ) == (-860, -840, 3440, 8400)
