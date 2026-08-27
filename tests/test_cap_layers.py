@@ -10,5 +10,6 @@ def test_mim_device_layer_streamout_and_clearance_contract() -> None:
     by_name = {entry["Layer"]: entry for entry in layers["Abstraction"]}
 
     assert by_name["CapMIMLayer"]["ViewerPassthrough"] is True
+    assert by_name["CapMIMContact"]["ViewerPassthrough"] is True
     assert by_name["CapMIMLayer"]["UnrelatedMetalSpacing"] == 1340
     assert by_name["Cap"]["unrelatedMetalMargin"] == 20

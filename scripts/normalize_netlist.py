@@ -32,6 +32,10 @@ LVT_TO_RVT_ALIASES = {
 MOS_RE = re.compile(
     r"^(?P<indent>\s*)(?P<name>[mM]\S*)\s+(?P<d>\S+)\s+(?P<g>\S+)\s+(?P<s>\S+)\s+(?P<b>\S+)\s+(?P<model>\S+)(?P<suffix>(?:\s+.*)?$)"
 )
+CAP_RE = re.compile(
+    r"^(?P<indent>\s*)(?P<name>[cC]\S*)\s+(?P<plus>\S+)\s+(?P<minus>\S+)\s+"
+    r"(?P<value>\S+)(?P<suffix>(?:\s+.*)?$)"
+)
 PARAM_RE = re.compile(r"(?<!\S)(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?P<value>[^ \t]+)")
 
 
@@ -149,6 +153,57 @@ def normalize_instance_name(name: str, mos_as_subckt: bool) -> str:
     return f"X{name}"
 
 
+def normalize_mim_cap_instance(
+    match: re.Match[str],
+    *,
+    uppercase_nets: bool,
+    model: str,
+    density_ff_per_um2: float,
+) -> str:
+    """Translate one explicitly selected ideal C into its physical MIM class.
+
+    ALIGN's Sky130 CAP generator realizes a square capacitor using a nominal
+    2 fF/um^2 density and snaps each dimension to an even nanometer.  Reuse
+    that exact sizing contract when the source does not already carry L/W.
+    This conversion is opt-in by instance name; generic ideal capacitors are
+    never silently reclassified as MIM devices.
+    """
+
+    params = params_to_dict(match.group("suffix"))
+    has_l = "l" in params
+    has_w = "w" in params
+    if has_l != has_w:
+        raise ValueError(
+            f"Selected MIM capacitor {match.group('name')} must specify both L and W"
+        )
+    if has_l:
+        length_um = format_um(params["l"])
+        width_um = format_um(params["w"])
+    else:
+        capacitance = parse_number(match.group("value"))
+        if capacitance is None or capacitance <= 0:
+            raise ValueError(
+                f"Selected MIM capacitor {match.group('name')} has invalid value "
+                f"{match.group('value')!r}"
+            )
+        if density_ff_per_um2 <= 0:
+            raise ValueError("MIM capacitance density must be positive")
+        size_ff = round(capacitance * 1e15, 4)
+        dimension_nm = int((size_ff / density_ff_per_um2) ** 0.5 * 1000)
+        if dimension_nm % 2:
+            dimension_nm += 1
+        length_um = width_um = f"{dimension_nm / 1000:.12g}"
+
+    name = match.group("name")
+    instance_name = name if name[:1].lower() == "x" else f"X{name}"
+    plus = normalize_node_name(match.group("plus"), uppercase_nets)
+    minus = normalize_node_name(match.group("minus"), uppercase_nets)
+    return (
+        f"{match.group('indent')}{instance_name} {plus} {minus} {model} "
+        f"l={length_um} w={width_um}\n"
+    )
+
+
 def normalize_subckt_line(line: str, uppercase_nets: bool) -> str:
     if not uppercase_nets:
         return line
@@ -207,12 +262,27 @@ def normalize_line(
     scale_wl_to_um: bool,
     mos_as_subckt: bool,
     uppercase_nets: bool,
+    mim_cap_instances: set[str],
+    mim_cap_model: str,
+    mim_cap_density_ff_per_um2: float,
 ) -> str:
     if not line.strip() or line.lstrip().startswith(("*", ".", "+")):
         if line.lstrip().lower().startswith(".subckt"):
             return normalize_subckt_line(line, uppercase_nets)
         return line
-    match = MOS_RE.match(line.rstrip("\n"))
+    stripped_line = line.rstrip("\n")
+    cap_match = CAP_RE.match(stripped_line)
+    if (
+        cap_match
+        and cap_match.group("name").lower() in mim_cap_instances
+    ):
+        return normalize_mim_cap_instance(
+            cap_match,
+            uppercase_nets=uppercase_nets,
+            model=mim_cap_model,
+            density_ff_per_um2=mim_cap_density_ff_per_um2,
+        )
+    match = MOS_RE.match(stripped_line)
     if not match:
         return line
     model = match.group("model")
@@ -245,12 +315,18 @@ def normalize_text(
     coerce_lvt_to_rvt: bool = False,
     mos_as_subckt: bool = False,
     uppercase_nets: bool = False,
+    mim_cap_instances: set[str] | None = None,
+    mim_cap_model: str = "sky130_fd_pr__cap_mim_m3_1",
+    mim_cap_density_ff_per_um2: float = 2.0,
 ) -> str:
     model_aliases = model_aliases or MODEL_ALIASES
     if coerce_lvt_to_rvt:
         model_aliases = apply_lvt_to_rvt_aliases(model_aliases)
     drop_params = drop_params or set()
     rename_params = rename_params or {}
+    mim_cap_instances = {
+        name.lower() for name in (mim_cap_instances or set())
+    }
     return "".join(
         normalize_line(
             line,
@@ -261,6 +337,9 @@ def normalize_text(
             scale_wl_to_um,
             mos_as_subckt,
             uppercase_nets,
+            mim_cap_instances,
+            mim_cap_model,
+            mim_cap_density_ff_per_um2,
         )
         for line in text.splitlines(keepends=True)
     )
@@ -313,6 +392,26 @@ def main() -> int:
         action="store_true",
         help="Uppercase MOS node names and .subckt ports to match Magic extraction naming style.",
     )
+    parser.add_argument(
+        "--mim-cap-instance",
+        action="append",
+        default=[],
+        help=(
+            "Convert exactly this ideal capacitor instance to the official "
+            "Sky130 MIM subcircuit dialect. Repeatable; no other C instances change."
+        ),
+    )
+    parser.add_argument(
+        "--mim-cap-model",
+        default="sky130_fd_pr__cap_mim_m3_1",
+        help="Physical MIM subcircuit model used for selected capacitor instances.",
+    )
+    parser.add_argument(
+        "--mim-cap-density-ff-per-um2",
+        type=float,
+        default=2.0,
+        help="Sizing density matching the ALIGN Sky130 CAP generator (default: 2.0).",
+    )
     args = parser.parse_args()
 
     rename_params = parse_rename(args.rename_param)
@@ -327,6 +426,9 @@ def main() -> int:
         coerce_lvt_to_rvt=args.coerce_lvt_to_rvt,
         mos_as_subckt=args.mos_as_subckt,
         uppercase_nets=args.uppercase_nets,
+        mim_cap_instances=set(args.mim_cap_instance),
+        mim_cap_model=args.mim_cap_model,
+        mim_cap_density_ff_per_um2=args.mim_cap_density_ff_per_um2,
     )
     if args.output:
         args.output.write_text(normalized)

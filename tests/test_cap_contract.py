@@ -26,6 +26,21 @@ def valid_cap_terminals():
     ]
 
 
+def valid_cap_terminals_with_halo():
+    terminals = valid_cap_terminals()
+    terminals.extend(
+        [
+            {"layer": "M4", "netName": None, "netType": "blockage", "rect": [5, 10, 15, 80]},
+            {"layer": "M4", "netName": None, "netType": "blockage", "rect": [80, 10, 90, 80]},
+            {"layer": "M4", "netName": None, "netType": "blockage", "rect": [15, 10, 80, 20]},
+        ]
+    )
+    terminals.append(
+        {"layer": "Boundary", "netName": "Boundary", "netType": "drawing", "rect": [0, 0, 100, 100]}
+    )
+    return terminals
+
+
 def test_valid_mim_terminal_topology_passes() -> None:
     MODULE.validate_cap_terminal_topology(valid_cap_terminals(), m4_pitch=5)
 
@@ -80,4 +95,23 @@ def test_insufficient_capm_to_unrelated_m4_spacing_is_rejected() -> None:
     with pytest.raises(ValueError, match="CAPM clearance to unrelated MINUS M4"):
         MODULE.validate_cap_terminal_topology(
             valid_cap_terminals(), unrelated_m4_spacing=16
+        )
+
+
+def test_complete_routing_halo_passes() -> None:
+    MODULE.validate_cap_terminal_topology(
+        valid_cap_terminals_with_halo(),
+        unrelated_m4_spacing=15,
+        require_routing_halo=True,
+    )
+
+
+def test_incomplete_routing_halo_is_rejected() -> None:
+    terminals = valid_cap_terminals_with_halo()
+    terminals.pop(-2)
+    with pytest.raises(ValueError, match="routing-only M4 halo"):
+        MODULE.validate_cap_terminal_topology(
+            terminals,
+            unrelated_m4_spacing=15,
+            require_routing_halo=True,
         )

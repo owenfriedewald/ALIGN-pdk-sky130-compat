@@ -105,11 +105,99 @@ class CapGenerator(DefaultCanvas):
                         x_number+1,
                         y_number+3)
 
+        # CAPM requires substantially more clearance to unrelated M4
+        # (official Sky130 metal3) than the ordinary M4 routing rule.  Encode
+        # that physical contract as routing-only M4 obstructions.  The
+        # obstructions are consumed by LEF/routing and must not be emitted as
+        # physical GDS geometry.
+        clearance = required_unrelated_m4_clearance
+        capm = next(t for t in self.terminals if t["layer"] == "CapMIMLayer")
+        bottom_plate = next(
+            t
+            for t in self.terminals
+            if t["layer"] == "M4"
+            and t.get("netName") is None
+            and t.get("netType") != "blockage"
+            and t["rect"][0] <= capm["rect"][0]
+            and t["rect"][1] <= capm["rect"][1]
+            and t["rect"][2] >= capm["rect"][2]
+            and t["rect"][3] >= capm["rect"][3]
+        )
+        plus_pin = next(
+            t
+            for t in self.terminals
+            if t["layer"] == "M4" and t.get("netName") == "PLUS"
+        )
+        boundary = next(t for t in self.terminals if t["layer"] == "Boundary")
+
+        # Shift by whole placement-grid pitches so the CAPM halo stays inside
+        # the primitive boundary on every side without disturbing pin grids.
+        device_terminals = [
+            terminal
+            for terminal in self.terminals
+            if terminal["layer"] != "Boundary"
+        ]
+        min_x = min(terminal["rect"][0] for terminal in device_terminals)
+        min_y = min(terminal["rect"][1] for terminal in device_terminals)
+        shift_x_need = max(clearance - capm["rect"][0], -min_x, 0)
+        shift_y_need = max(clearance - capm["rect"][1], -min_y, 0)
+        shift_x = math.ceil(shift_x_need / m1_p) * m1_p
+        # M4 pins are horizontal, so vertical translation must preserve both
+        # the M4 routing grid and the M2 placement grid.  In this PDK the M4
+        # pitch is an integer multiple of the M2 pitch.
+        m4_pitch = self.pdk['M4']['Pitch']
+        if m4_pitch % m2_p:
+            raise ValueError("MIM capacitor M4 pitch must align to the M2 grid")
+        shift_y = math.ceil(shift_y_need / m4_pitch) * m4_pitch
+        if shift_x or shift_y:
+            for terminal in self.terminals:
+                terminal["rect"] = [
+                    terminal["rect"][0] + shift_x,
+                    terminal["rect"][1] + shift_y,
+                    terminal["rect"][2] + shift_x,
+                    terminal["rect"][3] + shift_y,
+                ]
+
+        capm_rect = capm["rect"]
+        plate_rect = bottom_plate["rect"]
+        plus_rect = plus_pin["rect"]
+        halo = [
+            capm_rect[0] - clearance,
+            capm_rect[1] - clearance,
+            capm_rect[2] + clearance,
+            capm_rect[3] + clearance,
+        ]
+        blockage_rects = [
+            [halo[0], halo[1], plate_rect[0], halo[3]],
+            [plate_rect[2], halo[1], halo[2], halo[3]],
+            [plate_rect[0], halo[1], plate_rect[2], plate_rect[1]],
+            [plate_rect[0], max(plate_rect[3], plus_rect[3]), plate_rect[2], halo[3]],
+        ]
+        for rect in blockage_rects:
+            if rect[0] < rect[2] and rect[1] < rect[3]:
+                self.transform_and_add(
+                    {
+                        "layer": "M4",
+                        "netName": None,
+                        "netType": "blockage",
+                        "rect": rect,
+                    }
+                )
+
+        boundary_width = math.ceil(
+            max(boundary["rect"][2], halo[2]) / m1_p
+        ) * m1_p
+        boundary_height = math.ceil(
+            max(boundary["rect"][3], halo[3]) / m2_p
+        ) * m2_p
+        boundary["rect"] = [0, 0, boundary_width, boundary_height]
+
         validate_cap_terminal_topology(
             self.terminals,
             m4_pitch=self.pdk['M4']['Pitch'],
             m4_offset=self.pdk['M4']['Offset'],
             unrelated_m4_spacing=required_unrelated_m4_clearance,
+            require_routing_halo=True,
         )
 
         #self.addRegion( self.Cboundary, 'Cboundary', None,

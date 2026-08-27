@@ -358,7 +358,8 @@
 "GdsDatatype": {"Draw":44},
 "WidthX": 200,
 "WidthY": 200,
-"Enclosure": 200
+"Enclosure": 200,
+"ViewerPassthrough": true
 },
 
 {

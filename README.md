@@ -36,6 +36,15 @@ equivalent exporter fixes natively. Set
 `ALIGN_SKY130_REQUIRE_NATIVE_EXPORT=1` in that flow: an older ALIGN build then
 fails immediately instead of falling back to runtime source mutation.
 
+The MIM-capacitor primitive carries the official CAPM recognition layer and
+its dedicated contact into native streamout.  Its abstract macro also exposes
+the official CAPM-to-unrelated-metal3 clearance as routing-only M4
+obstructions.  These obstructions remain in LEF for routing but require an
+ALIGN exporter that omits `netType=blockage` rectangles from physical GDS.
+The LVS normalizer can reclassify a specifically named ideal capacitor as the
+Sky130 MIM subcircuit with `--mim-cap-instance`; this opt-in conversion never
+changes unrelated ideal capacitors.
+
 ## Getting started
 
 ### Step 1: Install ALIGN

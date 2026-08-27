@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage:
   run_one_circuit_validation.sh --open-pdks-root PATH --gds PATH --schematic PATH --top CELL --out-dir DIR [--drop-param NAME ...]
-  run_one_circuit_validation.sh --open-pdks-root PATH --gds PATH --layout-top CELL --schematic PATH --schematic-top CELL --out-dir DIR [--drop-param NAME ...] [--expand-nf-stack] [--scale-wl-to-um] [--coerce-lvt-to-rvt] [--mos-as-subckt] [--uppercase-nets]
+  run_one_circuit_validation.sh --open-pdks-root PATH --gds PATH --layout-top CELL --schematic PATH --schematic-top CELL --out-dir DIR [--drop-param NAME ...] [--expand-nf-stack] [--scale-wl-to-um] [--coerce-lvt-to-rvt] [--mos-as-subckt] [--uppercase-nets] [--mim-cap-instance NAME ...]
 
 Runs the prepared one-circuit flow:
   reference preflight -> static layer/model checks -> schematic normalization ->
@@ -32,6 +32,7 @@ SCALE_WL_TO_UM=0
 COERCE_LVT_TO_RVT=0
 MOS_AS_SUBCKT=0
 UPPERCASE_NETS=0
+MIM_CAP_INSTANCES=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -50,6 +51,7 @@ while [[ $# -gt 0 ]]; do
     --coerce-lvt-to-rvt) COERCE_LVT_TO_RVT=1; shift ;;
     --mos-as-subckt) MOS_AS_SUBCKT=1; shift ;;
     --uppercase-nets) UPPERCASE_NETS=1; shift ;;
+    --mim-cap-instance) MIM_CAP_INSTANCES+=("$2"); shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
@@ -94,6 +96,9 @@ COMMANDS="$OUT_DIR/commands.sh"
   if [[ "$UPPERCASE_NETS" -eq 1 ]]; then
     printf ' --uppercase-nets'
   fi
+  for instance in "${MIM_CAP_INSTANCES[@]}"; do
+    printf ' --mim-cap-instance %q' "$instance"
+  done
   printf '\n'
 } >> "$COMMANDS"
 
@@ -132,6 +137,9 @@ fi
 if [[ "$UPPERCASE_NETS" -eq 1 ]]; then
   NORMALIZE_ARGS+=(--uppercase-nets)
 fi
+for instance in "${MIM_CAP_INSTANCES[@]}"; do
+  NORMALIZE_ARGS+=(--mim-cap-instance "$instance")
+done
 python3 scripts/normalize_netlist.py "$SCHEMATIC" "${NORMALIZE_ARGS[@]}" \
   -o "$NORMALIZED/${SCHEMATIC_TOP}.normalized.sp"
 
