@@ -3,6 +3,8 @@ from align.primitive.default.canvas import DefaultCanvas
 from align.cell_fabric.generators import *
 from align.cell_fabric.grid import *
 
+from .cap_contract import validate_cap_terminal_topology
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -40,15 +42,13 @@ class CapGenerator(DefaultCanvas):
         m2_p = self.pdk['M2']['Pitch']
 
         m4n_xwidth = x_length + 2*self.pdk['CapMIMLayer']['Enclosure']
-        m4n_ywidth = y_length + 2*self.pdk['CapMIMLayer']['Enclosure']
-        
+        # The broad M4 rectangle is the physical bottom plate.  Keep it as one
+        # routable terminal instead of adding a perpendicular M4 pin shape:
+        # ALIGN's scanline connectivity checker does not merge perpendicular
+        # rectangles on the same layer, even when they geometrically overlap.
         m4n = Wire( 'm4n', 'M4', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=2*m4n_xwidth, width=m4n_xwidth, offset=m4n_xwidth//2),
                                      spg=EnclosureGrid(pitch=y_length, stoppoint=self.pdk['CapMIMLayer']['Enclosure'], check=False))
-
-        m4n_plate = Wire( 'm4n_plate', 'M4', 'v',
-                                     clg=UncoloredCenterLineGrid( pitch=m4n_xwidth-self.pdk['Cap']['m4Width']//2, width=self.pdk['Cap']['m4Width'], offset=0),
-                                     spg=EnclosureGrid(pitch=self.pdk['M4']['Pitch'], stoppoint=0, offset=-self.pdk['M4']['Width']//4, check=False))
         mimcap = Wire( 'mim', 'CapMIMLayer', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=2*x_length, width=x_length, offset=x_length//2+self.pdk['CapMIMLayer']['Enclosure']),
                                      spg=EnclosureGrid(pitch=y_length, stoppoint=0, check=False))
@@ -60,21 +60,32 @@ class CapGenerator(DefaultCanvas):
 
         logger.debug( f"Number of wires {x_number} {y_number}")
 
-        self.addWire( m4n, 'MINUS', 0, (0, -1), (1, 1))
-        self.addWire( m4n_plate, 'PLUS', 1, (y_number_m4-1-1, -1), (y_number_m4, 1))
-        self.addWire( mimcap, 'MINUS', 0, (0, -1), (1, 1))
+        # A Sky130 CAPM-over-M4 capacitor has two distinct conductors:
+        #   PLUS  -> M4 bottom plate
+        #   MINUS -> CAPM top plate, contacted to M5 and then to the M4 pin
+        # The historical generator assigned both plates to MINUS and placed a
+        # PLUS strip across the MINUS M4 plate, creating a physical short that
+        # was hidden by the checker limitation described above.
+        self.addWire( m4n, 'PLUS', 0, (0, -1), (1, 1), netType = 'pin')
+        # CAPM is a device-definition layer, not an ALIGN routing conductor.
+        # Its electrical association is established physically by the
+        # CapMIMContact shape into the MINUS M5 access strap.  Giving CAPM a
+        # routing net name creates a false open because the contact is a
+        # streamed device region rather than an ALIGN routing-stack via.
+        self.addWire( mimcap, None, 0, (0, -1), (1, 1))
         self.addWire( self.m5n, 'MINUS', 0, (-3, 1), (1, 1)) 
         self.addVia( self.v4_x, 'MINUS', 0, -1)
         gridx0= (self.m5_offset - self.pdk['CapMIMContact']['WidthX']//2)//2
         gridx1= gridx0 + self.pdk['CapMIMContact']['WidthX']//2
         self.addRegion( self.CapMIMC, None, gridx0, 150, gridx1, 250)
         gridx2 = math.floor(m4n_xwidth/self.pdk['M3']['Pitch'])
-        self.addWire( self.m4, 'PLUS', y_number_m4, (-1, -1), (gridx2, 1), netType = 'pin')
         self.addWire( self.m4, 'MINUS', -1, (-1, -1), (gridx2, 1), netType = 'pin')
  
         self.addRegion( self.boundary, 'Boundary', -2, -6,
                         x_number+1,
                         y_number+3)
+
+        validate_cap_terminal_topology(self.terminals)
 
         #self.addRegion( self.Cboundary, 'Cboundary', None,
         #                    -1, -1,
