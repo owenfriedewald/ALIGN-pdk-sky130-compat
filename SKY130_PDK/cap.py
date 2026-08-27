@@ -42,18 +42,29 @@ class CapGenerator(DefaultCanvas):
         m2_p = self.pdk['M2']['Pitch']
 
         m4n_xwidth = x_length + 2*self.pdk['CapMIMLayer']['Enclosure']
+        required_unrelated_m4_clearance = (
+            self.pdk['CapMIMLayer']['UnrelatedMetalSpacing']
+            + self.pdk['Cap']['unrelatedMetalMargin']
+        )
+        native_unrelated_m4_clearance = (
+            self.pdk['M4']['Pitch'] - self.pdk['M4']['Width']//2
+        )
+        mim_y_offset = (
+            required_unrelated_m4_clearance - native_unrelated_m4_clearance
+        )
+        if mim_y_offset < 0 or mim_y_offset % 2:
+            raise ValueError(
+                "MIM capacitor clearance offset must be a nonnegative even value"
+            )
         # The broad M4 rectangle is the physical bottom plate.  Its center is
         # determined by device dimensions rather than the routing grid, so it
         # must remain device geometry rather than a block pin.
         m4n = Wire( 'm4n', 'M4', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=2*m4n_xwidth, width=m4n_xwidth, offset=m4n_xwidth//2),
-                                     spg=EnclosureGrid(pitch=y_length, stoppoint=self.pdk['CapMIMLayer']['Enclosure'], check=False))
-        m4n_plate = Wire( 'm4n_plate', 'M4', 'v',
-                                     clg=UncoloredCenterLineGrid( pitch=m4n_xwidth-self.pdk['Cap']['m4Width']//2, width=self.pdk['Cap']['m4Width'], offset=0),
-                                     spg=EnclosureGrid(pitch=self.pdk['M4']['Pitch'], stoppoint=0, offset=-self.pdk['M4']['Width']//4, check=False))
+                                     spg=EnclosureGrid(pitch=y_length, stoppoint=self.pdk['CapMIMLayer']['Enclosure'], offset=mim_y_offset, check=False))
         mimcap = Wire( 'mim', 'CapMIMLayer', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=2*x_length, width=x_length, offset=x_length//2+self.pdk['CapMIMLayer']['Enclosure']),
-                                     spg=EnclosureGrid(pitch=y_length, stoppoint=0, check=False))
+                                     spg=EnclosureGrid(pitch=y_length, stoppoint=0, offset=mim_y_offset, check=False))
 
 
         x_number = math.ceil(m4n_xwidth/m1_p)
@@ -63,22 +74,29 @@ class CapGenerator(DefaultCanvas):
         logger.debug( f"Number of wires {x_number} {y_number}")
 
         # A Sky130 CAPM-over-M4 capacitor has distinct bottom-plate and
-        # top-plate conductors.  Keep the dimension-derived plate/bridge
-        # shapes unnamed in ALIGN's routing model; the explicit contract below
-        # proves their physical overlap with the grid-aligned PLUS pin.
+        # top-plate conductors.  Keep the dimension-derived plate unnamed in
+        # ALIGN's routing model; the explicit contract below proves its
+        # physical overlap with the grid-aligned PLUS pin.
         self.addWire( m4n, None, 0, (0, -1), (1, 1))
-        self.addWire( m4n_plate, None, 1, (y_number_m4-1-1, -1), (y_number_m4, 1))
         # CAPM is a device-definition layer, not an ALIGN routing conductor.
         # Its electrical association is established physically by the
         # CapMIMContact shape into the MINUS M5 access strap.  Giving CAPM a
         # routing net name creates a false open because the contact is a
         # streamed device region rather than an ALIGN routing-stack via.
         self.addWire( mimcap, None, 0, (0, -1), (1, 1))
-        self.addWire( self.m5n, 'MINUS', 0, (-3, 1), (1, 1)) 
+        self.addWire( self.m5n, 'MINUS', 0, (-3, 1), (2, 1))
         self.addVia( self.v4_x, 'MINUS', 0, -1)
         gridx0= (self.m5_offset - self.pdk['CapMIMContact']['WidthX']//2)//2
         gridx1= gridx0 + self.pdk['CapMIMContact']['WidthX']//2
-        self.addRegion( self.CapMIMC, None, gridx0, 150, gridx1, 250)
+        contact_y_offset = mim_y_offset//2
+        self.addRegion(
+            self.CapMIMC,
+            None,
+            gridx0,
+            150 + contact_y_offset,
+            gridx1,
+            250 + contact_y_offset,
+        )
         gridx2 = math.floor(m4n_xwidth/self.pdk['M3']['Pitch'])
         self.addWire( self.m4, 'PLUS', y_number_m4, (-1, -1), (gridx2, 1), netType = 'pin')
         self.addWire( self.m4, 'MINUS', -1, (-1, -1), (gridx2, 1), netType = 'pin')
@@ -91,6 +109,7 @@ class CapGenerator(DefaultCanvas):
             self.terminals,
             m4_pitch=self.pdk['M4']['Pitch'],
             m4_offset=self.pdk['M4']['Offset'],
+            unrelated_m4_spacing=required_unrelated_m4_clearance,
         )
 
         #self.addRegion( self.Cboundary, 'Cboundary', None,

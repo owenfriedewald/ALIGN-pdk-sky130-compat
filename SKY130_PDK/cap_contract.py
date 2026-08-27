@@ -33,7 +33,17 @@ def _connected_component(start, shapes):
     return reached
 
 
-def validate_cap_terminal_topology(terminals, *, m4_pitch=None, m4_offset=0):
+def _axis_gap(left, right, lower, upper):
+    return max(left[lower] - right[upper], right[lower] - left[upper], 0)
+
+
+def validate_cap_terminal_topology(
+    terminals,
+    *,
+    m4_pitch=None,
+    m4_offset=0,
+    unrelated_m4_spacing=None,
+):
     """Reject MIM primitives whose streamed device topology is inconsistent.
 
     The compatibility PDK implements CAPM over the ALIGN M4 layer (official
@@ -85,6 +95,17 @@ def validate_cap_terminal_topology(terminals, *, m4_pitch=None, m4_offset=0):
         for minus in minus_m4
     ):
         raise ValueError("MIM capacitor bottom-plate geometry overlaps MINUS M4")
+
+    if unrelated_m4_spacing is not None:
+        for device in capm:
+            for minus in minus_m4:
+                x_gap = _axis_gap(device["rect"], minus["rect"], 0, 2)
+                y_gap = _axis_gap(device["rect"], minus["rect"], 1, 3)
+                if x_gap == 0 and y_gap < unrelated_m4_spacing:
+                    raise ValueError(
+                        "MIM capacitor CAPM clearance to unrelated MINUS M4 "
+                        f"is {y_gap}, below required {unrelated_m4_spacing}"
+                    )
 
     plus_component = _connected_component(plus_m4, plus_m4 + device_m4)
     if not any(shape in plus_component for shape in device_m4):

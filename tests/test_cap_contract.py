@@ -30,6 +30,12 @@ def test_valid_mim_terminal_topology_passes() -> None:
     MODULE.validate_cap_terminal_topology(valid_cap_terminals(), m4_pitch=5)
 
 
+def test_valid_mim_terminal_topology_passes_with_exact_unrelated_spacing() -> None:
+    MODULE.validate_cap_terminal_topology(
+        valid_cap_terminals(), unrelated_m4_spacing=15
+    )
+
+
 def test_cross_net_m4_overlap_is_rejected() -> None:
     terminals = valid_cap_terminals()
     terminals[-1]["rect"] = [5, 65, 45, 75]
@@ -68,3 +74,10 @@ def test_disconnected_plus_access_chain_is_rejected() -> None:
 
     with pytest.raises(ValueError, match="PLUS pin does not reach"):
         MODULE.validate_cap_terminal_topology(terminals)
+
+
+def test_insufficient_capm_to_unrelated_m4_spacing_is_rejected() -> None:
+    with pytest.raises(ValueError, match="CAPM clearance to unrelated MINUS M4"):
+        MODULE.validate_cap_terminal_topology(
+            valid_cap_terminals(), unrelated_m4_spacing=16
+        )

@@ -347,7 +347,9 @@
 "Layer": "CapMIMLayer",
 "GdsLayerNo": 89,
 "GdsDatatype": {"Draw":44},
-"Enclosure": 150
+"Enclosure": 150,
+"UnrelatedMetalSpacing": 1340,
+"ViewerPassthrough": true
 },
 
 {
@@ -409,7 +411,8 @@
 {
 "Layer": "Cap",
 "m4Width": 450,
-"m5Width": 450
+"m5Width": 450,
+"unrelatedMetalMargin": 20
 }
 
 ]
