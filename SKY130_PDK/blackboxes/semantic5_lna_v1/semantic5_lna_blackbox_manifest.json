@@ -1,0 +1,67 @@
+{
+  "classification": "official_magic_pcell_geometry_with_cell_and_port_label_normalization_only",
+  "final_gds_postprocessing": false,
+  "openpdks_image_digest": "sha256:ae380e2b0b96bd57b91f5864623ed488d00f78eaf58caf7f7d9d3754d315df38",
+  "openpdks_sky130a_commit": "54435919abffb937387ec956209f9cf5fd2dfbee",
+  "records": [
+    {
+      "geometry_changed": false,
+      "nontext_geometry_records": 461,
+      "output_file": "SKY130_FD_PR__RES_HIGH_PO_0P35_MGFMH8.gds",
+      "output_sha256": "a90a54179ab3eee29690aae97259ba78bdace9cf7e90cd0740a64a700fda44e5",
+      "port_label_map": {
+        "B": "W_N201_N2098#",
+        "R1": "A_N35_N1932#",
+        "R2": "A_N35_1500#"
+      },
+      "reference_file": "SKY130_RES_HIGH_PO_1P41_R15EQ_REFERENCE.gds",
+      "reference_geometry_sha256": "29a8e2a312bbd4d575e552e2f17e53ed593de60df759aab7482acc802e25c9ca",
+      "reference_sha256": "466a440635ded7f5fac1be3309240e4df69e08ce5add73130ab79eb72d6f15d8",
+      "target_cell": "SKY130_FD_PR__RES_HIGH_PO_0P35_MGFMH8"
+    },
+    {
+      "geometry_changed": false,
+      "nontext_geometry_records": 295,
+      "output_file": "SKY130_FD_PR__RES_HIGH_PO_0P35_V3QVRN.gds",
+      "output_sha256": "b2877f1be6579b3f6fb6d6733e08f55cacd303343cdf0331bd6f80fe92655a9c",
+      "port_label_map": {
+        "B": "W_N201_N1398#",
+        "R1": "A_N35_N1232#",
+        "R2": "A_N35_800#"
+      },
+      "reference_file": "SKY130_RES_HIGH_PO_1P41_R8EQ_REFERENCE.gds",
+      "reference_geometry_sha256": "73a35988f4dd0f5c3870a10345804d9f17e56b70c6d8a3ad5d064962f7cdec35",
+      "reference_sha256": "de38adbe4de5a632b9d40707d65e3c5851b47f74359be45dfb8b3f35b55db7f1",
+      "target_cell": "SKY130_FD_PR__RES_HIGH_PO_0P35_V3QVRN"
+    },
+    {
+      "geometry_changed": false,
+      "nontext_geometry_records": 347,
+      "output_file": "SKY130_FD_PR__CAP_MIM_M3_2_LJ5JLG.gds",
+      "output_sha256": "0049779a42c4d2bd6a366f01680aff0de16abffb804ff3c0fb6db3cbb3a60361",
+      "port_label_map": {
+        "C1": "C2_N3251_N3000#",
+        "C2": "M4_N3351_N3100#"
+      },
+      "reference_file": "SKY130_CAP_MIM_M3_2_L30W30_REFERENCE.gds",
+      "reference_geometry_sha256": "cd77cbdc955520d407ab10b772867cfffa1256fe3ccfa198d58fdcbc22ef6002",
+      "reference_sha256": "5be01fc1683790d330aac5fac7d3776e8ab134766f9c0b7579f6e592a3f70b69",
+      "target_cell": "SKY130_FD_PR__CAP_MIM_M3_2_LJ5JLG"
+    },
+    {
+      "geometry_changed": false,
+      "nontext_geometry_records": 155,
+      "output_file": "SKY130_FD_PR__DIODE_PD2NW_05V5_WW7YB9.gds",
+      "output_sha256": "45a55692719ffacbb80fe93e60c95deeefe1d9fd7f5156d9a744026910693d23",
+      "port_label_map": {
+        "D1": "A_N200_N200#",
+        "D2": "W_N338_N338#"
+      },
+      "reference_file": "SKY130_DIODE_PD2NW_05V5_A4_REFERENCE.gds",
+      "reference_geometry_sha256": "487eb5369f873014b4cb1a735e9a9446f9c8cc0f52f67f708d8ace4402238454",
+      "reference_sha256": "150496b2c56f272232ebe3e0ccb400422c1a10f6b8a099853d69e7ee430e16b0",
+      "target_cell": "SKY130_FD_PR__DIODE_PD2NW_05V5_WW7YB9"
+    }
+  ],
+  "schema": "semantic5_lna_blackboxes_v1"
+}
