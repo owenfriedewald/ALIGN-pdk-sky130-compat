@@ -45,6 +45,11 @@ The LVS normalizer can reclassify a specifically named ideal capacitor as the
 Sky130 MIM subcircuit with `--mim-cap-instance`; this opt-in conversion never
 changes unrelated ideal capacitors.
 
+The primitive's formal-terminal contract follows the official extraction
+order: ALIGN `PLUS` (the first source capacitor node) reaches the contacted
+CAPM top plate, while `MINUS` reaches the broad M4 bottom plate.  Static
+contract tests reject a reversed plate assignment before layout.
+
 ## Getting started
 
 ### Step 1: Install ALIGN

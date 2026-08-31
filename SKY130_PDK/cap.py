@@ -76,16 +76,16 @@ class CapGenerator(DefaultCanvas):
         # A Sky130 CAPM-over-M4 capacitor has distinct bottom-plate and
         # top-plate conductors.  Keep the dimension-derived plate unnamed in
         # ALIGN's routing model; the explicit contract below proves its
-        # physical overlap with the grid-aligned PLUS pin.
+        # physical overlap with the grid-aligned MINUS pin.
         self.addWire( m4n, None, 0, (0, -1), (1, 1))
         # CAPM is a device-definition layer, not an ALIGN routing conductor.
         # Its electrical association is established physically by the
-        # CapMIMContact shape into the MINUS M5 access strap.  Giving CAPM a
+        # CapMIMContact shape into the PLUS M5 access strap.  Giving CAPM a
         # routing net name creates a false open because the contact is a
         # streamed device region rather than an ALIGN routing-stack via.
         self.addWire( mimcap, None, 0, (0, -1), (1, 1))
-        self.addWire( self.m5n, 'MINUS', 0, (-3, 1), (2, 1))
-        self.addVia( self.v4_x, 'MINUS', 0, -1)
+        self.addWire( self.m5n, 'PLUS', 0, (-3, 1), (2, 1))
+        self.addVia( self.v4_x, 'PLUS', 0, -1)
         gridx0= (self.m5_offset - self.pdk['CapMIMContact']['WidthX']//2)//2
         gridx1= gridx0 + self.pdk['CapMIMContact']['WidthX']//2
         contact_y_offset = mim_y_offset//2
@@ -98,8 +98,11 @@ class CapGenerator(DefaultCanvas):
             250 + contact_y_offset,
         )
         gridx2 = math.floor(m4n_xwidth/self.pdk['M3']['Pitch'])
-        self.addWire( self.m4, 'PLUS', y_number_m4, (-1, -1), (gridx2, 1), netType = 'pin')
-        self.addWire( self.m4, 'MINUS', -1, (-1, -1), (gridx2, 1), netType = 'pin')
+        # ALIGN binds the first two-terminal capacitor node to PLUS.  Magic's
+        # official Sky130 MIM extraction presents the CAPM top plate first, so
+        # PLUS must reach CAPM and MINUS must reach the broad M4 bottom plate.
+        self.addWire( self.m4, 'MINUS', y_number_m4, (-1, -1), (gridx2, 1), netType = 'pin')
+        self.addWire( self.m4, 'PLUS', -1, (-1, -1), (gridx2, 1), netType = 'pin')
  
         self.addRegion( self.boundary, 'Boundary', -2, -6,
                         x_number+1,
@@ -123,10 +126,10 @@ class CapGenerator(DefaultCanvas):
             and t["rect"][2] >= capm["rect"][2]
             and t["rect"][3] >= capm["rect"][3]
         )
-        plus_pin = next(
+        bottom_pin = next(
             t
             for t in self.terminals
-            if t["layer"] == "M4" and t.get("netName") == "PLUS"
+            if t["layer"] == "M4" and t.get("netName") == "MINUS"
         )
         boundary = next(t for t in self.terminals if t["layer"] == "Boundary")
 
@@ -160,7 +163,7 @@ class CapGenerator(DefaultCanvas):
 
         capm_rect = capm["rect"]
         plate_rect = bottom_plate["rect"]
-        plus_rect = plus_pin["rect"]
+        bottom_pin_rect = bottom_pin["rect"]
         halo = [
             capm_rect[0] - clearance,
             capm_rect[1] - clearance,
@@ -171,7 +174,12 @@ class CapGenerator(DefaultCanvas):
             [halo[0], halo[1], plate_rect[0], halo[3]],
             [plate_rect[2], halo[1], halo[2], halo[3]],
             [plate_rect[0], halo[1], plate_rect[2], plate_rect[1]],
-            [plate_rect[0], max(plate_rect[3], plus_rect[3]), plate_rect[2], halo[3]],
+            [
+                plate_rect[0],
+                max(plate_rect[3], bottom_pin_rect[3]),
+                plate_rect[2],
+                halo[3],
+            ],
         ]
         for rect in blockage_rects:
             if rect[0] < rect[2] and rect[1] < rect[3]:

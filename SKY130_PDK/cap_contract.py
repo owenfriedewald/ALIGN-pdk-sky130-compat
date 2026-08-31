@@ -57,8 +57,10 @@ def validate_cap_terminal_topology(
     """Reject MIM primitives whose streamed device topology is inconsistent.
 
     The compatibility PDK implements CAPM over the ALIGN M4 layer (official
-    Sky130 met3).  M4 is the bottom electrode; CAPM is the top electrode and
-    reaches the MINUS routing terminal through CapMIMContact and M5.  CAPM and
+    Sky130 met3).  M4 is the bottom electrode and reaches MINUS; CAPM is the
+    top electrode and reaches PLUS through CapMIMContact and M5.  This agrees
+    with the first-node/PLUS convention used by ALIGN and the terminal order
+    emitted by official Magic Sky130 MIM extraction.  CAPM and
     its device contact are streamed device layers, not independent ALIGN
     routing nets.
     """
@@ -70,7 +72,7 @@ def validate_cap_terminal_topology(
         for shape in _shapes(terminals, layer="M4", net_name=None)
         if shape.get("netType") != "blockage"
     ]
-    minus_m5 = _shapes(terminals, layer="M5", net_name="MINUS")
+    plus_m5 = _shapes(terminals, layer="M5", net_name="PLUS")
     capm = _shapes(terminals, layer="CapMIMLayer")
     contacts = _shapes(terminals, layer="CapMIMContact")
     m4_blockages = [
@@ -83,8 +85,8 @@ def validate_cap_terminal_topology(
         raise ValueError("MIM capacitor requires a routable PLUS pin on M4")
     if not any("pin" in shape.get("netType", "") for shape in minus_m4):
         raise ValueError("MIM capacitor requires a routable MINUS pin on M4")
-    if not minus_m5:
-        raise ValueError("MIM capacitor requires a MINUS M5 top-plate strap")
+    if not plus_m5:
+        raise ValueError("MIM capacitor requires a PLUS M5 top-plate strap")
     if not capm or not contacts:
         raise ValueError("MIM capacitor requires CAPM and CapMIMContact geometry")
 
@@ -109,20 +111,20 @@ def validate_cap_terminal_topology(
     if not device_m4:
         raise ValueError("MIM capacitor requires unnamed M4 bottom-plate geometry")
     if any(
-        _positive_area_overlap(device["rect"], minus["rect"])
+        _positive_area_overlap(device["rect"], plus["rect"])
         for device in device_m4
-        for minus in minus_m4
+        for plus in plus_m4
     ):
-        raise ValueError("MIM capacitor bottom-plate geometry overlaps MINUS M4")
+        raise ValueError("MIM capacitor bottom-plate geometry overlaps PLUS M4")
 
     if unrelated_m4_spacing is not None:
         for device in capm:
-            for minus in minus_m4:
-                x_gap = _axis_gap(device["rect"], minus["rect"], 0, 2)
-                y_gap = _axis_gap(device["rect"], minus["rect"], 1, 3)
+            for plus in plus_m4:
+                x_gap = _axis_gap(device["rect"], plus["rect"], 0, 2)
+                y_gap = _axis_gap(device["rect"], plus["rect"], 1, 3)
                 if x_gap == 0 and y_gap < unrelated_m4_spacing:
                     raise ValueError(
-                        "MIM capacitor CAPM clearance to unrelated MINUS M4 "
+                        "MIM capacitor CAPM clearance to unrelated PLUS M4 "
                         f"is {y_gap}, below required {unrelated_m4_spacing}"
                     )
 
@@ -142,7 +144,7 @@ def validate_cap_terminal_topology(
             raise ValueError("MIM capacitor requires routing-only M4 halo blockages")
         cap_rect = capm[0]["rect"]
         plate_rect = plate_candidates[0]["rect"]
-        plus_top = max(shape["rect"][3] for shape in plus_m4)
+        bottom_pin_top = max(shape["rect"][3] for shape in minus_m4)
         halo = [
             cap_rect[0] - unrelated_m4_spacing,
             cap_rect[1] - unrelated_m4_spacing,
@@ -153,7 +155,12 @@ def validate_cap_terminal_topology(
             [halo[0], halo[1], plate_rect[0], halo[3]],
             [plate_rect[2], halo[1], halo[2], halo[3]],
             [plate_rect[0], halo[1], plate_rect[2], plate_rect[1]],
-            [plate_rect[0], max(plate_rect[3], plus_top), plate_rect[2], halo[3]],
+            [
+                plate_rect[0],
+                max(plate_rect[3], bottom_pin_top),
+                plate_rect[2],
+                halo[3],
+            ],
         ]
         for region in required_regions:
             if region[0] >= region[2] or region[1] >= region[3]:
@@ -168,16 +175,16 @@ def validate_cap_terminal_topology(
         if len(boundaries) != 1 or not _contains(boundaries[0]["rect"], halo):
             raise ValueError("MIM capacitor boundary does not contain its routing halo")
 
-    plus_component = _connected_component(plus_m4, plus_m4 + device_m4)
-    if not any(shape in plus_component for shape in device_m4):
-        raise ValueError("MIM capacitor PLUS pin does not reach bottom-plate geometry")
+    minus_component = _connected_component(minus_m4, minus_m4 + device_m4)
+    if not any(shape in minus_component for shape in device_m4):
+        raise ValueError("MIM capacitor MINUS pin does not reach bottom-plate geometry")
     if not any(
-        shape in plus_component
+        shape in minus_component
         and _positive_area_overlap(shape["rect"], device["rect"])
         for shape in device_m4
         for device in capm
     ):
-        raise ValueError("MIM capacitor PLUS access chain does not reach the CAPM overlap")
+        raise ValueError("MIM capacitor MINUS access chain does not reach the CAPM overlap")
 
     for contact in contacts:
         if not any(
@@ -187,6 +194,6 @@ def validate_cap_terminal_topology(
             raise ValueError("MIM contact does not overlap CAPM")
         if not any(
             _positive_area_overlap(contact["rect"], strap["rect"])
-            for strap in minus_m5
+            for strap in plus_m5
         ):
-            raise ValueError("MIM contact does not overlap the MINUS M5 strap")
+            raise ValueError("MIM contact does not overlap the PLUS M5 strap")
