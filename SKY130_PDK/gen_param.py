@@ -6,6 +6,23 @@ from decimal import Decimal
 logger = logging.getLogger(__name__)
 
 
+DIRECT_SKY130_MOS_GENERATORS = frozenset(
+    {
+        "sky130_fd_pr__pfet_01v8",
+        "sky130_fd_pr__nfet_01v8",
+        "sky130_fd_pr__pfet_01v8_lvt",
+        "sky130_fd_pr__nfet_01v8_lvt",
+        "sky130_fd_pr__pfet_01v8_hvt",
+    }
+)
+
+
+def canonical_generator_name(name):
+    """Map direct Sky130 MOS model instances onto the MOS generator."""
+
+    return "MOS" if str(name).lower() in DIRECT_SKY130_MOS_GENERATORS else name
+
+
 def uniform_int_parameter(mvalues, parameter, default, primitive_name):
     """Return a generator-wide integer parameter or reject mixed values.
 
@@ -135,9 +152,12 @@ def gen_param(subckt, primitives, pdk_dir):
     block_name = subckt.name
     vt = subckt.elements[0].model
     values = subckt.elements[0].parameters
-    generator_name = subckt.generator["name"]
-    block_name = subckt.name
-    generator_name = subckt.generator["name"]
+    generator_name = canonical_generator_name(subckt.generator["name"])
+    if generator_name != subckt.generator["name"]:
+        # Direct model instances synthesize a primitive definition whose
+        # generator initially equals the model. Normalize that definition
+        # before the standard MOS parameter and primitive-dispatch paths.
+        subckt.generator["name"] = generator_name
     layers_json = pdk_dir / "layers.json"
     with open(layers_json, "rt") as fp:
         pdk_data = json.load(fp)

@@ -2,6 +2,8 @@ from align.primitive.default.canvas import DefaultCanvas
 from align.cell_fabric.generators import *
 from align.cell_fabric.grid import *
 
+from .res_contract import resistor_routing_rules
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -10,26 +12,35 @@ class ResGenerator(DefaultCanvas):
     def __init__(self, pdk, fin, finDummy):
         super().__init__(pdk)
         self.finsPerUnitCell = fin + 2*finDummy
-        # TODO: Generalize these
+        self.res_rules = resistor_routing_rules(self.pdk)
+        m1_pitch = self.res_rules['M1']['pitch']
+        m1_width = self.res_rules['M1']['width']
+        m2_pitch = self.res_rules['M2']['pitch']
+        m2_width = self.res_rules['M2']['width']
+        m3_pitch = self.res_rules['M3']['pitch']
+        m3_width = self.res_rules['M3']['width']
+
+        # Sky130 metals are uncolored. Derive every resistor routing grid from
+        # its physical metal layer instead of removed mock-PDK Cap.m* fields.
         self.m1res = self.addGen( Wire( 'm1res', 'M1', 'v',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m1Pitch'], width=self.pdk['Cap']['m1Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V1']['VencA_L'] +self.pdk['Cap']['m2Width']//2, check=True)))
+                                     clg=UncoloredCenterLineGrid(pitch=m1_pitch, width=m1_width),
+                                     spg=EnclosureGrid(pitch=m2_pitch, stoppoint=self.pdk['V1']['VencA_L'] + m2_width//2, check=True)))
 
         self.m1res2 = self.addGen( Wire( 'm1res2', 'M1', 'h',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['Cap']['m1Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['Cap']['m1Width']//2, check=False)))
+                                     clg=UncoloredCenterLineGrid(pitch=m2_pitch, width=m1_width),
+                                     spg=EnclosureGrid(pitch=m1_pitch, stoppoint=m1_width//2, check=False)))
 
         self.m2res = self.addGen( Wire( 'm2res', 'M2', 'h',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['M2']['Pitch'], width=self.pdk['Cap']['m2Width']),
-                                     spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['V1']['VencA_H'] + self.pdk['Cap']['m1Width']//2, check=False)))
+                                     clg=UncoloredCenterLineGrid(pitch=m2_pitch, width=m2_width),
+                                     spg=EnclosureGrid(pitch=m1_pitch, stoppoint=self.pdk['V1']['VencA_H'] + m1_width//2, check=False)))
 
         self.m2res2 = self.addGen( Wire( 'm2res2', 'M2', 'h',
-                                      clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m2Pitch'], width=self.pdk['Cap']['m2Width']),
-                                      spg=EnclosureGrid( pitch=self.pdk['Cap']['m1Pitch'], stoppoint=self.pdk['V1']['VencA_H'] + self.pdk['Cap']['m1Width']//2)))
+                                      clg=UncoloredCenterLineGrid(pitch=m2_pitch, width=m2_width),
+                                      spg=EnclosureGrid(pitch=m1_pitch, stoppoint=self.pdk['V1']['VencA_H'] + m1_width//2)))
 
         self.m3res = self.addGen( Wire( 'm3res', 'M3', 'v',
-                                     clg=ColoredCenterLineGrid( colors=['c1','c2'], pitch=self.pdk['Cap']['m3Pitch'], width=self.pdk['Cap']['m3Width']),
-                                     spg=EnclosureGrid(pitch=self.pdk['M2']['Pitch'], stoppoint=self.pdk['V2']['VencA_H'] + self.pdk['Cap']['m2Width']//2, check=True)))
+                                     clg=UncoloredCenterLineGrid(pitch=m3_pitch, width=m3_width),
+                                     spg=EnclosureGrid(pitch=m2_pitch, stoppoint=self.pdk['V2']['VencA_H'] + m2_width//2, check=True)))
 
         self.v1res = self.addGen( Via( 'v1res', 'V1',
                                         h_clg=self.m2res.clg, v_clg=self.m1res.clg,
@@ -55,12 +66,18 @@ class ResGenerator(DefaultCanvas):
         res_per_length = 67
         x_number = max( 1, int(round(((1000*unit_res)/(res_per_length*y_length)))))
 
-        # ga = 2 if x_number == 1 else 1 ## when number of wires is 2 then large spacing req. so contact can be placed without a DRC error 
-        # x_length = (x_number - 1) *ga*self.pdk['Cap']['m1Pitch']
+        # ga = 2 if x_number == 1 else 1 ## when number of wires is 2 then large spacing req. so contact can be placed without a DRC error
+        # x_length = (x_number - 1) * ga * self.res_rules['M1']['pitch']
 
-        y_number = int(2 *round(((y_length+self.pdk['Cap']['m2Pitch']-self.pdk['Cap']['m2Width'])/(2.0*self.pdk['Cap']['m2Pitch']))))
+        m2_pitch = self.res_rules['M2']['pitch']
+        m2_width = self.res_rules['M2']['width']
+        y_number = int(
+            2 * round((y_length + m2_pitch - m2_width) / (2.0 * m2_pitch))
+        )
 
-        last_y1_track = ((y_number-1)*self.pdk['Cap']['m2Pitch']+self.pdk['M2']['Pitch']-1)//self.pdk['M2']['Pitch']
+        last_y1_track = (
+            (y_number - 1) * m2_pitch + m2_pitch - 1
+        ) // m2_pitch
         last_x_track = x_number - 1
 
         m2factor = 2 ### number of m2-tracks (m2factor-1)in between two unitcells in y-direction
