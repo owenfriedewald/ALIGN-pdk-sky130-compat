@@ -68,7 +68,11 @@ def mos_width_to_nfin(width, fin_pitch_nm, device_name, primitive_name):
 
     width_nm = Decimal(str(width)) * Decimal("1e9")
     integral_nm = width_nm.to_integral_value()
-    if width_nm != integral_nm:
+    # ALIGN's parser has already converted the authoritative decimal SPICE
+    # token to a binary float by the time this hook runs. Permit only the
+    # sub-femtometre representation residue introduced by that conversion;
+    # genuinely fractional-nanometre widths remain errors.
+    if abs(width_nm - integral_nm) > Decimal("1e-6"):
         raise ValueError(
             f"Width of device {device_name} in {primitive_name} must be an "
             f"integral number of nanometers: {width}"
