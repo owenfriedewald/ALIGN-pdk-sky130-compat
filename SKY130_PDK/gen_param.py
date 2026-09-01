@@ -2,6 +2,7 @@ import json
 import logging
 from math import sqrt, floor, ceil, log10
 from copy import deepcopy
+from decimal import Decimal
 logger = logging.getLogger(__name__)
 
 
@@ -55,6 +56,31 @@ def maximum_one_sided_body_tap_rows(
     if unit_height_nm <= 0 or int(max_distance_nm) <= 0:
         raise ValueError("body-tap distance and MOS unit height must be positive")
     return max(1, int(max_distance_nm) // unit_height_nm)
+
+
+def mos_width_to_nfin(width, fin_pitch_nm, device_name, primitive_name):
+    """Convert a SPICE MOS width to an exact integral PDK fin count.
+
+    Binary-float truncation turns legal decimal widths such as 4.2 um into
+    4199 nm on some Python builds.  SPICE tokens are decimal authority, so use
+    exact decimal arithmetic and reject genuinely off-grid widths.
+    """
+
+    width_nm = Decimal(str(width)) * Decimal("1e9")
+    integral_nm = width_nm.to_integral_value()
+    if width_nm != integral_nm:
+        raise ValueError(
+            f"Width of device {device_name} in {primitive_name} must be an "
+            f"integral number of nanometers: {width}"
+        )
+    width_nm_int = int(integral_nm)
+    pitch = int(fin_pitch_nm)
+    if width_nm_int % pitch:
+        raise ValueError(
+            f"Width of device {device_name} in {primitive_name} should be "
+            f"multiple of fin pitch:{pitch}"
+        )
+    return width_nm_int // pitch
 
 
 def add_primitive(primitives, block_name, block_args, max_y_cells=None):
@@ -174,10 +200,12 @@ def gen_param(subckt, primitives, pdk_dir):
 
         for key in mvalues:
             assert mvalues[key]["W"] != str, f"unrecognized size of device {key}:{mvalues[key]['W']} in {block_name}"
-            assert int(
-                float(mvalues[key]["W"])*1E+9) % design_config["Fin_pitch"] == 0, \
-                f"Width of device {key} in {block_name} should be multiple of fin pitch:{design_config['Fin_pitch']}"
-            size = int(float(mvalues[key]["W"])*1E+9/design_config["Fin_pitch"])
+            size = mos_width_to_nfin(
+                mvalues[key]["W"],
+                design_config["Fin_pitch"],
+                key,
+                block_name,
+            )
             mvalues[key]["NFIN"] = size
         name_arg = 'NFIN'+str(size)
 

@@ -50,9 +50,10 @@ def test_semantic5_lna_macro_manifest_binds_exact_gds() -> None:
         assert sha256(MACRO_ROOT / filename) == digest
 
 
-def test_true_lvt_is_an_enabled_mos_generator_variant() -> None:
+def test_unsupported_lvt_is_not_a_global_default_variant() -> None:
     layers = json.loads((ROOT / "SKY130_PDK" / "layers.json").read_text())
-    assert "LVT" in layers["design_info"]["vt_type"]
+    assert "LVT" not in layers["design_info"]["vt_type"]
+    assert layers["design_info"]["vt_type"] == ["HVT", "RVT"]
 
 
 def test_reference_builder_uses_drc_capable_compatible_resistor_variant() -> None:

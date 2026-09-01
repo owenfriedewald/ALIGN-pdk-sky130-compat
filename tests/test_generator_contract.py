@@ -48,6 +48,16 @@ def test_one_sided_body_tap_row_limit_matches_official_latchup_rule() -> None:
     assert MODULE.maximum_one_sided_body_tap_rows(15000, 28, 210) == 2
 
 
+def test_decimal_mos_width_avoids_binary_float_truncation() -> None:
+    assert MODULE.mos_width_to_nfin("4.2E-06", 210, "M1", "PMOS_TEST") == 20
+    assert MODULE.mos_width_to_nfin("8.4E-07", 210, "M2", "NMOS_TEST") == 4
+
+
+def test_decimal_mos_width_rejects_real_off_grid_value() -> None:
+    with pytest.raises(ValueError, match="multiple of fin pitch:210"):
+        MODULE.mos_width_to_nfin("1.0E-06", 210, "M1", "PMOS_TEST")
+
+
 def test_mos_aspect_variants_exclude_rows_beyond_body_tap_reach() -> None:
     primitives = {}
     args = {
