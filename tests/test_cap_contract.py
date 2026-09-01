@@ -45,6 +45,34 @@ def test_valid_mim_terminal_topology_passes() -> None:
     MODULE.validate_cap_terminal_topology(valid_cap_terminals(), m4_pitch=5)
 
 
+def test_minimum_cap_selects_highest_track_that_overlaps_bottom_plate() -> None:
+    # Frozen Sky130 minimum-CAPM geometry: the bottom plate spans through
+    # y=1650, while M4 has pitch 1260 and width 800.  Track 1 overlaps by
+    # positive area; the historical ceil expression incorrectly chose track 2.
+    assert MODULE.highest_grid_track_with_positive_overlap(
+        1650,
+        pitch=1260,
+        width=800,
+        offset=0,
+    ) == 1
+
+
+def test_cap_access_track_requires_positive_area_not_edge_touch() -> None:
+    assert MODULE.highest_grid_track_with_positive_overlap(
+        860,
+        pitch=1260,
+        width=800,
+        offset=0,
+    ) == 0
+
+
+def test_cap_access_track_rejects_invalid_grid_parameters() -> None:
+    with pytest.raises(ValueError, match="pitch and width"):
+        MODULE.highest_grid_track_with_positive_overlap(1000, pitch=0, width=800)
+    with pytest.raises(ValueError, match="width must be even"):
+        MODULE.highest_grid_track_with_positive_overlap(1000, pitch=1260, width=801)
+
+
 def test_valid_mim_terminal_topology_passes_with_exact_unrelated_spacing() -> None:
     MODULE.validate_cap_terminal_topology(
         valid_cap_terminals(), unrelated_m4_spacing=15

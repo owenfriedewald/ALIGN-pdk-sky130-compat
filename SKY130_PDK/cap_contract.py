@@ -1,6 +1,27 @@
 """Static connectivity contract for generated Sky130 MIM capacitors."""
 
 
+def highest_grid_track_with_positive_overlap(
+    rect_top,
+    *,
+    pitch,
+    width,
+    offset=0,
+):
+    """Return the highest routing track whose wire overlaps a rectangle.
+
+    Rectangle and wire coordinates are integral PDK database units.  Positive
+    area overlap requires the wire's lower edge to be strictly below the
+    rectangle top; merely touching the edge is not electrical connectivity.
+    """
+
+    if pitch <= 0 or width <= 0:
+        raise ValueError("routing pitch and width must be positive")
+    if width % 2:
+        raise ValueError("routing width must be even")
+    return (rect_top + width // 2 - offset - 1) // pitch
+
+
 def _positive_area_overlap(left, right):
     return (
         min(left[2], right[2]) > max(left[0], right[0])

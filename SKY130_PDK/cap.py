@@ -3,7 +3,10 @@ from align.primitive.default.canvas import DefaultCanvas
 from align.cell_fabric.generators import *
 from align.cell_fabric.grid import *
 
-from .cap_contract import validate_cap_terminal_topology
+from .cap_contract import (
+    highest_grid_track_with_positive_overlap,
+    validate_cap_terminal_topology,
+)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -68,7 +71,21 @@ class CapGenerator(DefaultCanvas):
 
 
         x_number = math.ceil(m4n_xwidth/m1_p)
-        y_number_m4 = math.ceil((y_length+self.pdk['CapMIMLayer']['Enclosure']+0.5*self.pdk['M4']['Width'])/self.pdk['M4']['Pitch'])
+        # Put the MINUS access on the highest legal M4 track that still has
+        # positive-area overlap with the dimension-derived bottom plate.  The
+        # previous ceil expression selected the first track *above* the plate
+        # for the minimum legal 1-um-square CAPM, leaving a physical open.
+        bottom_plate_top = (
+            mim_y_offset + y_length + self.pdk['CapMIMLayer']['Enclosure']
+        )
+        y_number_m4 = highest_grid_track_with_positive_overlap(
+            bottom_plate_top,
+            pitch=self.pdk['M4']['Pitch'],
+            width=self.pdk['M4']['Width'],
+            offset=self.pdk['M4']['Offset'],
+        )
+        if y_number_m4 <= -1:
+            raise ValueError("MIM capacitor cannot separate PLUS and MINUS access tracks")
         y_number = math.ceil((y_number_m4*self.pdk['M4']['Pitch'])/m2_p)
 
         logger.debug( f"Number of wires {x_number} {y_number}")
