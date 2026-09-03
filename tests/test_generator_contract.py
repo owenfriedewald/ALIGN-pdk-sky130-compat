@@ -138,7 +138,7 @@ def test_two_nwell_halos_guarantee_the_official_spacing() -> None:
     ) == (-860, -840, 3440, 8400)
 
 
-def test_placement_routing_channels_match_first_signal_track_pitches() -> None:
+def test_placement_routing_channels_leave_one_interior_signal_track() -> None:
     with (ROOT / "SKY130_PDK" / "layers.json").open(encoding="utf-8") as stream:
         pdk = json.load(stream)
 
@@ -148,5 +148,8 @@ def test_placement_routing_channels_match_first_signal_track_pitches() -> None:
     assert design["bottom_signal_routing_layer"] == "M1"
     assert layers["M1"]["Direction"] == "V"
     assert layers["M2"]["Direction"] == "H"
-    assert design["Hspace"] == layers["M1"]["Pitch"] == 430
-    assert design["Vspace"] == layers["M2"]["Pitch"] == 420
+    # A one-pitch boundary-to-boundary gap contains no guaranteed interior
+    # centerline once macro obstruction and wire width are considered.  Two
+    # pitches preserve one routable track between adjacent hard macros.
+    assert design["Hspace"] == 2 * layers["M1"]["Pitch"] == 860
+    assert design["Vspace"] == 2 * layers["M2"]["Pitch"] == 840
