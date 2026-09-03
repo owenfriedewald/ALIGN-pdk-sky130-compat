@@ -73,6 +73,42 @@ def test_cap_access_track_rejects_invalid_grid_parameters() -> None:
         MODULE.highest_grid_track_with_positive_overlap(1000, pitch=1260, width=801)
 
 
+def test_cap_placement_contract_preserves_zero_offset_m4_grid() -> None:
+    assert MODULE.horizontal_pin_placement_grid_constraint(
+        pitch=1260,
+        routing_offset=0,
+    ) == {
+        "constraint": "PlaceOnGrid",
+        "direction": "H",
+        "pitch": 1260,
+        "ored_terms": [{"offsets": [0], "scalings": [1, -1]}],
+    }
+
+
+def test_cap_placement_contract_handles_nonzero_grid_offset_and_mirroring() -> None:
+    assert MODULE.horizontal_pin_placement_grid_constraint(
+        pitch=10,
+        routing_offset=3,
+    )["ored_terms"] == [
+        {"offsets": [0], "scalings": [1]},
+        {"offsets": [6], "scalings": [-1]},
+    ]
+
+
+@pytest.mark.parametrize(
+    ("pitch", "routing_offset"),
+    [(0, 0), (10.0, 0), (10, -1), (10, 10), (10, 1.5)],
+)
+def test_cap_placement_contract_rejects_invalid_grid(
+    pitch, routing_offset
+) -> None:
+    with pytest.raises(ValueError, match="routing (pitch|offset)"):
+        MODULE.horizontal_pin_placement_grid_constraint(
+            pitch=pitch,
+            routing_offset=routing_offset,
+        )
+
+
 def test_valid_mim_terminal_topology_passes_with_exact_unrelated_spacing() -> None:
     MODULE.validate_cap_terminal_topology(
         valid_cap_terminals(), unrelated_m4_spacing=15

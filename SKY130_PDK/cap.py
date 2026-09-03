@@ -5,6 +5,7 @@ from align.cell_fabric.grid import *
 
 from .cap_contract import (
     highest_grid_track_with_positive_overlap,
+    horizontal_pin_placement_grid_constraint,
     validate_cap_terminal_topology,
 )
 
@@ -15,6 +16,20 @@ class CapGenerator(DefaultCanvas):
 
     def __init__(self, pdk):
         super().__init__(pdk)
+
+        # The generated capacitor's PLUS and MINUS access pins lie on M4.
+        # ALIGN's ordinary placement lattice is finer than the M4 routing
+        # lattice, so a legal primitive can otherwise be translated until both
+        # pins become inaccessible to the router.  Propagate the native ALIGN
+        # placement-grid contract through hierarchy instead of compensating in
+        # a circuit-specific netlist or after streamout.
+        self.metadata = getattr(self, "metadata", {})
+        self.metadata["constraints"] = [
+            horizontal_pin_placement_grid_constraint(
+                pitch=self.pdk["M4"]["Pitch"],
+                routing_offset=self.pdk["M4"]["Offset"],
+            )
+        ]
  
         self.m3n = self.addGen( Wire( 'm3n', 'CapMIMLayer', 'v',
                                      clg=UncoloredCenterLineGrid( pitch=self.pdk['M3']['Pitch'], width=self.pdk['M3']['Width']),

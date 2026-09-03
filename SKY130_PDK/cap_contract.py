@@ -1,6 +1,46 @@
 """Static connectivity contract for generated Sky130 MIM capacitors."""
 
 
+def horizontal_pin_placement_grid_constraint(*, pitch, routing_offset=0):
+    """Return the ALIGN placement contract that preserves a horizontal pin grid.
+
+    ``PlaceOnGrid(direction="H")`` constrains an instance's Y transform.  A
+    horizontal routing pin whose native center is congruent to
+    ``routing_offset`` remains on that routing grid when an unmirrored instance
+    has translation offset zero, or when a vertically mirrored instance has
+    translation offset ``2 * routing_offset``.  Keeping this construction in a
+    pure helper makes the compatibility contract testable without importing an
+    installed ALIGN package.
+    """
+
+    if not isinstance(pitch, int) or isinstance(pitch, bool) or pitch <= 0:
+        raise ValueError("routing pitch must be a positive integer")
+    if (
+        not isinstance(routing_offset, int)
+        or isinstance(routing_offset, bool)
+        or not 0 <= routing_offset < pitch
+    ):
+        raise ValueError("routing offset must be an integer within the pitch")
+
+    positive_offset = 0
+    negative_offset = (2 * routing_offset) % pitch
+    if positive_offset == negative_offset:
+        ored_terms = [
+            {"offsets": [positive_offset], "scalings": [1, -1]},
+        ]
+    else:
+        ored_terms = [
+            {"offsets": [positive_offset], "scalings": [1]},
+            {"offsets": [negative_offset], "scalings": [-1]},
+        ]
+    return {
+        "constraint": "PlaceOnGrid",
+        "direction": "H",
+        "pitch": pitch,
+        "ored_terms": ored_terms,
+    }
+
+
 def highest_grid_track_with_positive_overlap(
     rect_top,
     *,
