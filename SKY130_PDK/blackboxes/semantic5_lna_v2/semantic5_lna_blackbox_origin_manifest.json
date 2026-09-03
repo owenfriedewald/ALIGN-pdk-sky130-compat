@@ -1,0 +1,114 @@
+{
+  "classification": "rigid_lower_left_origin_translation_of_frozen_official_magic_pcell_macros",
+  "final_gds_postprocessing": false,
+  "records": [
+    {
+      "after_bbox_dbu": [
+        0,
+        0,
+        2960,
+        66140
+      ],
+      "before_bbox_dbu": [
+        -1480,
+        -33070,
+        1480,
+        33070
+      ],
+      "nontext_geometry_records": 461,
+      "output_file": "SKY130_FD_PR__RES_HIGH_PO_0P35_MGFMH8.gds",
+      "output_sha256": "0bdcaf84197b3ff4d017b70faa912fd866dd68c33415e461ebce5a9bdbdb2bbb",
+      "rigid_translation_only": true,
+      "source_file": "SKY130_FD_PR__RES_HIGH_PO_0P35_MGFMH8.gds",
+      "source_sha256": "a90a54179ab3eee29690aae97259ba78bdace9cf7e90cd0740a64a700fda44e5",
+      "target_cell": "SKY130_FD_PR__RES_HIGH_PO_0P35_MGFMH8",
+      "text_records": 3,
+      "translation_dbu": [
+        1480,
+        33070
+      ]
+    },
+    {
+      "after_bbox_dbu": [
+        0,
+        0,
+        2960,
+        37940
+      ],
+      "before_bbox_dbu": [
+        -1480,
+        -18970,
+        1480,
+        18970
+      ],
+      "nontext_geometry_records": 295,
+      "output_file": "SKY130_FD_PR__RES_HIGH_PO_0P35_V3QVRN.gds",
+      "output_sha256": "e2214c4229402350a868430ecd6b20582b0e02706cc7bf1385ce06dd1f5f31b6",
+      "rigid_translation_only": true,
+      "source_file": "SKY130_FD_PR__RES_HIGH_PO_0P35_V3QVRN.gds",
+      "source_sha256": "b2877f1be6579b3f6fb6d6733e08f55cacd303343cdf0331bd6f80fe92655a9c",
+      "target_cell": "SKY130_FD_PR__RES_HIGH_PO_0P35_V3QVRN",
+      "text_records": 3,
+      "translation_dbu": [
+        1480,
+        18970
+      ]
+    },
+    {
+      "after_bbox_dbu": [
+        0,
+        0,
+        33600,
+        30810
+      ],
+      "before_bbox_dbu": [
+        -16745,
+        -15405,
+        16855,
+        15405
+      ],
+      "nontext_geometry_records": 347,
+      "output_file": "SKY130_FD_PR__CAP_MIM_M3_2_LJ5JLG.gds",
+      "output_sha256": "84017930a5749b7caecdfa499c5ac14ed57c766ee0f5859497af116176ed22b0",
+      "rigid_translation_only": true,
+      "source_file": "SKY130_FD_PR__CAP_MIM_M3_2_LJ5JLG.gds",
+      "source_sha256": "0049779a42c4d2bd6a366f01680aff0de16abffb804ff3c0fb6db3cbb3a60361",
+      "target_cell": "SKY130_FD_PR__CAP_MIM_M3_2_LJ5JLG",
+      "text_records": 2,
+      "translation_dbu": [
+        16745,
+        15405
+      ]
+    },
+    {
+      "after_bbox_dbu": [
+        0,
+        0,
+        4650,
+        4650
+      ],
+      "before_bbox_dbu": [
+        -2325,
+        -2325,
+        2325,
+        2325
+      ],
+      "nontext_geometry_records": 155,
+      "output_file": "SKY130_FD_PR__DIODE_PD2NW_05V5_WW7YB9.gds",
+      "output_sha256": "9ddedc67ee458c1c292891f9564ddcb780cf5f5baef417078228eb89a4f6216c",
+      "rigid_translation_only": true,
+      "source_file": "SKY130_FD_PR__DIODE_PD2NW_05V5_WW7YB9.gds",
+      "source_sha256": "45a55692719ffacbb80fe93e60c95deeefe1d9fd7f5156d9a744026910693d23",
+      "target_cell": "SKY130_FD_PR__DIODE_PD2NW_05V5_WW7YB9",
+      "text_records": 2,
+      "translation_dbu": [
+        2325,
+        2325
+      ]
+    }
+  ],
+  "schema": "semantic5_lna_blackbox_origins_v2",
+  "shape_or_connectivity_change": false,
+  "source_manifest": "semantic5_lna_blackbox_manifest.json",
+  "source_manifest_sha256": "b5d7bef973b54b06117bfa8c1af6b844a14f18127c421629ab5c4fda70247527"
+}

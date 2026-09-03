@@ -19,6 +19,16 @@ def pdk_layers():
     return {entry["Layer"]: entry for entry in data["Abstraction"]}
 
 
+class IndexOnlyPdk:
+    """Minimal stand-in for ALIGN's runtime Pdk facade."""
+
+    def __init__(self, layers):
+        self.layers = layers
+
+    def __getitem__(self, layer):
+        return self.layers[layer]
+
+
 def test_resistor_routing_uses_authoritative_sky130_metal_rules() -> None:
     pdk = pdk_layers()
     rules = MODULE.resistor_routing_rules(pdk)
@@ -27,6 +37,15 @@ def test_resistor_routing_uses_authoritative_sky130_metal_rules() -> None:
         for layer in ("M1", "M2", "M3")
     }
     assert not any(key.startswith("m1") for key in pdk["Cap"])
+
+
+def test_resistor_routing_accepts_align_index_only_pdk_facade() -> None:
+    pdk = pdk_layers()
+    rules = MODULE.resistor_routing_rules(IndexOnlyPdk(pdk))
+    assert rules == {
+        layer: {"pitch": pdk[layer]["Pitch"], "width": pdk[layer]["Width"]}
+        for layer in ("M1", "M2", "M3")
+    }
 
 
 def test_resistor_routing_rejects_nonphysical_geometry() -> None:
