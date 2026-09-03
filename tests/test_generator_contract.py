@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import importlib.util
 from types import SimpleNamespace
@@ -64,6 +65,19 @@ def test_decimal_mos_width_rejects_real_off_grid_value() -> None:
         MODULE.mos_width_to_nfin("1.0E-06", 210, "M1", "PMOS_TEST")
 
 
+def test_mos_height_expands_only_when_wide_device_requires_dummy_fins() -> None:
+    assert MODULE.mos_generator_height(4, 28) == 28
+    assert MODULE.mos_generator_height(8, 28) == 28
+    assert MODULE.mos_generator_height(12, 28) == 28
+    assert MODULE.mos_generator_height(20, 28) == 36
+    assert (36 - 20) // 2 == 8
+
+
+def test_wide_mos_height_tightens_one_sided_body_tap_row_limit() -> None:
+    height = MODULE.mos_generator_height(20, 28)
+    assert MODULE.maximum_one_sided_body_tap_rows(15000, height, 210) == 1
+
+
 def test_mos_aspect_variants_exclude_rows_beyond_body_tap_reach() -> None:
     primitives = {}
     args = {
@@ -122,3 +136,17 @@ def test_two_nwell_halos_guarantee_the_official_spacing() -> None:
     assert PLACEMENT.expand_bbox(
         (0, 0, 2580, 7560), halo_x=halo_x, halo_y=halo_y
     ) == (-860, -840, 3440, 8400)
+
+
+def test_placement_routing_channels_match_first_signal_track_pitches() -> None:
+    with (ROOT / "SKY130_PDK" / "layers.json").open(encoding="utf-8") as stream:
+        pdk = json.load(stream)
+
+    design = pdk["design_info"]
+    layers = {entry["Layer"]: entry for entry in pdk["Abstraction"]}
+
+    assert design["bottom_signal_routing_layer"] == "M1"
+    assert layers["M1"]["Direction"] == "V"
+    assert layers["M2"]["Direction"] == "H"
+    assert design["Hspace"] == layers["M1"]["Pitch"] == 430
+    assert design["Vspace"] == layers["M2"]["Pitch"] == 420

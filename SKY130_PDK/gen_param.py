@@ -104,6 +104,28 @@ def mos_width_to_nfin(width, fin_pitch_nm, device_name, primitive_name):
     return width_nm_int // pitch
 
 
+def mos_generator_height(
+        nfin, default_height, minimum_dummy_fins=8, height_quantum=4):
+    """Return the smallest legal MOS cell height for a physical fin count.
+
+    ``MOSGenerator`` requires at least eight dummy fins above and below the
+    active device and requires its total height to be a multiple of four.
+    The historical fixed height of 28 is valid through 12 active fins but is
+    too short for wider legal Sky130 devices such as the VCO's 20-fin PMOS.
+    """
+
+    nfin = int(nfin)
+    default_height = int(default_height)
+    minimum_dummy_fins = int(minimum_dummy_fins)
+    height_quantum = int(height_quantum)
+    if nfin <= 1 or default_height <= 0 or minimum_dummy_fins < 0:
+        raise ValueError("MOS fin count and default height must be positive")
+    if height_quantum <= 0:
+        raise ValueError("MOS height quantum must be positive")
+    required = max(default_height, nfin + 2 * minimum_dummy_fins)
+    return int(ceil(required / height_quantum) * height_quantum)
+
+
 def add_primitive(primitives, block_name, block_args, max_y_cells=None):
     if block_name in primitives:
         if not primitives[block_name] == block_args:
@@ -283,7 +305,11 @@ def gen_param(subckt, primitives, pdk_dir):
             'value': mvalues[device_name]["NFIN"],
             'x_cells': xval,
             'y_cells': yval,
-            'parameters': mvalues
+            'parameters': mvalues,
+            'height': mos_generator_height(
+                mvalues[device_name]["NFIN"],
+                design_config["mos_unit_height_fins"],
+            ),
         }
         if unit_counts:
             block_args['parameters']['unit_counts'] = unit_counts
@@ -293,7 +319,7 @@ def gen_param(subckt, primitives, pdk_dir):
             block_args['vt_type'] = vt[0]
         max_y_cells = maximum_one_sided_body_tap_rows(
             design_config["max_diffusion_to_body_tap_nm"],
-            design_config["mos_unit_height_fins"],
+            block_args["height"],
             design_config["Fin_pitch"],
         )
         add_primitive(
