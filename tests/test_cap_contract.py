@@ -235,11 +235,31 @@ def test_lower_metal_access_requires_connected_m3_v3_for_both_pins() -> None:
         ]
     )
     MODULE.validate_cap_terminal_topology(
-        terminals, require_lower_metal_access=True
+        terminals,
+        require_lower_metal_access=True,
+        v3_m3_end_enclosure=2,
     )
 
     terminals[-1]["rect"] = [100, 100, 110, 110]
     with pytest.raises(ValueError, match="MINUS M3/V3 access is disconnected"):
         MODULE.validate_cap_terminal_topology(
             terminals, require_lower_metal_access=True
+        )
+
+
+def test_lower_metal_access_rejects_insufficient_v3_end_enclosure() -> None:
+    terminals = valid_cap_terminals()
+    terminals.extend(
+        [
+            {"layer": "M3", "netName": "PLUS", "netType": "pin", "rect": [20, 4, 30, 10]},
+            {"layer": "V3", "netName": "PLUS", "netType": "drawing", "rect": [22, 4, 28, 10]},
+            {"layer": "M3", "netName": "MINUS", "netType": "pin", "rect": [20, 70, 30, 80]},
+            {"layer": "V3", "netName": "MINUS", "netType": "drawing", "rect": [22, 72, 28, 78]},
+        ]
+    )
+    with pytest.raises(ValueError, match="PLUS M3/V3 end enclosure"):
+        MODULE.validate_cap_terminal_topology(
+            terminals,
+            require_lower_metal_access=True,
+            v3_m3_end_enclosure=2,
         )

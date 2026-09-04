@@ -152,12 +152,12 @@ class CapGenerator(DefaultCanvas):
         )
         self.addWire(
             self.m3, 'PLUS', access_x_track,
-            (plus_m3_stop, -1), (plus_m3_stop, 1), netType='pin'
+            (plus_m3_stop - 1, -1), (plus_m3_stop + 1, 1), netType='pin'
         )
         self.addVia(self.v3, 'PLUS', access_x_track, plus_m4_track)
         self.addWire(
             self.m3, 'MINUS', access_x_track,
-            (minus_m3_stop, -1), (minus_m3_stop, 1), netType='pin'
+            (minus_m3_stop - 1, -1), (minus_m3_stop + 1, 1), netType='pin'
         )
         self.addVia(self.v3, 'MINUS', access_x_track, y_number_m4)
  
@@ -261,6 +261,7 @@ class CapGenerator(DefaultCanvas):
             require_routing_halo=True,
             m4_width=self.pdk['M4']['Width'],
             require_lower_metal_access=True,
+            v3_m3_end_enclosure=self.pdk['V3']['VencA_L'],
         )
 
         #self.addRegion( self.Cboundary, 'Cboundary', None,

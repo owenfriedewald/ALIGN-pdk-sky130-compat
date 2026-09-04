@@ -173,6 +173,7 @@ def validate_cap_terminal_topology(
     require_routing_halo=False,
     m4_width=None,
     require_lower_metal_access=False,
+    v3_m3_end_enclosure=None,
 ):
     """Reject MIM primitives whose streamed device topology is inconsistent.
 
@@ -221,6 +222,18 @@ def validate_cap_terminal_topology(
             ):
                 raise ValueError(
                     f"MIM capacitor {net_name} M3/V3 access is disconnected"
+                )
+            if v3_m3_end_enclosure is not None and not any(
+                lower["rect"][1]
+                <= via["rect"][1] - v3_m3_end_enclosure
+                and lower["rect"][3]
+                >= via["rect"][3] + v3_m3_end_enclosure
+                for via in v3_access
+                for lower in m3_access
+                if _positive_area_overlap(via["rect"], lower["rect"])
+            ):
+                raise ValueError(
+                    f"MIM capacitor {net_name} M3/V3 end enclosure is insufficient"
                 )
 
     if not any("pin" in shape.get("netType", "") for shape in plus_m4):
