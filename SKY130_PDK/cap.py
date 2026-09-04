@@ -6,6 +6,7 @@ from align.cell_fabric.grid import *
 from .cap_contract import (
     highest_grid_track_with_positive_overlap,
     horizontal_pin_placement_grid_constraint,
+    routing_track_blockage_rects,
     validate_cap_terminal_topology,
 )
 
@@ -135,6 +136,30 @@ class CapGenerator(DefaultCanvas):
         # PLUS must reach CAPM and MINUS must reach the broad M4 bottom plate.
         self.addWire( self.m4, 'MINUS', y_number_m4, (-1, -1), (gridx2, 1), netType = 'pin')
         self.addWire( self.m4, 'PLUS', -1, (-1, -1), (gridx2, 1), netType = 'pin')
+
+        # Give both terminals an explicit M3/V3 access point.  M4 is
+        # horizontal, so a routing halo on that layer must not be the only
+        # possible entrance to the terminal.  Track 2 lies outside the CAPM
+        # device rectangle for the minimum legal capacitor while remaining
+        # inside both wide M4 pins.
+        access_x_track = 2
+        plus_m4_track = -1
+        plus_m3_stop = (
+            plus_m4_track * self.pdk['M4']['Pitch'] // self.pdk['M2']['Pitch']
+        )
+        minus_m3_stop = (
+            y_number_m4 * self.pdk['M4']['Pitch'] // self.pdk['M2']['Pitch']
+        )
+        self.addWire(
+            self.m3, 'PLUS', access_x_track,
+            (plus_m3_stop, -1), (plus_m3_stop, 1), netType='pin'
+        )
+        self.addVia(self.v3, 'PLUS', access_x_track, plus_m4_track)
+        self.addWire(
+            self.m3, 'MINUS', access_x_track,
+            (minus_m3_stop, -1), (minus_m3_stop, 1), netType='pin'
+        )
+        self.addVia(self.v3, 'MINUS', access_x_track, y_number_m4)
  
         self.addRegion( self.boundary, 'Boundary', -2, -6,
                         x_number+1,
@@ -157,11 +182,6 @@ class CapGenerator(DefaultCanvas):
             and t["rect"][1] <= capm["rect"][1]
             and t["rect"][2] >= capm["rect"][2]
             and t["rect"][3] >= capm["rect"][3]
-        )
-        bottom_pin = next(
-            t
-            for t in self.terminals
-            if t["layer"] == "M4" and t.get("netName") == "MINUS"
         )
         boundary = next(t for t in self.terminals if t["layer"] == "Boundary")
 
@@ -195,24 +215,25 @@ class CapGenerator(DefaultCanvas):
 
         capm_rect = capm["rect"]
         plate_rect = bottom_plate["rect"]
-        bottom_pin_rect = bottom_pin["rect"]
         halo = [
             capm_rect[0] - clearance,
             capm_rect[1] - clearance,
             capm_rect[2] + clearance,
             capm_rect[3] + clearance,
         ]
-        blockage_rects = [
-            [halo[0], halo[1], plate_rect[0], halo[3]],
-            [plate_rect[2], halo[1], halo[2], halo[3]],
-            [plate_rect[0], halo[1], plate_rect[2], plate_rect[1]],
-            [
-                plate_rect[0],
-                max(plate_rect[3], bottom_pin_rect[3]),
-                plate_rect[2],
-                halo[3],
-            ],
+        conductive_m4_rects = [
+            terminal["rect"]
+            for terminal in self.terminals
+            if terminal["layer"] == "M4"
+            and terminal.get("netType") != "blockage"
         ]
+        blockage_rects = routing_track_blockage_rects(
+            halo,
+            conductive_m4_rects,
+            pitch=self.pdk['M4']['Pitch'],
+            width=self.pdk['M4']['Width'],
+            offset=self.pdk['M4']['Offset'],
+        )
         for rect in blockage_rects:
             if rect[0] < rect[2] and rect[1] < rect[3]:
                 self.transform_and_add(
@@ -238,6 +259,8 @@ class CapGenerator(DefaultCanvas):
             m4_offset=self.pdk['M4']['Offset'],
             unrelated_m4_spacing=required_unrelated_m4_clearance,
             require_routing_halo=True,
+            m4_width=self.pdk['M4']['Width'],
+            require_lower_metal_access=True,
         )
 
         #self.addRegion( self.Cboundary, 'Cboundary', None,

@@ -28,13 +28,20 @@ def valid_cap_terminals():
 
 def valid_cap_terminals_with_halo():
     terminals = valid_cap_terminals()
-    terminals.extend(
-        [
-            {"layer": "M4", "netName": None, "netType": "blockage", "rect": [5, 10, 15, 80]},
-            {"layer": "M4", "netName": None, "netType": "blockage", "rect": [80, 10, 90, 80]},
-            {"layer": "M4", "netName": None, "netType": "blockage", "rect": [15, 10, 80, 20]},
-        ]
-    )
+    halo = [5, 10, 90, 80]
+    conductive = [
+        terminal["rect"]
+        for terminal in terminals
+        if terminal["layer"] == "M4"
+    ]
+    terminals.extend({
+        "layer": "M4",
+        "netName": None,
+        "netType": "blockage",
+        "rect": rect,
+    } for rect in MODULE.routing_track_blockage_rects(
+        halo, conductive, pitch=10, width=10, offset=5
+    ))
     terminals.append(
         {"layer": "Boundary", "netName": "Boundary", "netType": "drawing", "rect": [0, 0, 100, 100]}
     )
@@ -177,6 +184,9 @@ def test_insufficient_capm_to_unrelated_m4_spacing_is_rejected() -> None:
 def test_complete_routing_halo_passes() -> None:
     MODULE.validate_cap_terminal_topology(
         valid_cap_terminals_with_halo(),
+        m4_pitch=10,
+        m4_offset=5,
+        m4_width=10,
         unrelated_m4_spacing=15,
         require_routing_halo=True,
     )
@@ -188,6 +198,48 @@ def test_incomplete_routing_halo_is_rejected() -> None:
     with pytest.raises(ValueError, match="routing-only M4 halo"):
         MODULE.validate_cap_terminal_topology(
             terminals,
+            m4_pitch=10,
+            m4_offset=5,
+            m4_width=10,
             unrelated_m4_spacing=15,
             require_routing_halo=True,
+        )
+
+
+def test_routing_halo_uses_only_legal_width_tracks_and_preserves_pins() -> None:
+    halo = [80, 1660, 3800, 5380]
+    conductive = [
+        [1290, 2870, 2590, 4170],
+        [695, 3380, 2745, 4180],
+        [695, 860, 2745, 1660],
+    ]
+    blockages = MODULE.routing_track_blockage_rects(
+        halo, conductive, pitch=1260, width=800
+    )
+
+    assert blockages
+    assert all(rect[3] - rect[1] == 800 for rect in blockages)
+    assert all(((rect[1] + rect[3]) // 2) % 1260 == 0 for rect in blockages)
+    minus_pin = conductive[1]
+    assert not any(MODULE._positive_area_overlap(rect, minus_pin) for rect in blockages)
+
+
+def test_lower_metal_access_requires_connected_m3_v3_for_both_pins() -> None:
+    terminals = valid_cap_terminals()
+    terminals.extend(
+        [
+            {"layer": "M3", "netName": "PLUS", "netType": "pin", "rect": [20, 0, 30, 20]},
+            {"layer": "V3", "netName": "PLUS", "netType": "drawing", "rect": [22, 4, 28, 10]},
+            {"layer": "M3", "netName": "MINUS", "netType": "pin", "rect": [20, 65, 30, 85]},
+            {"layer": "V3", "netName": "MINUS", "netType": "drawing", "rect": [22, 72, 28, 78]},
+        ]
+    )
+    MODULE.validate_cap_terminal_topology(
+        terminals, require_lower_metal_access=True
+    )
+
+    terminals[-1]["rect"] = [100, 100, 110, 110]
+    with pytest.raises(ValueError, match="MINUS M3/V3 access is disconnected"):
+        MODULE.validate_cap_terminal_topology(
+            terminals, require_lower_metal_access=True
         )

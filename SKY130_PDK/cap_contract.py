@@ -107,6 +107,63 @@ def _contains(outer, inner):
     )
 
 
+def routing_track_blockage_rects(
+    halo,
+    conductive_rects,
+    *,
+    pitch,
+    width,
+    offset=0,
+):
+    """Cover a horizontal-layer halo with legal-width routing obstructions.
+
+    A broad rectangular obstruction on a unidirectional routing layer is
+    interpreted by ALIGN's duplicate checker as a conductor with a nonstandard
+    width.  More importantly, such a rectangle can overlap and seal a legal
+    pin.  This helper instead blocks only the uncovered portions of each M4
+    routing track.  Existing plate and pin metal remains available as the
+    obstacle on its occupied interval, leaving named pins reachable through
+    the orthogonal routing layer.
+    """
+
+    if len(halo) != 4 or halo[0] >= halo[2] or halo[1] >= halo[3]:
+        raise ValueError("routing halo must be a nonempty rectangle")
+    if pitch <= 0 or width <= 0 or width % 2:
+        raise ValueError("routing pitch and even width must be positive")
+    if not 0 <= offset < pitch:
+        raise ValueError("routing offset must lie within the pitch")
+
+    half_width = width // 2
+    first_track = (halo[1] - half_width - offset) // pitch
+    last_track = (halo[3] + half_width - offset - 1) // pitch
+    result = []
+    for track in range(first_track, last_track + 1):
+        center = offset + track * pitch
+        track_bottom = center - half_width
+        track_top = center + half_width
+        if min(track_top, halo[3]) <= max(track_bottom, halo[1]):
+            continue
+
+        intervals = []
+        for rect in conductive_rects:
+            if min(track_top, rect[3]) <= max(track_bottom, rect[1]):
+                continue
+            left = max(halo[0], rect[0])
+            right = min(halo[2], rect[2])
+            if left < right:
+                intervals.append((left, right))
+        intervals.sort()
+
+        cursor = halo[0]
+        for left, right in intervals:
+            if left > cursor:
+                result.append([cursor, track_bottom, left, track_top])
+            cursor = max(cursor, right)
+        if cursor < halo[2]:
+            result.append([cursor, track_bottom, halo[2], track_top])
+    return result
+
+
 def validate_cap_terminal_topology(
     terminals,
     *,
@@ -114,6 +171,8 @@ def validate_cap_terminal_topology(
     m4_offset=0,
     unrelated_m4_spacing=None,
     require_routing_halo=False,
+    m4_width=None,
+    require_lower_metal_access=False,
 ):
     """Reject MIM primitives whose streamed device topology is inconsistent.
 
@@ -141,6 +200,28 @@ def validate_cap_terminal_topology(
         for shape in _shapes(terminals, layer="M4")
         if shape.get("netType") == "blockage"
     ]
+
+    if require_lower_metal_access:
+        for net_name in ("PLUS", "MINUS"):
+            m3_access = _shapes(terminals, layer="M3", net_name=net_name)
+            v3_access = _shapes(terminals, layer="V3", net_name=net_name)
+            m4_access = _shapes(terminals, layer="M4", net_name=net_name)
+            if not m3_access or not v3_access:
+                raise ValueError(
+                    f"MIM capacitor {net_name} requires M3/V3 routing access"
+                )
+            if not any(
+                _positive_area_overlap(via["rect"], lower["rect"])
+                for via in v3_access
+                for lower in m3_access
+            ) or not any(
+                _positive_area_overlap(via["rect"], upper["rect"])
+                for via in v3_access
+                for upper in m4_access
+            ):
+                raise ValueError(
+                    f"MIM capacitor {net_name} M3/V3 access is disconnected"
+                )
 
     if not any("pin" in shape.get("netType", "") for shape in plus_m4):
         raise ValueError("MIM capacitor requires a routable PLUS pin on M4")
@@ -203,34 +284,38 @@ def validate_cap_terminal_topology(
             )
         if not m4_blockages:
             raise ValueError("MIM capacitor requires routing-only M4 halo blockages")
+        if m4_pitch is None or m4_width is None:
+            raise ValueError("MIM routing halo requires M4 pitch and width")
         cap_rect = capm[0]["rect"]
-        plate_rect = plate_candidates[0]["rect"]
-        bottom_pin_top = max(shape["rect"][3] for shape in minus_m4)
         halo = [
             cap_rect[0] - unrelated_m4_spacing,
             cap_rect[1] - unrelated_m4_spacing,
             cap_rect[2] + unrelated_m4_spacing,
             cap_rect[3] + unrelated_m4_spacing,
         ]
-        required_regions = [
-            [halo[0], halo[1], plate_rect[0], halo[3]],
-            [plate_rect[2], halo[1], halo[2], halo[3]],
-            [plate_rect[0], halo[1], plate_rect[2], plate_rect[1]],
-            [
-                plate_rect[0],
-                max(plate_rect[3], bottom_pin_top),
-                plate_rect[2],
-                halo[3],
-            ],
-        ]
+        conductive_rects = [shape["rect"] for shape in device_m4 + plus_m4 + minus_m4]
+        required_regions = routing_track_blockage_rects(
+            halo,
+            conductive_rects,
+            pitch=m4_pitch,
+            width=m4_width,
+            offset=m4_offset,
+        )
         for region in required_regions:
-            if region[0] >= region[2] or region[1] >= region[3]:
-                continue
-            if not any(_contains(blockage["rect"], region) for blockage in m4_blockages):
+            if not any(
+                _contains(blockage["rect"], region)
+                for blockage in m4_blockages
+            ):
                 raise ValueError(
                     "MIM capacitor routing-only M4 halo does not cover "
                     f"required region {region}"
                 )
+        for blockage in m4_blockages:
+            rect = blockage["rect"]
+            if rect[3] - rect[1] != m4_width:
+                raise ValueError("MIM capacitor M4 blockage has nonstandard width")
+            if ((rect[1] + rect[3]) // 2 - m4_offset) % m4_pitch:
+                raise ValueError("MIM capacitor M4 blockage is off grid")
 
         boundaries = _shapes(terminals, layer="Boundary")
         if len(boundaries) != 1 or not _contains(boundaries[0]["rect"], halo):

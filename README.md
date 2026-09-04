@@ -38,9 +38,11 @@ fails immediately instead of falling back to runtime source mutation.
 
 The MIM-capacitor primitive carries the official CAPM recognition layer and
 its dedicated contact into native streamout.  Its abstract macro also exposes
-the official CAPM-to-unrelated-metal3 clearance as routing-only M4
-obstructions.  These obstructions remain in LEF for routing but require an
-ALIGN exporter that omits `netType=blockage` rectangles from physical GDS.
+the official CAPM-to-unrelated-metal3 clearance as legal-width, grid-aligned
+routing-only M4 obstructions, while explicit M3/V3 access points keep both
+formal terminals reachable.  These obstructions remain in LEF for routing but
+require an ALIGN exporter that omits `netType=blockage` rectangles from
+physical GDS.
 The LVS normalizer can reclassify a specifically named ideal capacitor as the
 Sky130 MIM subcircuit with `--mim-cap-instance`; this opt-in conversion never
 changes unrelated ideal capacitors.
